@@ -4,21 +4,18 @@
 			<div class="col-md-5">
 				<h2>info</h2>
 			</div>
-			<div class="col-md-7">
-				<h2>items</h2>
-				<list-items :items="items"></list-items>
-			</div>
+			<list-items :items="items"></list-items>
 		</div>
 	</div>
 </template>
 
 <script>
-import ListItems from './ListItems'
+import ListItems from './items/ItemList'
 
 export default {
 	data() {
 		return {
-			items: []
+			items: [],
 		}
 	},
 
@@ -46,3 +43,9 @@ export default {
 	components: { ListItems }
 }	
 </script>
+
+<style lang="scss">
+.pack {
+	padding-top: 5px;
+}
+</style>

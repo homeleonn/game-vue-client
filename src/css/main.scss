@@ -18,12 +18,14 @@ body {
     height: 100%;
     font-size: 14px;
     font-family: Tahoma, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    overflow-x: hidden;
 }
 
 body {
     display: flex;
     flex-direction: column;
     background-color: var(--back);
+
 }
 
 *,:after,:before {

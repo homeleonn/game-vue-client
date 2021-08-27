@@ -14,17 +14,17 @@
 </template>
 
 <script>
-// import { defineAsyncComponent } from 'vue'
+import { defineAsyncComponent } from 'vue'
 import { mapMutations } from 'vuex'
 import GameHeader from './GameHeader'
 import GameFooter from './GameFooter'
 import LocationWrapper from './LocationWrapper'
-import UserBackpack from './user/UserBackpack'
+// import UserBackpack from './user/UserBackpack'
 import Api from '../api/api.js';
 
-// const UserBackpack = defineAsyncComponent(() =>
-//   import('./user/UserBackpack.vue')
-// )
+const UserBackpack = defineAsyncComponent(() =>
+  import('./user/backpack/UserBackpack.vue')
+)
 
 const api = new Api();
 
