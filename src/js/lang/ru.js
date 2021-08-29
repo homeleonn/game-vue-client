@@ -82,4 +82,5 @@ export const langValue = {
 	mace: 'молот',
 	'fishing rod': 'удочка',
 	gift: 'подарок',
+	trash: 'мусор',
 };

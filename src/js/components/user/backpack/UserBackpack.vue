@@ -4,29 +4,25 @@
 			<div class="col-md-5">
 				<h2>info</h2>
 			</div>
-			<item-list :items="items"></item-list>
+			<item-lists :items="items"></item-lists>
 		</div>
 	</div>
 </template>
 
 <script>
-import ItemList from './items/ItemList'
+import ItemLists from './items/ItemLists'
 
 export default {
-	data() {
-		return {
-			items: [],
-		}
-	},
+	components: { ItemLists },
 
 	inject: [
 		'api',
 		'apiSubscribe'
 	],
 
-	methods: {
-		backpack(backpack) {
-			this.items = backpack;
+	data() {
+		return {
+			items: [],
 		}
 	},
 
@@ -40,7 +36,11 @@ export default {
 		this.api.getBackPack();
 	},
 
-	components: { ItemList }
+	methods: {
+		backpack(backpack) {
+			this.items = backpack;
+		}
+	}
 }	
 </script>
 
