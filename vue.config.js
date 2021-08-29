@@ -2,7 +2,8 @@ module.exports = {
   devServer: {
     proxy: {
       '^/api': {
-        target: 'http://fightworld.loc',
+        // target: 'http://fightworld.loc',
+        target: 'http://fw.lobbet.com',
         ws: true,
         changeOrigin: true
         }

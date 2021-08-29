@@ -4,13 +4,13 @@
 			<div class="col-md-5">
 				<h2>info</h2>
 			</div>
-			<list-items :items="items"></list-items>
+			<item-list :items="items"></item-list>
 		</div>
 	</div>
 </template>
 
 <script>
-import ListItems from './items/ItemList'
+import ItemList from './items/ItemList'
 
 export default {
 	data() {
@@ -40,7 +40,7 @@ export default {
 		this.api.getBackPack();
 	},
 
-	components: { ListItems }
+	components: { ItemList }
 }	
 </script>
 

@@ -156,5 +156,9 @@ export default {
 </script>
 
 <style lang="scss">
-	
+
+.center {
+	text-align: center;
+}
+
 </style>

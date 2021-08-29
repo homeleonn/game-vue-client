@@ -22,6 +22,7 @@ module.exports = {
     'eol-last': 'off',
     'no-tabs': 'off',
     'no-undef': 'off',
+    'no-unreachable': 'off',
     'quotes': 'off'
   }
 }

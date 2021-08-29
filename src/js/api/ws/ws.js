@@ -1,4 +1,4 @@
-import { host, port } from '@/../.env.js';
+import { host, port, tokenUrl } from '@/../.env.js';
 
 const DUPLICATE = '1';
 
@@ -17,7 +17,7 @@ export class Server {
   }
 
   async connectViaToken() {
-    const res = await fetch('http://framework.loc/wsToken');
+    const res = await fetch(tokenUrl);
     const token = await res.text();
     if (res === 'error') {
       throw new Error('Session error');
