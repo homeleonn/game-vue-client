@@ -1,19 +1,18 @@
 <template>
 	<div class="pack">
 		<div class="row">
-			<div class="col-md-5">
-				<h2>info</h2>
-			</div>
-			<item-lists :items="items"></item-lists>
+			<user-form :items="wearedItems"></user-form>
+			<item-lists :items="packedItems"></item-lists>
 		</div>
 	</div>
 </template>
 
 <script>
 import ItemLists from './items/ItemLists'
+import UserForm from './form/UserForm'
 
 export default {
-	components: { ItemLists },
+	components: { ItemLists, UserForm },
 
 	inject: [
 		'api',
@@ -36,9 +35,21 @@ export default {
 		this.api.getBackPack();
 	},
 
+	computed: {
+		packedItems() {
+			// return this.items;
+			return this.items.filter(item => item.loc === 'INVENTORY');
+		},
+
+		wearedItems() {
+			return this.items.filter(item => item.loc === 'WEARING');
+		}
+	},
+
 	methods: {
 		backpack(backpack) {
 			this.items = backpack;
+			// cl(backpack);
 		}
 	}
 }	
