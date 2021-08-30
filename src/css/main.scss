@@ -1,6 +1,10 @@
 @import "bootstrap-grid.min.css";
 @import "fontello.css";
 
+.row {
+    --bs-gutter-x: 0;
+}
+
 :root {
     --color: #90ee90;
     // --color: #ff0;

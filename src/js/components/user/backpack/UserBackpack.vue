@@ -4,15 +4,17 @@
 			<user-form :items="wearedItems"></user-form>
 			<item-lists :items="packedItems"></item-lists>
 		</div>
+		<item-info></item-info>
 	</div>
 </template>
 
 <script>
 import ItemLists from './items/ItemLists'
 import UserForm from './form/UserForm'
+import ItemInfo from '../../modal/ItemInfo'
 
 export default {
-	components: { ItemLists, UserForm },
+	components: { ItemLists, UserForm, ItemInfo },
 
 	inject: [
 		'api',

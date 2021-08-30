@@ -1,6 +1,6 @@
 <template>
-	{{item}}
-	<div class="item-info" v-if="item">
+	{{activeItem}}
+	<div class="item-info" v-if="activeItem">
 		<div class="name">{{ item.name }}</div>
 		<div class="info">
 			<div class="main row">
@@ -30,16 +30,29 @@
 
 <script>
 import { langKey, langValue } from '../../lang/ru';
+import { mapGetters } from 'vuex'
 
 export default {
-	props: ['item'],
-
 	data() {
 		return {
+			item: null,
 			itemProps: {},
-			activeItem: false,
 			
 			autoList: ['power', 'critical', 'evasion', 'stamina', 'hp', 'mf_crit', 'mf_acrit', 'mf_evas', 'mf_aevas', 'weight', 'item_type', 'material']
+		}
+	},
+
+	computed: {
+		...mapGetters(['activeItem']),
+		// item() {
+		// 	return this.$store.activeItem;
+		// }
+	},
+
+	watch: {
+		activeItem(item) {
+			this.item = item;
+			this.itemPropsView(item)
 		}
 	},
 
@@ -74,15 +87,7 @@ export default {
 		langValue(value) {
 			return langValue[value];
 		}
-	},
-
-	watch: {
-		item(item) {
-			this.itemPropsView(item)
-		}
 	}
-
-
 }
 </script>
 

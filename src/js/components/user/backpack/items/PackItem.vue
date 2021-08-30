@@ -1,17 +1,21 @@
 <template>
 	<img 
 		:src="item.image" 
-		@mouseenter="$emit('setActiveItem', item)" 
-		@mouseleave="$emit('setActiveItem', false)"
+		@mouseenter="SET_ACTIVE_ITEM(item)" 
+		@mouseleave="SET_ACTIVE_ITEM(false)" 
 	>
 </template>
 
 <script>
+import { mapMutations } from 'vuex'
+
 export default {
 	props: {
 		item: Object
 	},
 
-	emits: ['setActiveItem']
+	methods: {
+		...mapMutations(['SET_ACTIVE_ITEM'])
+	}
 }
 </script>

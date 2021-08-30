@@ -13,27 +13,24 @@
 		<div class="backpack-items">
 			
 			<div v-if="currentTab === 'main'">
-				<item-list :items="itemsByType.armors" @setActiveItem="setActiveItem">
+				<item-list :items="itemsByType.armors">
 					<small class="center">Вещи</small>
 				</item-list>
 
-				<item-list :items="itemsByType.supplies" @setActiveItem="setActiveItem">
+				<item-list :items="itemsByType.supplies">
 					<small class="center">Расходные материалы</small>
 				</item-list>
 			</div>
 			
 			<div v-else>
-				<item-list :items="itemsByType[currentTab]" @setActiveItem="setActiveItem"></item-list>
+				<item-list :items="itemsByType[currentTab]"></item-list>
 			</div>
 		
 		</div>
-		
-		<item-info :item="activeItem"></item-info>
 	</div>
 </template>
 
 <script>
-import ItemInfo from '@/js/components/modal/ItemInfo'
 import ItemList from './ItemList'
 
 export default {
@@ -41,11 +38,10 @@ export default {
 		items: Array
 	},
 
-	components: { ItemInfo, ItemList },
+	components: { ItemList },
 
 	data() {
 		return {
-			itemProps: '',
 			activeItem: false,
 			currentTab: 'main',
 			itemsByType: {
@@ -84,9 +80,7 @@ export default {
 	},
 
 	methods: {
-		setActiveItem(item) {
-			this.activeItem = item;
-		}
+		
 	}
 }
 </script>

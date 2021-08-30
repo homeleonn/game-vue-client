@@ -8,6 +8,7 @@ export default createStore({
     locationUsers: [],
     closestLocations: {},
     activeLocation: false,
+    activeItem: null,
     dbLog: [],
     csrf: ''
   },
@@ -52,12 +53,20 @@ export default createStore({
 
     SET_CSRF(state, csrf) {
       state.csrf = csrf;
+    },
+
+    SET_ACTIVE_ITEM(state, item) {
+      state.activeItem = item;
     }
   },
 
   getters: {
     user(state) {
       return state.user;
+    },
+
+    activeItem(state) {
+      return state.activeItem;
     },
 
     csrf(state) {
