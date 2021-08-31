@@ -59,10 +59,13 @@ export default {
 </script>
 
 <style lang="scss">
+
 .user-form {
 
 .row {
-	line-height: 0;
+	> * {
+		line-height: 0;
+	}
 }
 
 > .row {

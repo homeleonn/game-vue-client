@@ -38,15 +38,12 @@ export default {
 			item: null,
 			itemProps: {},
 			
-			autoList: ['power', 'critical', 'evasion', 'stamina', 'hp', 'mf_crit', 'mf_acrit', 'mf_evas', 'mf_aevas', 'weight', 'item_type', 'material']
+			autoList: ['power', 'critical', 'evasion', 'stamina', 'hp', 'weight', 'item_type', 'material']
 		}
 	},
 
 	computed: {
 		...mapGetters(['activeItem']),
-		// item() {
-		// 	return this.$store.activeItem;
-		// }
 	},
 
 	watch: {
@@ -64,13 +61,11 @@ export default {
 			
 			this.autoList.forEach(key => {
 				const checkKey = +item[key];
-				// cl(key, checkKey);
 				if (checkKey !== 0) {
 					const value = isNaN(checkKey) ? item[key] : '+' + item[key];
 					this.addItemProp(item.item_id, key, value);
 				}	
 			});
-			// cl(this.itemProps[item.item_id]);
 
 			if (item.item_type === 'weapon') {
 				this.addItemProp(item.item_id, 'Урон', `+${item.min_damage}...+${item.max_damage}`, true)
