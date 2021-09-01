@@ -13,17 +13,17 @@
 		<div class="backpack-items">
 			
 			<div v-if="currentTab === 'main'">
-				<item-list :items="itemsByType.armors">
+				<item-list :items="itemsByType.armors" usage="Надеть" @removeItem="itemId => $emit('removeItem', itemId)" @wearItem="itemId => $emit('wearItem', itemId)">
 					<small class="center">Вещи</small>
 				</item-list>
 
-				<item-list :items="itemsByType.supplies">
+				<item-list :items="itemsByType.supplies" usage="Исп-ть">
 					<small class="center">Расходные материалы</small>
 				</item-list>
 			</div>
 			
 			<div v-else>
-				<item-list :items="itemsByType[currentTab]"></item-list>
+				<item-list :items="itemsByType[currentTab]" @removeItem="itemId => $emit('removeItem', itemId)"></item-list>
 			</div>
 		
 		</div>
@@ -37,6 +37,8 @@ export default {
 	props: {
 		items: Array
 	},
+
+	emits: ['removeItem', 'wearItem'],
 
 	components: { ItemList },
 

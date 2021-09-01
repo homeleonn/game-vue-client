@@ -8,6 +8,7 @@ export default createStore({
     locationUsers: [],
     closestLocations: {},
     activeLocation: false,
+    userItems: null,
     activeItem: null,
     dbLog: [],
     csrf: ''
@@ -16,6 +17,10 @@ export default createStore({
   mutations: {
     SET_USER(state, user) {
       state.user = user;
+    },
+
+    SET_USER_ITEMS(state, items) {
+      state.userItems = items;
     },
 
     SET_USER_LOCATION(state, locationId) {
@@ -63,6 +68,10 @@ export default createStore({
   getters: {
     user(state) {
       return state.user;
+    },
+
+    userItems(state) {
+      return state.userItems;
     },
 
     activeItem(state) {

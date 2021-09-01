@@ -2,7 +2,7 @@
 	<div class="pack">
 		<div class="row">
 			<user-form :items="wearedItems"></user-form>
-			<item-lists :items="packedItems"></item-lists>
+			<item-lists :items="packedItems" @removeItem="removeItem" @wearItem="wearItem"></item-lists>
 		</div>
 		<item-info></item-info>
 	</div>
@@ -39,12 +39,11 @@ export default {
 
 	computed: {
 		packedItems() {
-			// return this.items;
-			return this.items.filter(item => item.loc === 'INVENTORY');
+			return this.filterByLoc(this.items, 'INVENTORY');
 		},
 
 		wearedItems() {
-			return this.items.filter(item => item.loc === 'WEARING');
+			return this.filterByLoc(this.items, 'WEARING');
 		}
 	},
 
@@ -52,6 +51,28 @@ export default {
 		backpack(backpack) {
 			this.items = backpack;
 			// cl(backpack);
+		},
+
+		removeItem(itemId) {
+			// cl(itemId);
+			this.api.removeItem(itemId);
+		},
+
+		wearItem(itemId) {
+			// cl(itemId);
+			this.api.wearItem(itemId);
+		},
+
+		filterByLoc(items, loc) {
+			const filteredItems = [];
+			
+			for (const itemId in items) {
+				if (items[itemId].loc === loc) {
+					filteredItems.push(items[itemId]);
+				}
+			}
+
+			return filteredItems;
 		}
 	}
 }	

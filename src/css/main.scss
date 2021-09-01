@@ -1,6 +1,10 @@
 @import "bootstrap-grid.min.css";
 @import "fontello.css";
 
+.center {
+    text-align: center;
+}
+
 .row {
     --bs-gutter-x: 0;
 }
@@ -163,13 +167,15 @@ body > *,
     // flex-shrink: 0;
 }
 
+header + div {
+    margin-bottom: var(--chat-height);
+}
 
 
 #location-wrapper {
     border: 2px green solid;
     flex-grow: 1;
     overflow-y: auto;
-    margin-bottom: var(--chat-height);
     transition: .5s;
 }
 

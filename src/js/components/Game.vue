@@ -1,14 +1,14 @@
 <template>
 	<game-header @setCurComp="setCurComp"></game-header>
 	<!-- <location-wrapper @chloc="changeLocation"></location-wrapper> -->
-	<keep-alive>
+	<!-- <keep-alive> -->
 		<component 
 			:is="currentMainComponent" 
 			@chloc="changeLocation"
 			>
 			
 		</component>
-	</keep-alive>
+	<!-- </keep-alive> -->
 
 	<game-footer @sendMessage="sendMessage"></game-footer>
 </template>
@@ -154,11 +154,3 @@ export default {
 	components: { GameHeader, GameFooter, LocationWrapper, UserBackpack },
 };
 </script>
-
-<style lang="scss">
-
-.center {
-	text-align: center;
-}
-
-</style>

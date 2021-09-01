@@ -117,6 +117,16 @@ export class WS {
     this.send({ getBackPack: true });
   }
 
+  removeItem(itemId) {
+    this.send({ removeItem: itemId });
+  }
+
+  wearItem(itemId) {
+    this.send({ wearItem: itemId });
+  }
+
+  
+
 
   // subscribe to events
   subscribe(event, cb, ctx) {
