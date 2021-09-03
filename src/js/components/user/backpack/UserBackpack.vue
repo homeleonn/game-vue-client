@@ -35,7 +35,6 @@ export default {
 
 	mounted() {
 		this.api.getBackPack();
-		cl(this.$store)
 	},
 
 	computed: {

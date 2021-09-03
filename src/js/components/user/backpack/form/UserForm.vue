@@ -2,14 +2,14 @@
 	<div class="user-form col-md-5">
 		<div class="row">
 			<div class="user-form__left">
-				<div class="user-form__slot" v-for="(item, idx) in ['head', 'lrhand', 'chest', 'underwear']" :key="idx">
+				<div class="user-form__slot" v-for="(item, idx) in ['head', 'rhand', 'chest']" :key="idx">
 					<pack-item :item="getSlot(item)" usage="Снять"></pack-item>
 				</div>
 			</div>
 			<div class="user-form__image"><img :src="'/img/images/0.png'"></div>
 			<div class="user-form__right">
 				<div class="user-form__slot" v-for="(item, idx) in ['gloves', 'lhand', 'legs', 'feet']" :key="idx">
-					<pack-item :item="getSlot(item)"></pack-item>
+					<pack-item :item="getSlot(item)" usage="Снять"></pack-item>
 				</div>
 			</div>
 		</div>
@@ -63,7 +63,12 @@ export default {
 	methods: {
 		// рубаху убрать
 		getSlot(bodyPart) {
-			const item = this.items.filter(item => item.body_part === bodyPart);
+			const parts = [bodyPart];
+			if (bodyPart === 'rhand') {
+				parts.push('dblhand');
+			}
+
+			const item = this.items.filter(item => parts.includes(item.body_part));
 			return item[0] ? item[0] : { image: `/img/slots/${bodyPart}.png` };
 		},
 	}
@@ -96,7 +101,6 @@ export default {
 
 &__slot {
 	height: 60px;
-	border: 1px solid #d5d5d5;
 	// border-top: transparent;
 	// border-right: transparent;
 }

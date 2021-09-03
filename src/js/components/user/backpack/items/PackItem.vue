@@ -93,10 +93,17 @@ export default {
 
 <style lang="scss">
 .pack-item {
+	overflow: hidden;
 display: flex;
 position: relative;
 line-height: 1.5;
 align-items: center;
+	border: 1px solid #d5d5d5;
+> img {
+	width: 60px;
+	height: 60px;
+}
+
 
 
 &:hover {

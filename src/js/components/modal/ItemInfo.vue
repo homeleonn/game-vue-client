@@ -97,6 +97,11 @@ export default {
 	z-index: 999;
 	min-width: 300px;
 
+	img {
+		width: 60px;
+		height: 60px;
+	}
+
 	> * {
 		padding: 3px
 	}
