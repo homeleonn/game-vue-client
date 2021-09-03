@@ -23,7 +23,7 @@ export default {
 
 	data() {
 		return {
-			items: [],
+			// items: [],
 		}
 	},
 
@@ -35,9 +35,14 @@ export default {
 
 	mounted() {
 		this.api.getBackPack();
+		cl(this.$store)
 	},
 
 	computed: {
+		items() {
+			return this.$store.state.userItems;
+		},
+
 		packedItems() {
 			return this.filterByLoc(this.items, 'INVENTORY');
 		},
@@ -49,8 +54,9 @@ export default {
 
 	methods: {
 		backpack(backpack) {
-			this.items = backpack;
+			// this.items = backpack;
 			// cl(backpack);
+			this.$store.commit('SET_USER_ITEMS', backpack);
 		},
 
 		removeItem(itemId) {

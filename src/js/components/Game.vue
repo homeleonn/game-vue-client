@@ -1,38 +1,41 @@
 <template>
-	<game-header @setCurComp="setCurComp"></game-header>
-	<!-- <location-wrapper @chloc="changeLocation"></location-wrapper> -->
-	<!-- <keep-alive> -->
-		<component 
-			:is="currentMainComponent" 
-			@chloc="changeLocation"
-			>
-			
-		</component>
-	<!-- </keep-alive> -->
+	<template v-if="apiReady">
+		<game-header @setCurComp="setCurComp"></game-header>
+		<!-- <location-wrapper @chloc="changeLocation"></location-wrapper> -->
+		<!-- <keep-alive> -->
+			<component 
+				:is="currentMainComponent" 
+				@chloc="changeLocation"
+				>
+				
+			</component>
+		<!-- </keep-alive> -->
 
-	<game-footer @sendMessage="sendMessage"></game-footer>
+		<game-footer @sendMessage="sendMessage"></game-footer>
+	</template>
 </template>
 
 <script>
-import { defineAsyncComponent } from 'vue'
+// import { defineAsyncComponent } from 'vue'
 import { mapMutations } from 'vuex'
 import GameHeader from './GameHeader'
 import GameFooter from './GameFooter'
 import LocationWrapper from './LocationWrapper'
-// import UserBackpack from './user/UserBackpack'
+import UserBackpack from './user/backpack/UserBackpack'
 import Api from '../api/api.js';
 
-const UserBackpack = defineAsyncComponent(() =>
-  import('./user/backpack/UserBackpack.vue')
-)
+// const UserBackpack = defineAsyncComponent(() =>
+//   import('./user/backpack/UserBackpack.vue')
+// )
 
 const api = new Api();
 
-export default { 
+export default {
+	components: { GameHeader, GameFooter, LocationWrapper, UserBackpack },
 	data() {
 		return {
-			currentMainComponent: 'LocationWrapper',
-			// currentMainComponent: 'UserBackpack',
+			// currentMainComponent: 'LocationWrapper',
+			currentMainComponent: 'UserBackpack',
 			// currentMainComponent: null,
 			apiReady: false
 		}
@@ -150,7 +153,5 @@ export default {
 
 		api.subscribeToWS('open', () => { this.apiReady = true; }, this)
 	},
-
-	components: { GameHeader, GameFooter, LocationWrapper, UserBackpack },
 };
 </script>

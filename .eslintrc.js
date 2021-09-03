@@ -23,6 +23,7 @@ module.exports = {
     'no-tabs': 'off',
     'no-undef': 'off',
     'no-unreachable': 'off',
+    'vue/no-mutating-props': 'off',
     'quotes': 'off'
   }
 }

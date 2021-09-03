@@ -44,15 +44,11 @@ export default {
 
 	data() {
 		return {
+			test: 1,
+			itemIdCounter: 100,
 			activeItem: false,
 			currentTab: 'main',
-			itemsByType: {
-				armors: [],
-				supplies: [],
-				others: [],
-				quests: [],
-				gifts: [],
-			}
+			itemsByType: null
 		}
 	},
 
@@ -65,16 +61,21 @@ export default {
 		gifts: ['gift'],
 	},
 
+	created() {
+		this.resetItemsByType();
+	},
+
 	computed: {
 	},
 
 	watch: {
 		items(items) {
+			this.resetItemsByType();
 			// sort items by type
 			items.forEach(item => {
 				for (const [type, types] of Object.entries(this.$options.itemTypes)) {
 					if (types.includes(item.item_type)) {
-						this.itemsByType.[type].push(item);
+						this.itemsByType[type].push(item);
 					}
 				}
 			});
@@ -82,7 +83,15 @@ export default {
 	},
 
 	methods: {
-		
+		resetItemsByType() {
+			this.itemsByType = {
+				armors: [],
+				supplies: [],
+				others: [],
+				quests: [],
+				gifts: [],
+			};
+		}
 	}
 }
 </script>

@@ -11,7 +11,7 @@
 				v-if="usage" 
 				class="action tl" 
 				@mouseenter="itemTitle=usage" 
-				@click="use(item)"
+				@click="use(item, usage)"
 			>
 				н
 			</div>
@@ -44,7 +44,7 @@ export default {
 		item: Object,
 		usage: {
 			type: String,
-			validator: (val) => [null, 'Надеть', 'Исп-ть'].includes(val),
+			validator: (val) => [null, 'Надеть', 'Снять', 'Исп-ть'].includes(val),
 			default: null
 		}
 	},
@@ -66,11 +66,21 @@ export default {
 		remove (item) {
 			if (!confirm('Точно выбрость?')) return false;
 
-			this.$emit('removeItem', item.id);
+			// this.$emit('removeItem', item.id);
+			
+			this.$store.commit('REMOVE_ITEM', item.id);
 		},
 
-		use(item) {
-			this.$emit('wearItem', item.id);
+		use(item, usage) {
+			// this.$emit('wearItem', item.id);
+			// this.$store.commit('PUT_ON_ITEM', item.id);
+			cl(usage)
+
+			if (usage === 'Надеть') {
+				this.$store.commit('PUT_ON_ITEM', item.id);
+			} else {
+				this.$store.commit('TAKE_OFF_ITEM', item.id);
+			}
 		},
 
 		info() {

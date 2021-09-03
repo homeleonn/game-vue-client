@@ -62,6 +62,18 @@ export default createStore({
 
     SET_ACTIVE_ITEM(state, item) {
       state.activeItem = item;
+    },
+
+    REMOVE_ITEM(state, itemId) {
+      delete (state.userItems[itemId]);
+    },
+
+    PUT_ON_ITEM(state, itemId) {
+      state.userItems[itemId].loc = 'WEARING';
+    },
+
+    TAKE_OFF_ITEM(state, itemId) {
+      state.userItems[itemId].loc = 'INVENTORY';
     }
   },
 

@@ -2,28 +2,26 @@
 	<div class="user-form col-md-5">
 		<div class="row">
 			<div class="user-form__left">
-				<div class="user-form__slot"><pack-item :item="getSlot('head')"></pack-item></div>
-				<div class="user-form__slot"><pack-item :item="getSlot('lrhand')"></pack-item></div>
-				<div class="user-form__slot"><img :src="getSlot('chest').image" /></div>
-				<div class="__slot"><img :src="getSlot('ear').image" /></div>
+				<div class="user-form__slot" v-for="(item, idx) in ['head', 'lrhand', 'chest', 'underwear']" :key="idx">
+					<pack-item :item="getSlot(item)" usage="Снять"></pack-item>
+				</div>
+			</div>
+			<div class="user-form__image"><img :src="'/img/images/0.png'"></div>
+			<div class="user-form__right">
+				<div class="user-form__slot" v-for="(item, idx) in ['gloves', 'lhand', 'legs', 'feet']" :key="idx">
+					<pack-item :item="getSlot(item)"></pack-item>
+				</div>
+			</div>
+		</div>
+	</div>
+</template>
+			<!-- <div class="__slot"><img :src="getSlot('ear').image" /></div>
 				<div class="__slot"><img :src="getSlot('neck').image" /></div>
 				<div class="row">
 					<div class="col-md-4 __slot"><img :src="getSlot('finger').image" /></div>
 					<div class="col-md-4 __slot"><img :src="getSlot('finger').image" /></div>
 					<div class="col-md-4 __slot"><img :src="getSlot('finger').image" /></div>
-				</div>
-			</div>
-			<div class="user-form__image"><img :src="'/img/images/0.png'"></div>
-			<div class="user-form__right">
-				<div class="user-form__slot"><img :src="getSlot('gloves').image" /></div>
-				<div class="user-form__slot"><img :src="getSlot('lhand').image" /></div>
-				<div class="user-form__slot"><img :src="getSlot('legs').image" /></div>
-				<div class="user-form__slot"><img :src="getSlot('feet').image" /></div>
-			</div>
-		</div>
-	</div>
-</template>
-
+				</div> -->
 <script>
 import PackItem from '../items/PackItem';
 
@@ -33,6 +31,19 @@ export default {
 	props: {
 		userImage: String,
 		items: Array
+	},
+
+	data() {
+		return {
+			slots: [
+				{
+					isFullSlot: true,
+					slots: [
+
+					]
+				}
+			]
+		}
 	},
 
 	computed: {
@@ -45,15 +56,16 @@ export default {
 
 	watch: {
 		items(items) {
-			cl(items);
+			// cl(items);
 		}
 	},
 
 	methods: {
+		// рубаху убрать
 		getSlot(bodyPart) {
 			const item = this.items.filter(item => item.body_part === bodyPart);
 			return item[0] ? item[0] : { image: `/img/slots/${bodyPart}.png` };
-		}
+		},
 	}
 }
 </script>
@@ -62,9 +74,10 @@ export default {
 
 .user-form {
 
-.row {
+> .row {
 	> * {
 		line-height: 0;
+		width: 60px;
 	}
 }
 
@@ -78,7 +91,7 @@ export default {
 }
 
 &__image {
-	width: 100px;
+	width: 100px !important;
 }
 
 &__slot {
