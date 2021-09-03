@@ -86,7 +86,7 @@ export default {
 	margin-left: 20px;
 }
 
-&__left, &__right, &__slot  {
+&__left, &__right, &__slot	{
 	width: 60px;
 }
 

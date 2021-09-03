@@ -105,13 +105,13 @@ export function isFunction(guess, exception = false) {
 
 
 function sortClosestLocationsByType(closestLocations) {
-    const closestLocationByType = {};
-    for (const closestLocation of closestLocations) {
-        if (typeof closestLocationByType[closestLocation.type] == 'undefined') {
-            closestLocationByType[closestLocation.type] = [];
-        }
-        closestLocationByType[closestLocation.type].push(closestLocation);
-    }
+	const closestLocationByType = {};
+	for (const closestLocation of closestLocations) {
+		if (typeof closestLocationByType[closestLocation.type] == 'undefined') {
+			closestLocationByType[closestLocation.type] = [];
+		}
+		closestLocationByType[closestLocation.type].push(closestLocation);
+	}
 
-    return closestLocationByType;
+	return closestLocationByType;
 }

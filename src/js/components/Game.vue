@@ -25,7 +25,7 @@ import UserBackpack from './user/backpack/UserBackpack'
 import Api from '../api/api.js';
 
 // const UserBackpack = defineAsyncComponent(() =>
-//   import('./user/backpack/UserBackpack.vue')
+//	 import('./user/backpack/UserBackpack.vue')
 // )
 
 const api = new Api();

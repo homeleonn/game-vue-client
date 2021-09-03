@@ -1,41 +1,41 @@
 <template>
-    <div
-        v-for="(location, id) in closestLocations[type]"
-        :key="'link-loc-' + id"
-        :class="['link', 'loc-' + id, {active: activeLocation == id}]"
-        @mouseenter="SET_ACTIVE_LOCATION(id)"
-        @mouseleave="SET_ACTIVE_LOCATION(false)"
-        @click="test(id)"
-    >
-        {{ location }}
-    </div>
+	<div
+		v-for="(location, id) in closestLocations[type]"
+		:key="'link-loc-' + id"
+		:class="['link', 'loc-' + id, {active: activeLocation == id}]"
+		@mouseenter="SET_ACTIVE_LOCATION(id)"
+		@mouseleave="SET_ACTIVE_LOCATION(false)"
+		@click="test(id)"
+	>
+		{{ location }}
+	</div>
 </template>
 
 <script>
 import { mapGetters, mapMutations } from 'vuex'
 export default {
-    name: "LocationLink",
+	name: "LocationLink",
 
-    props: ['closestLocations', 'type'],
-    emits: ['chloc'],
+	props: ['closestLocations', 'type'],
+	emits: ['chloc'],
 
-    methods: {
-        ...mapMutations(['SET_ACTIVE_LOCATION']),
+	methods: {
+		...mapMutations(['SET_ACTIVE_LOCATION']),
 
-        test(id) {
-            this.$emit('chloc', id);
-        }
-    },
+		test(id) {
+			this.$emit('chloc', id);
+		}
+	},
 
-    computed: {
-        ...mapGetters([
-            'activeLocation',
-        ])
-    },
+	computed: {
+		...mapGetters([
+			'activeLocation',
+		])
+	},
 
-    mounted() {
-        // cl(this.closestLocations['location'])
-    }
+	mounted() {
+		// cl(this.closestLocations['location'])
+	}
 
 }
 </script>
