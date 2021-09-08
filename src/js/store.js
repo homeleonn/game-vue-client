@@ -16,6 +16,12 @@ export default createStore({
 
 	mutations: {
 	SET_USER(state, user) {
+		for (var key in user) {
+			if (isNumeric(user[key])) {
+				user[key] = +user[key];
+			}
+		}cl(1);
+
 		state.user = user;
 	},
 
@@ -69,6 +75,7 @@ export default createStore({
 	},
 
 	PUT_ON_ITEM(state, itemId) {
+		// cl(state.userItems[itemId]);
 		state.userItems[itemId].loc = 'WEARING';
 	},
 

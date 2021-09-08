@@ -31,6 +31,10 @@ function fnOnTimeout(callback, delay = 1000) {
 	}
 }
 
+function isNumeric(n) {
+  return !isNaN(parseFloat(n)) && isFinite(n);
+}
+
 function cl(){
 	console.log(...arguments, ' / ' + new Error().stack.split(/\n/)[1].split('/').pop());
 }

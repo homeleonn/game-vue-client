@@ -13,7 +13,12 @@
 		<div class="backpack-items">
 			
 			<div v-if="currentTab === 'main'">
-				<item-list :items="itemsByType.armors" usage="Надеть" @removeItem="itemId => $emit('removeItem', itemId)" @wearItem="itemId => $emit('wearItem', itemId)">
+				<item-list
+				:items="itemsByType.armors"
+				usage="Надеть"
+				@removeItem="itemId => $emit('removeItem', itemId)"
+				@wearItem="itemId => $emit('wearItem', itemId)"
+			>
 					<small class="center">Вещи</small>
 				</item-list>
 

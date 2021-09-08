@@ -65,28 +65,37 @@ export default {
 
 		remove (item) {
 			if (!confirm('Точно выбрость?')) return false;
-
-			// this.$emit('removeItem', item.id);
-			
 			this.$store.commit('REMOVE_ITEM', item.id);
 		},
 
 		use(item, usage) {
-			// this.$emit('wearItem', item.id);
-			// this.$store.commit('PUT_ON_ITEM', item.id);
-			cl(usage)
-
 			if (usage === 'Надеть') {
+				this.updateUser(item, 'on');
 				this.$store.commit('PUT_ON_ITEM', item.id);
 			} else {
+				this.updateUser(item, 'off');
 				this.$store.commit('TAKE_OFF_ITEM', item.id);
 			}
 		},
 
-		info() {
+		updateUser(item, action) {
+			const user = this.$store.state.user;
+			const addStates = ['power', 'critical', 'evasion', 'stamina', 'hp'];
+			let userState;
+			
+			addStates.forEach(state => {
+				switch (state) {
+					case 'hp': userState = 'maxhp'; break;
 
+					default: userState = state;
+				}
+				
+				user[userState] = action === 'on' ? user[userState] + +item[state] : user[userState] - +item[state];
+			});
+
+
+			this.$store.commit('SET_USER', user);
 		}
-
 	}
 }
 </script>
