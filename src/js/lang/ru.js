@@ -35,7 +35,7 @@ export const langKey = {
 	// need_ax: 'имя',
 	// need_mace: 'имя',
 	price: 'Цена',
-	// возможность: 
+	// возможность:
 	stackable: 'стыковки',
 	sellable: 'продажи',
 	dropable: 'выпадения',
@@ -83,4 +83,18 @@ export const langValue = {
 	'fishing rod': 'удочка',
 	gift: 'подарок',
 	trash: 'мусор',
+};
+
+
+export const userInfo = {
+	level: 'Уровень',
+	power: 'Сила',
+	critical: 'Интуиция',
+	evasion: 'Ловкость',
+	stamina: 'Выносливость',
+	gold: 'Золото',
+	exp: 'Опыт',
+	win: 'Побед',
+	defeat: 'Поражений',
+	draw: 'Ничьих',
 };
