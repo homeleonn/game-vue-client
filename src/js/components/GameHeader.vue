@@ -34,7 +34,7 @@
 					@click="$emit('setCurComp', 'LocationWrapper')"
 				/>
 			</div>
-			<div><img src="img/other/fight.jpg" title="Бои" /></div>
+			<div><img src="img/other/fight.jpg" title="Бои" @click="$emit('setCurComp', 'TheHunting')" /></div>
 			<div><img src="img/other/quest.jpg" title="Квесты" /></div>
 			<div><img src="img/other/info.jpg" title="Анкета" /></div>
 		</div>

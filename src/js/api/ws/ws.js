@@ -126,6 +126,10 @@ export class WS {
 		this.send({ wearItem: itemId });
 	}
 
+	getMonsters() {
+		this.send({ getMonsters: true });
+	}
+
 	// subscribe to events
 	subscribe(event, cb, ctx) {
 		if (typeof this.eventHandlers[event] === "undefined") {

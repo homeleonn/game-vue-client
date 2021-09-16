@@ -11,7 +11,7 @@
 </template>
 
 <script>
-// import { defineAsyncComponent } from 'vue'
+import { defineAsyncComponent } from 'vue'
 import { mapMutations, mapGetters } from "vuex";
 import GameHeader from "./GameHeader";
 import GameFooter from "./GameFooter";
@@ -23,10 +23,14 @@ import Api from "../api/api.js";
 //	 import('./user/backpack/UserBackpack.vue')
 // )
 
+const TheHunting = defineAsyncComponent(() =>
+	import('./hunt/TheHunting.vue')
+)
+
 const api = new Api();
 
 export default {
-	components: { GameHeader, GameFooter, LocationWrapper, UserBackpack },
+	components: { GameHeader, GameFooter, LocationWrapper, UserBackpack, TheHunting },
 	data() {
 		return {
 			// currentMainComponent: 'LocationWrapper',
