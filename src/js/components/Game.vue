@@ -3,12 +3,7 @@
 		<game-header @setCurComp="setCurComp"></game-header>
 		<!-- <location-wrapper @chloc="changeLocation"></location-wrapper> -->
 		<!-- <keep-alive> -->
-			<component 
-				:is="currentMainComponent" 
-				@chloc="changeLocation"
-				>
-				
-			</component>
+		<component :is="currentMainComponent" @chloc="changeLocation"> </component>
 		<!-- </keep-alive> -->
 
 		<game-footer @sendMessage="sendMessage"></game-footer>
@@ -17,12 +12,12 @@
 
 <script>
 // import { defineAsyncComponent } from 'vue'
-import { mapMutations } from 'vuex'
-import GameHeader from './GameHeader'
-import GameFooter from './GameFooter'
-import LocationWrapper from './LocationWrapper'
-import UserBackpack from './user/backpack/UserBackpack'
-import Api from '../api/api.js';
+import { mapMutations, mapGetters } from "vuex";
+import GameHeader from "./GameHeader";
+import GameFooter from "./GameFooter";
+import LocationWrapper from "./LocationWrapper";
+import UserBackpack from "./user/backpack/UserBackpack";
+import Api from "../api/api.js";
 
 // const UserBackpack = defineAsyncComponent(() =>
 //	 import('./user/backpack/UserBackpack.vue')
@@ -35,26 +30,26 @@ export default {
 	data() {
 		return {
 			// currentMainComponent: 'LocationWrapper',
-			currentMainComponent: 'UserBackpack',
+			currentMainComponent: "UserBackpack",
 			// currentMainComponent: null,
 			apiReady: false
-		}
+		};
 	},
 
 	provide() {
 		return {
 			api,
 			apiSubscribe: this.apiSubscribe
-		}
+		};
 	},
 
 	methods: {
 		...mapMutations([
-			'SET_CSRF', 
-			'SET_USER', 
-			'SET_LOCATION', 
-			'SET_CLOSEST_LOCATIONS', 
-			'SET_LOCATION_USERS'
+			"SET_CSRF",
+			"SET_USER",
+			"SET_LOCATION",
+			"SET_CLOSEST_LOCATIONS",
+			"SET_LOCATION_USERS"
 		]),
 
 		event(event, data) {
@@ -79,12 +74,14 @@ export default {
 		},
 
 		append(message) {
-			messages.innerHTML += `<div class="msg">${date('H:i:s')} ${message}</div>`;
+			messages.innerHTML += `<div class="msg">${date(
+				"H:i:s"
+			)} ${message}</div>`;
 		},
-
 
 		// api interaction
 		me(user) {
+			this.apiReady = true;
 			this.SET_USER(user);
 		},
 
@@ -104,23 +101,30 @@ export default {
 
 		message(message) {
 			switch (typeof message) {
-				case 'string': this.append(message); break;
-				case 'object': this.append(`${message.from}: ${message.text}`); break;
+				case "string":
+					this.append(message);
+					break;
+				case "object":
+					this.append(`${message.from}: ${message.text}`);
+					break;
 			}
-			
+
 			this.scrollDown();
 		},
 
 		apiSubscribe(events, ctx) {
-			events.forEach(event => api.subscribe(event, ctx[event], ctx)
-		);
+			events.forEach(event => api.subscribe(event, ctx[event], ctx));
 		}
 	},
 
 	computed: {
+		...mapGetters(["test", 'user']),
+		// ...mapState(['user']),
+
 		currentProps() {
 			switch (currentMainComponent) {
-				case 'LocationWrapper': return 1;
+				case "LocationWrapper":
+					return 1;
 			}
 
 			return 1;
@@ -130,9 +134,9 @@ export default {
 	watch: {
 		apiReady() {
 			// if (this.apiReady) {
-				// this.currentMainComponent = 'UserBackpack';
+			// this.currentMainComponent = 'UserBackpack';
 			// }
-		}
+		},
 	},
 
 	mounted() {
@@ -143,15 +147,38 @@ export default {
 	},
 
 	created() {
-		this.apiSubscribe([
-			'me', 
-			'loc', 
-			'addLocUser', 
-			'leaveLocUser', 
-			'message'
-		], this);
+		this.apiSubscribe(
+			["me", "loc", "addLocUser", "leaveLocUser", "message"],
+			this
+		);
 
-		api.subscribeToWS('open', () => { this.apiReady = true; }, this)
-	},
+		api.subscribeToWS(
+			"open",
+			() => {
+				// this.apiReady = true;
+			},
+			this
+		);
+
+		// this.$store.watch(
+		// 	(state, getters) => getters.test,
+		// 	() => {
+		// 		console.log("update");
+		// 	}
+		// );
+
+
+		// cl(this.$store);
+		
+		// this.$store.watch(
+  //     () => this.$store.state.test,
+  //     (q) => {
+  //       cl(q);
+  //     }
+  //   )
+
+
+    // this.$store.watch(() => this.$store.getters.SEND_LOGIN, Login => { console.log('watched: ', Login) })
+	}
 };
 </script>

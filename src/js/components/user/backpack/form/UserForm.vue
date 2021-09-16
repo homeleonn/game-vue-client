@@ -27,13 +27,6 @@
 		</div>
 	</div>
 </template>
-			<!-- <div class="__slot"><img :src="getSlot('ear').image" /></div>
-				<div class="__slot"><img :src="getSlot('neck').image" /></div>
-				<div class="row">
-					<div class="col-md-4 __slot"><img :src="getSlot('finger').image" /></div>
-					<div class="col-md-4 __slot"><img :src="getSlot('finger').image" /></div>
-					<div class="col-md-4 __slot"><img :src="getSlot('finger').image" /></div>
-				</div> -->
 <script>
 import PackItem from '../items/PackItem';
 import { mapGetters } from 'vuex'
@@ -49,23 +42,19 @@ export default {
 
 	data() {
 		return {
-			slots: [
-				{
-					isFullSlot: true,
-					slots: [
-
-					]
-				}
-			],
-			info: ['power', 'critical', 'evasion', 'stamina', 'win', 'defeat', 'draw', 'exp', 'gold'],
 		}
 	},
+
+	// options
+	info: ['power', 'critical', 'evasion', 'stamina', 'win', 'defeat', 'draw', 'exp', 'gold'],
 
 	computed: {
 		...mapGetters(['user']),
 		userInfo() {
-			// return this.info.map(i => { k: userInfo[i], v: this.user[i] }`${userInfo[i]}: ${this.user[i]}`);
-			return this.info.map(i => ({ k: userInfo[i], v: this.user[i] }));
+			const formattedInfo = this.$options.info.map(i => ({ k: userInfo[i], v: this.user[i] }));
+
+			formattedInfo.splice(1, 0, { k: 'Урон', v: `+${this.user.min_damage + this.user.extra_min_damage}...+${this.user.max_damage + this.user.extra_max_damage}` });
+			return formattedInfo;
 		}
 	},
 

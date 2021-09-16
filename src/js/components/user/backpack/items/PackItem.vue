@@ -29,7 +29,6 @@
 			>
 				x
 			</div>
-
 			<div class="pack-item__title">{{ itemTitle }}</div>
 		</template>
 		<template v-else><img :src="item.image"></template>
@@ -38,6 +37,8 @@
 
 <script>
 import { mapMutations } from 'vuex'
+
+const STAMINA_RATE = 6;
 
 export default {
 	props: {
@@ -53,12 +54,12 @@ export default {
 
 	data() {
 		return {
-			itemTitle: null
+			itemTitle: null,
 		}
 	},
 
 	methods: {
-		...mapMutations(['SET_ACTIVE_ITEM']),
+		...mapMutations(['SET_ACTIVE_ITEM', 'SET_NEED_REGENERATION']),
 		setActive(item) {
 			this.SET_ACTIVE_ITEM(item);
 		},
@@ -80,21 +81,44 @@ export default {
 
 		updateUser(item, action) {
 			const user = this.$store.state.user;
-			const addStates = ['power', 'critical', 'evasion', 'stamina', 'hp'];
-			let userState;
+			const addProps = ['power', 'critical', 'evasion', 'stamina', 'hp', 'min_damage', 'max_damage'];
+			let userProp;
+			const isAdd = action === 'on';
 
-			addStates.forEach(state => {
-				switch (state) {
-					case 'hp': userState = 'maxhp'; break;
+			addProps.forEach(prop => {
+				let needRegen = false;
 
-					default: userState = state;
+				userProp = prop;
+
+				if (prop === 'hp') {
+					userProp = 'maxhp';
+					needRegen = true;
+				} else if (prop === 'stamina') {
+					this.updateUserProps(user, 'maxhp', item[prop] * STAMINA_RATE, isAdd);
+					needRegen = true;
+				} else if (prop === 'min_damage' || prop === 'max_damage') {
+					userProp = `extra_${prop}`;
 				}
 
-				user[userState] = action === 'on' ? user[userState] + +item[state] : user[userState] - +item[state];
+				this.updateUserProps(user, userProp, item[prop], isAdd);
+
+				if (prop === 'power') {
+					this.recalculateDamage(user);
+				}
+
+				if (needRegen) {
+					this.SET_NEED_REGENERATION(true);
+				}
 			});
+		},
 
+		updateUserProps(user, prop, amount, isAdd) {
+			user[prop] = isAdd === true ? user[prop] + +amount : user[prop] - +amount;
+		},
 
-			this.$store.commit('SET_USER', user);
+		recalculateDamage(user) {
+			user.min_damage = Math.floor(user.power / 2);
+			user.max_damage = user.power + Math.ceil(user.power / 2);
 		}
 	}
 }

@@ -11,18 +11,26 @@ export default createStore({
 		userItems: null,
 		activeItem: null,
 		dbLog: [],
+		isRegenerating: false,
+		needRegeneration: false,
 		csrf: ''
 	},
 
 	mutations: {
 		SET_USER(state, user) {
-			for (var key in user) {
-				if (isNumeric(user[key])) {
-					user[key] = +user[key];
-				}
-			}// cl(1);
+			state.user = toNums(user);
+		},
 
-			state.user = user;
+		SET_NEED_REGENERATION(state, needRegeneration) {
+			state.needRegeneration = needRegeneration;
+		},
+
+		UPDATE_USER(state, user) {
+			Object.assign(state.user, toNums(user));
+		},
+
+		SET_IS_REGENERATING(state, isRegenerating) {
+			state.isRegenerating = isRegenerating;
 		},
 
 		SET_USER_ITEMS(state, items) {
@@ -85,6 +93,9 @@ export default createStore({
 	},
 
 	getters: {
+		isRegenerating(state) {
+			return state.isRegenerating;
+		},
 		user(state) {
 			return state.user;
 		},

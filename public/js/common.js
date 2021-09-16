@@ -35,6 +35,20 @@ function isNumeric(n) {
   return !isNaN(parseFloat(n)) && isFinite(n);
 }
 
+function toNums(obj) {
+	for (var key in obj) {
+		if (isNumeric(obj[key])) {
+			obj[key] = +obj[key];
+		}
+	}
+
+	return obj;
+}
+
+function getTimeSeconds() {
+	return new Date().getTime() / 1000;
+}
+
 function cl(){
 	console.log(...arguments, ' / ' + new Error().stack.split(/\n/)[1].split('/').pop());
 }
