@@ -75,7 +75,7 @@ export default {
 
 					this.hpLineStyle.width = curHp / maxHp * 100 + '%';
 					this.hpLineStyle.backgroundColor = color;
-					
+
 					return endRestoreFlag;
 				}
 			}
@@ -108,6 +108,16 @@ export default {
 	},
 
 	mounted() {
+		// this.$store.watch((state, getters) => getters.user, (a) => {
+		// 	cl(2)
+		// })
+
+		this.$store.watch(
+      state => state.user,
+      () => {
+        console.log("update");
+      }
+    );
 	},
 
 	watch: {
@@ -122,5 +132,5 @@ export default {
 </script>
 
 <style>
-	
+
 </style>

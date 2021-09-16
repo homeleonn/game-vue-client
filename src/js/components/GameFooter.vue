@@ -42,24 +42,24 @@ export default {
 	name: "GameFooter",
 
 	data() {
-	return {
-		message: ''
-	}
+		return {
+			message: ''
+		}
 	},
 
 	computed: mapGetters([
-	'csrf',
-	'location',
-	'locationUsers'
+		'csrf',
+		'location',
+		'locationUsers'
 	]),
 
 	methods: {
-	send() {
-		this.$emit('sendMessage', this.message);
-		this.message = '';
-		// this.$server.sendMessage(this.message);
-		// chat.sendMessage(this.message);
-	}
+		send() {
+			this.$emit('sendMessage', this.message);
+			this.message = '';
+			// this.$server.sendMessage(this.message);
+			// chat.sendMessage(this.message);
+		}
 	},
 
 	created() {

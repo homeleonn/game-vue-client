@@ -3,158 +3,158 @@ import { createStore } from "vuex";
 
 export default createStore({
 	state: {
-	user: {},
-	location: {},
-	locationUsers: [],
-	closestLocations: {},
-	activeLocation: false,
-	userItems: null,
-	activeItem: null,
-	dbLog: [],
-	csrf: ''
+		user: {},
+		location: {},
+		locationUsers: [],
+		closestLocations: {},
+		activeLocation: false,
+		userItems: null,
+		activeItem: null,
+		dbLog: [],
+		csrf: ''
 	},
 
 	mutations: {
-	SET_USER(state, user) {
-		for (var key in user) {
-			if (isNumeric(user[key])) {
-				user[key] = +user[key];
-			}
-		}cl(1);
+		SET_USER(state, user) {
+			for (var key in user) {
+				if (isNumeric(user[key])) {
+					user[key] = +user[key];
+				}
+			}// cl(1);
 
-		state.user = user;
-	},
+			state.user = user;
+		},
 
-	SET_USER_ITEMS(state, items) {
-		state.userItems = items;
-	},
+		SET_USER_ITEMS(state, items) {
+			state.userItems = items;
+		},
 
-	SET_USER_LOCATION(state, locationId) {
-		state.user.location = locationId;
-	},
+		SET_USER_LOCATION(state, locationId) {
+			state.user.location = locationId;
+		},
 
-	SET_LOCATION(state, location) {
-		state.location = location;
-	},
+		SET_LOCATION(state, location) {
+			state.location = location;
+		},
 
-	SET_LOCATION_USERS(state, locationUsers) {
-		state.locationUsers = locationUsers;
-	},
+		SET_LOCATION_USERS(state, locationUsers) {
+			state.locationUsers = locationUsers;
+		},
 
-	ADD_LOCATION_USER(state, locationUser) {
-		state.locationUsers.push(locationUser);
-	},
+		ADD_LOCATION_USER(state, locationUser) {
+			state.locationUsers.push(locationUser);
+		},
 
-	REMOVE_LOCATION_USER(state, userId) {
-		state.locationUsers = state.locationUsers.filter(user => user.id !== userId);
-	},
+		REMOVE_LOCATION_USER(state, userId) {
+			state.locationUsers = state.locationUsers.filter(user => user.id !== userId);
+		},
 
-	SET_CLOSEST_LOCATIONS(state, closestLocations) {
-		state.closestLocations = closestLocations;
-		// state.closestLocations = sortClosestLocationsByType(closestLocations);
-	},
+		SET_CLOSEST_LOCATIONS(state, closestLocations) {
+			state.closestLocations = closestLocations;
+			// state.closestLocations = sortClosestLocationsByType(closestLocations);
+		},
 
-	SET_ACTIVE_LOCATION(state, activeLocation) {
-		state.activeLocation = activeLocation;
-	},
+		SET_ACTIVE_LOCATION(state, activeLocation) {
+			state.activeLocation = activeLocation;
+		},
 
-	SET_DB_LOG(state, dbLog) {
-		state.dbLog = dbLog;
-	},
+		SET_DB_LOG(state, dbLog) {
+			state.dbLog = dbLog;
+		},
 
-	SET_CSRF(state, csrf) {
-		state.csrf = csrf;
-	},
+		SET_CSRF(state, csrf) {
+			state.csrf = csrf;
+		},
 
-	SET_ACTIVE_ITEM(state, item) {
-		state.activeItem = item;
-	},
+		SET_ACTIVE_ITEM(state, item) {
+			state.activeItem = item;
+		},
 
-	REMOVE_ITEM(state, itemId) {
-		delete (state.userItems[itemId]);
-	},
+		REMOVE_ITEM(state, itemId) {
+			delete (state.userItems[itemId]);
+		},
 
-	PUT_ON_ITEM(state, itemId) {
-		// cl(state.userItems[itemId]);
-		state.userItems[itemId].loc = 'WEARING';
-	},
+		PUT_ON_ITEM(state, itemId) {
+			// cl(state.userItems[itemId]);
+			state.userItems[itemId].loc = 'WEARING';
+		},
 
-	TAKE_OFF_ITEM(state, itemId) {
-		state.userItems[itemId].loc = 'INVENTORY';
-	}
+		TAKE_OFF_ITEM(state, itemId) {
+			state.userItems[itemId].loc = 'INVENTORY';
+		}
 	},
 
 	getters: {
-	user(state) {
-		return state.user;
-	},
+		user(state) {
+			return state.user;
+		},
 
-	userItems(state) {
-		return state.userItems;
-	},
+		userItems(state) {
+			return state.userItems;
+		},
 
-	activeItem(state) {
-		return state.activeItem;
-	},
+		activeItem(state) {
+			return state.activeItem;
+		},
 
-	csrf(state) {
-		return state.csrf;
-	},
+		csrf(state) {
+			return state.csrf;
+		},
 
-	location(state) {
-		return state.location;
-	},
+		location(state) {
+			return state.location;
+		},
 
-	locationUsers(state) {
-		return state.locationUsers;
-	},
+		locationUsers(state) {
+			return state.locationUsers;
+		},
 
-	closestLocations(state) {
-		return state.closestLocations;
-	},
+		closestLocations(state) {
+			return state.closestLocations;
+		},
 
-	activeLocation(state) {
-		return state.activeLocation;
-	},
+		activeLocation(state) {
+			return state.activeLocation;
+		},
 
-	dbLog(state) {
-		return state.dbLog;
-	}
+		dbLog(state) {
+			return state.dbLog;
+		}
 	},
 
 	actions: {
-	async init({ commit }) {
-		await load('/init', (data, commit) => {
-		commit('SET_USER', data.user);
-		}, commit);
-	},
+		async init({ commit }) {
+			await load('/init', (data, commit) => {
+			commit('SET_USER', data.user);
+			}, commit);
+		},
 
-	async changeLocation({ commit }, locationId) {
-		await load('/change-location/' + locationId, (data, commit) => {
-		commit('SET_USER_LOCATION', locationId);
-		}, commit);
-	},
+		async changeLocation({ commit }, locationId) {
+			await load('/change-location/' + locationId, (data, commit) => {
+			commit('SET_USER_LOCATION', locationId);
+			}, commit);
+		},
 	}
 });
 
 
 async function load(url, callback = false, commit) {
 	try {
-	let data = await fetch(url, {
-		headers: { 'Content-Type': 'application/json' }
-	});
+		let data = await fetch(url, {
+			headers: { 'Content-Type': 'application/json' }
+		});
 
-	data = await data.json();
-	if (callback) callback(data, commit);
+		data = await data.json();
+		if (callback) callback(data, commit);
 
-	commit('SET_LOCATION', data.location);
-	commit('SET_CLOSEST_LOCATIONS', data.closestLocations);
-	if (data.db) {
-		commit('SET_DB_LOG', data.db);
-	}
+		commit('SET_LOCATION', data.location);
+		commit('SET_CLOSEST_LOCATIONS', data.closestLocations);
+		if (data.db) {
+			commit('SET_DB_LOG', data.db);
+		}
 
-	return data;
+		return data;
 	} catch (e) {
-	console.log(e);
+		console.log(e);
 	}
 }
