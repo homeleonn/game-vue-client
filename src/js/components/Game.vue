@@ -3,10 +3,10 @@
 		<game-header @setCurComp="setCurComp"></game-header>
 		<!-- <location-wrapper @chloc="changeLocation"></location-wrapper> -->
 		<!-- <keep-alive> -->
-		<component :is="currentMainComponent" @chloc="changeLocation"> </component>
+		<component :is="currentMainComponent" @chloc="changeLocation" @setCurComp="setCurComp"></component>
 		<!-- </keep-alive> -->
 
-		<game-footer @sendMessage="sendMessage"></game-footer>
+		<game-footer @sendMessage="sendMessage" @setCurComp="setCurComp"></game-footer>
 	</template>
 </template>
 
@@ -17,6 +17,8 @@ import GameHeader from "./GameHeader";
 import GameFooter from "./GameFooter";
 import LocationWrapper from "./LocationWrapper";
 import UserBackpack from "./user/backpack/UserBackpack";
+import TheDebug from "./debug/TheDebug";
+import GameFight from "./fight/GameFight";
 import Api from "../api/api.js";
 
 // const UserBackpack = defineAsyncComponent(() =>
@@ -30,11 +32,11 @@ const TheHunting = defineAsyncComponent(() =>
 const api = new Api();
 
 export default {
-	components: { GameHeader, GameFooter, LocationWrapper, UserBackpack, TheHunting },
+	components: { GameHeader, GameFooter, LocationWrapper, UserBackpack, TheHunting, TheDebug, GameFight },
 	data() {
 		return {
 			// currentMainComponent: 'LocationWrapper',
-			currentMainComponent: "UserBackpack",
+			currentMainComponent: "TheDebug",
 			// currentMainComponent: null,
 			apiReady: false
 		};
@@ -66,11 +68,11 @@ export default {
 		},
 
 		changeLocation(locId) {
-			api.chloc(locId);
+			api.doAction('chloc', locId);
 		},
 
 		sendMessage(message) {
-			api.sendMessage(message);
+			api.doAction('sendMessage', message);
 		},
 
 		scrollDown() {
@@ -123,7 +125,6 @@ export default {
 
 	computed: {
 		...mapGetters(["test", 'user']),
-		// ...mapState(['user']),
 
 		currentProps() {
 			switch (currentMainComponent) {
@@ -145,9 +146,6 @@ export default {
 
 	mounted() {
 		api.init();
-		// cl(this.$server);
-		// this.$store.dispatch('init');
-		// this.SET_CSRF(document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
 	},
 
 	created() {

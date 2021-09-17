@@ -37,6 +37,20 @@ export class WS {
 		this.eventHandlers = {};
 		this.wsEventHandlers = {};
 		this.wsBind();
+
+
+		this.validActions = [
+			'sendMessage',
+			'chloc',
+			'getBackPack',
+			'removeItem',
+			'wearItem',
+			'getLocMonsters',
+			'attack',
+			'getEnemy',
+		];
+
+		this.validActions.push('debug', 'admin_user');
 	}
 
 	send(sendData) {
@@ -106,28 +120,12 @@ export class WS {
 		this.server.connectViaToken();
 	}
 
-	chloc(locId) {
-		this.send({ chloc: locId });
-	}
+	doAction(action, params = '') {
+		if (!this.validActions.includes(action)) {
+			throw new Error('Invalid action');
+		}
 
-	sendMessage(message) {
-		this.send({ message });
-	}
-
-	getBackPack() {
-		this.send({ getBackPack: true });
-	}
-
-	removeItem(itemId) {
-		this.send({ removeItem: itemId });
-	}
-
-	wearItem(itemId) {
-		this.send({ wearItem: itemId });
-	}
-
-	getMonsters() {
-		this.send({ getMonsters: true });
+		this.send({ [action]: params });
 	}
 
 	// subscribe to events

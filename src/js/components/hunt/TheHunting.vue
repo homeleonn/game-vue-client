@@ -1,5 +1,6 @@
 <template>
 	<div class="hunting">
+		<h1 class="center">Охота</h1>
 		<div class="monsters row">
 			<div class="monster row" v-for="monster in monsters" :key="monster">
 				<img :src="'img/npc/' + monster.image">
@@ -16,6 +17,8 @@ export default {
 		'apiSubscribe'
 	],
 
+	emits: ['setCurComp'],
+
 	data() {
 		return {
 			monsters: []
@@ -29,13 +32,17 @@ export default {
 	},
 
 	mounted() {
-		this.api.getMonsters();
+		this.api.doAction('getLocMonsters');
 	},
 
 	methods: {
 		locMonsters(monsters) {
 			this.monsters = monsters;
-			// cl(monsters);
+		},
+
+		attack(monsterId) {
+			this.$emit('setCurComp', 'GameFight');
+			// this.api.doAction('attack', monsterId);
 		}
 	}
 }
@@ -43,13 +50,12 @@ export default {
 
 <style lang="scss">
 
-.monster {
-	width: 100px;
-	margin: 10px;
+.monsters {
+	justify-content: center;
 
-	img {
-		// height: 200px;
+	.monster {
+		width: 100px;
+		margin: 10px;
 	}
 }
-
 </style>

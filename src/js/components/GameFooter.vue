@@ -49,6 +49,8 @@
 					/>
 				</div>
 				<div><img src="img/chat/chat.ico" title="Смайлы" /></div>
+				<div><button @click="doAction">doAction</button></div>
+				<div><button @click="$emit('setCurComp', 'TheDebug')">Debug</button></div>
 				<form action="/logout" method="post" id="logout">
 					<input type="hidden" name="_token" :value="csrf" />
 					<button name="logout">Выход</button>
@@ -65,6 +67,12 @@ import UserList from "./location/UserList";
 export default {
 	name: "GameFooter",
 
+	emits: ['setCurComp'],
+	
+	inject: [
+		'api',
+	],
+
 	data() {
 		return {
 			message: ""
@@ -77,8 +85,14 @@ export default {
 		send() {
 			this.$emit("sendMessage", this.message);
 			this.message = "";
-			// this.$server.sendMessage(this.message);
-			// chat.sendMessage(this.message);
+		},
+		doAction() {
+			this.api.doAction('admin_user', {
+				userId: 1,
+				props: {
+					curhp: 18
+				}
+			})
 		}
 	},
 

@@ -1,7 +1,7 @@
 <template>
 	<div class="pack">
 		<div class="row">
-			<user-form :items="wearedItems"></user-form>
+			<user-form :items="wearedItems" :user="$store.getters.user"></user-form>
 			<item-lists :items="packedItems" @removeItem="removeItem" @wearItem="wearItem"></item-lists>
 		</div>
 		<item-info></item-info>
@@ -34,7 +34,7 @@ export default {
 	},
 
 	mounted() {
-		this.api.getBackPack();
+		this.api.doAction('getBackPack');
 	},
 
 	computed: {
@@ -59,13 +59,11 @@ export default {
 		},
 
 		removeItem(itemId) {
-			// cl(itemId);
-			this.api.removeItem(itemId);
+			this.api.doAction('removeItem', itemId);
 		},
 
 		wearItem(itemId) {
-			// cl(itemId);
-			this.api.wearItem(itemId);
+			this.api.doAction('wearItem', itemId);
 		},
 
 		filterByLoc(items, loc) {

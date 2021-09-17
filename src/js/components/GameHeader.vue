@@ -36,7 +36,7 @@
 			</div>
 			<div><img src="img/other/fight.jpg" title="Бои" @click="$emit('setCurComp', 'TheHunting')" /></div>
 			<div><img src="img/other/quest.jpg" title="Квесты" /></div>
-			<div><img src="img/other/info.jpg" title="Анкета" /></div>
+			<!-- <div><img src="img/other/info.jpg" title="Анкета" /></div> -->
 		</div>
 		<div id="dblog">
 			<div v-for="query in dbLog" :key="query">
@@ -68,6 +68,7 @@ export default {
 		},
 
 		regeneration(curHp = 180, maxHp = 200, lastRestore) {
+			return;
 			const hp = (curHp, maxHp, lastRestore) => {
 				return (lastRestoreTime = null) => {
 					maxHp = this.user.maxhp;
@@ -78,10 +79,10 @@ export default {
 					const limeLeft = time - lastRestore;
 					lastRestore = time;
 					curHp = curHp + limeLeft * restoreOneSecond;
-					cl('hp are regenerating');
+					// cl('hp are regenerating');
 					
 					if (curHp >= maxHp) {
-						cl('hp are full')
+						// cl('hp are full')
 						curHp = maxHp;
 						this.SET_IS_REGENERATING(false)
 					}
@@ -120,9 +121,9 @@ export default {
 			this.SET_IS_REGENERATING(true);
 
 			// const restoreSpeed = 1;
-			const minutesToMaxHp = 0.8;
-			// const renderSpeed = 1 / 2;
-			const renderSpeed = 1;
+			const minutesToMaxHp = 5;
+			const renderSpeed = 1 / 2;
+			// const renderSpeed = 1;
 			const restoreOneSecond = maxHp / (minutesToMaxHp / 1) / 60;
 
 			this.$options.HpRestore = hp(curHp, maxHp, lastRestore);
@@ -130,7 +131,6 @@ export default {
 
 			if (this.isRegenerating) {
 				const timer = setInterval(() => {
-					// cl(this.$options.HpRestore);
 					this.$options.HpRestore();
 					if (!this.isRegenerating) {
 						clearInterval(timer);
@@ -138,7 +138,8 @@ export default {
 				}, 1000 / renderSpeed);
 			}
 		},
-		...mapMutations(["SET_USER", 'SET_TEST', 'SET_IS_REGENERATING', 'SET_NEED_REGENERATION'])
+		...mapMutations(["SET_USER", 'SET_TEST', 'SET_IS_REGENERATING', 'SET_NEED_REGENERATION']),
+
 	},
 
 	computed: {
