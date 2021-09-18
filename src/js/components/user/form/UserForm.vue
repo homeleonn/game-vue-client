@@ -1,7 +1,16 @@
 <template>
-	<div class="user-form-wrapper col-md-5">
-		<div class="row">
-			<div class="user-form col-md-7">
+	<div
+		class="user-form-wrapper col-md-5"
+		:class="{'fight': isFight}"
+	>
+		<div class="flex">
+			<div v-if="isFight">
+				<user-short-info
+					:user="user"
+					:hpLineStyle="hpLineStyle"
+				></user-short-info>
+			</div>
+			<div class="user-form">
 				<div class="row">
 					<div class="user-form__left">
 						<div class="user-form__slot" v-for="(item, idx) in ['head', 'rhand', 'chest']" :key="idx">
@@ -16,32 +25,28 @@
 					</div>
 				</div>
 			</div>
-			<div class="col-md-5 user-info">
-				<table>
-					<tr v-for="i in userInfo" :key="i">
-						<td>{{ i.k }}</td>
-						<td>{{ i.v }}</td>
-					</tr>
-				</table>
-			</div>
+			<user-info :info="userInfo"></user-info>
 		</div>
 	</div>
 </template>
 <script>
-import PackItem from '../items/PackItem';
+import PackItem from '../backpack/items/PackItem';
+import UserInfo from './UserInfo';
+import UserShortInfo from './UserShortInfo'
 // import { mapGetters } from 'vuex'
 import { userInfo } from '@/js/lang/ru';
 
 export default {
-	components: { PackItem },
+	components: { PackItem, UserInfo, UserShortInfo },
 
 	props: {
+		user: Object,
 		items: Array,
 		info: {
-			type: Boolean,
+			type: Array,
 			required: false
 		},
-		user: Object
+		isFight: Boolean,
 	},
 
 	data() {
@@ -70,6 +75,10 @@ export default {
 
 		image() {
 			return 'img/images/' + (this.user.image ?? this.user.sex + '.png');
+		},
+
+		hpLineStyle() {
+			return setHpLineStyle(this.user.curhp, this.user.maxhp);
 		}
 
 	},
@@ -91,12 +100,31 @@ export default {
 	},
 
 	mounted() {
-		cl(this.info ?? 1);
+		// cl(this.info ?? 1);
 	}
 }
 </script>
 
 <style lang="scss">
+
+.user-form-wrapper {
+	> .flex {
+		justify-content: center;
+
+		> * {
+			margin: 0 10px;
+		}
+	}
+
+	&.fight > .flex {
+		flex-direction: column;
+		align-items: center;
+
+		> * {
+			margin: 10px;
+		}
+	}
+}
 
 .user-form {
 

@@ -102,6 +102,25 @@ function date(format, date = new Date()) {
 	});
 }
 
+function setHpLineStyle(curHp, maxHp) {
+	const curHpInPercent = (curHp / maxHp) * 100;
+	const color =
+		curHpInPercent < 33
+			? "#993e3e"
+			: curHpInPercent < 66
+			? "#dddd42"
+			: "green";
+
+	return {
+		width: (curHp / maxHp) * 100 + "%",
+		backgroundColor: color
+	}
+}
+
+function rand(min, max) {
+	return Math.round(Math.random() * (max - min)) + min;
+}
+
 (() => {
 
 function cl(){

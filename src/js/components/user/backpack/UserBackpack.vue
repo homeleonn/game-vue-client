@@ -10,7 +10,7 @@
 
 <script>
 import ItemLists from './items/ItemLists'
-import UserForm from './form/UserForm'
+import UserForm from '../form/UserForm'
 import ItemInfo from '../../modal/ItemInfo'
 
 export default {

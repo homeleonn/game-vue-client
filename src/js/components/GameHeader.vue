@@ -5,19 +5,10 @@
 			style="background-image: url('img/images/0.png')"
 			title="Персонаж"
 		></div>
-		<div class="info-wrapper">
-			<div class="info">
-				<div class="align"><img src="img/aligns/99.gif" /></div>
-				<div class="clan"><img src="img/clans/developers.png" /></div>
-				<div class="login">{{ user.login }}[{{ user.level }}]</div>
-			</div>
-			<div class="hp-wrapper">
-				<div class="hp-back">
-					<div class="hp-line" :style="hpLineStyle"></div>
-				</div>
-				<div class="hp">{{ user.curhp }} / {{ user.maxhp }}</div><span class="icon-spin3 active" v-if="isRegenerating"></span>
-			</div>
-		</div>
+		<user-short-info
+			:user="user"
+			:hpLineStyle="hpLineStyle"
+		></user-short-info>
 		<!-- <button class="reset-hp" @click="reset">сбросить хп</button> -->
 		<div class="top-panel flex">
 			<div>
@@ -49,9 +40,11 @@
 
 <script>
 import { mapGetters, mapMutations, mapState } from "vuex";
+import UserShortInfo from './user/form/UserShortInfo'
 
 export default {
 	name: "GameHeader",
+	components: { UserShortInfo },
 
 	data() {
 		return {
@@ -89,29 +82,18 @@ export default {
 
 					this.user.curhp = Math.floor(+curHp);
 					this.user.last_restore = time;
-					setHpLineStyle(curHp, maxHp);
+					this.hpLineStyle = setHpLineStyle(curHp, maxHp);
 				};
 			};
 
-			const setHpLineStyle = (curHp, maxHp) => {
-				const curHpInPercent = (curHp / maxHp) * 100;
-				const color =
-					curHpInPercent < 33
-						? "#993e3e"
-						: curHpInPercent < 66
-						? "#dddd42"
-						: "green";
 
-				this.hpLineStyle.width = (curHp / maxHp) * 100 + "%";
-				this.hpLineStyle.backgroundColor = color;
-			};
-
+			this.hpLineStyle = setHpLineStyle(curHp, maxHp);
 
 			curHp = this.user.curhp;
 			maxHp = this.user.maxhp;
 			if (curHp >= maxHp) {
 				this.user.curhp = maxHp;
-				setHpLineStyle(curHp, maxHp);
+				this.hpLineStyle = setHpLineStyle(curHp, maxHp);
 				return;
 			}
 			if (this.isRegenerating) {
