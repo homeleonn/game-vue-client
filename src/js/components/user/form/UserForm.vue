@@ -17,7 +17,12 @@
 							<pack-item :item="getSlot(item)" usage="Снять"></pack-item>
 						</div>
 					</div>
-					<div class="user-form__image"><img :src="image"></div>
+					<div class="user-form__image">
+						<img :src="image">
+						<!-- <div v-if="damageShowActive"> -->
+							<div class="damage active" v-for="d in damage" :key="d.id" :id="`d-${d.id}`">{{d.damage}}</div>
+						<!-- </div> -->
+					</div>
 					<div class="user-form__right">
 						<div class="user-form__slot" v-for="(item, idx) in ['gloves', 'lhand', 'legs', 'feet']" :key="idx">
 							<pack-item :item="getSlot(item)" usage="Снять"></pack-item>
@@ -47,10 +52,16 @@ export default {
 			required: false
 		},
 		isFight: Boolean,
+		damage: {
+			type: Array,
+			required: false,
+			default: () => []
+		},
 	},
 
 	data() {
 		return {
+			damageShowActive: false
 		}
 	},
 
@@ -97,10 +108,53 @@ export default {
 		setLangInfo(keys, user) {
 			return keys.map(i => ({ k: userInfo[i], v: user[i] }));
 		},
+
+
+		showDamage(id, counter = 50, speed = 25, side = 0) {
+			// cl(id)
+			let top = counter;
+			let left = 50;
+			const timer = setInterval(() => {
+				if (!--counter) {
+					clearInterval(timer);
+				}
+				top -= 1;
+				if (left > 20 && left < 80) {
+					left += (side === 1 ? -2 : (side === 2 ? 2 : 0));
+				}
+				
+				// cl(d1.style.top)
+				try {
+					_('#d-' + id).css({ top: top + '%', left: left + '%' });
+				} catch (e) {}
+			}, 1000 / speed);
+		}
 	},
 
 	mounted() {
-		// cl(this.info ?? 1);
+		const speed = 15;
+		const counter = 50;
+		// const repeatAfter = counter * (1000 / speed);
+		// cl(this.damage);
+		if (this.damage.length) {
+			setTimeout(() => {
+				this.showDamage(this.damage[0].id, counter, speed, rand(0, 2))
+			}, 2000)
+			// setInterval(() => { this.showDamage(this.damage[0].id, counter, speed, rand(0, 2)) }, repeatAfter);
+		}
+	},
+
+	updated() {
+		// cl(1)
+	},
+
+	watch: {
+		damage(damage) {
+			// cl(damage);
+			// this.damageShowActive = true;
+			// setTimeout(() => { this.damageShowActive = false }, 3000);
+			// this.showDamage(this.damage[0].id, counter, speed, rand(0, 2))
+		}
 	}
 }
 </script>
@@ -144,6 +198,35 @@ export default {
 
 &__image {
 	width: 100px !important;
+	position: relative;
+
+	.damage {
+		position: absolute;
+		font-weight: bold;
+		font-size: 30px;
+		color: white;
+		top: 50%;
+		left: 50%;
+		margin-top: -10px;
+		margin-left: -10px;
+		// display: none;
+
+		&.active {
+			display: block;
+			// animation: flyDamage 3s linear infinite;
+		}
+	}
+}
+
+@keyframes flyDamage {
+    from {
+        top: 50%;
+        opacity: 1;
+    }
+    to {
+        top: 0%;
+        opacity: 0;
+    }
 }
 
 &__slot {
