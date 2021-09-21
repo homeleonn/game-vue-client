@@ -20,7 +20,7 @@
 					<div class="user-form__image">
 						<img :src="image">
 						<!-- <div v-if="damageShowActive"> -->
-							<div class="damage active" v-for="d in damage" :key="d.id" :id="`d-${d.id}`">{{d.damage}}</div>
+							<!-- <div class="damage active" v-for="d in damage" :key="d.id" :id="`d-${d.id}`">{{d.damage}}</div> -->
 						<!-- </div> -->
 					</div>
 					<div class="user-form__right">
