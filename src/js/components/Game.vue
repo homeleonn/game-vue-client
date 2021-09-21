@@ -1,11 +1,12 @@
 <template>
 	<template v-if="apiReady">
 		<game-header @setCurComp="setCurComp"></game-header>
-		<!-- <location-wrapper @chloc="changeLocation"></location-wrapper> -->
-		<!-- <keep-alive> -->
-		<component :is="currentMainComponent" @chloc="changeLocation" @setCurComp="setCurComp"></component>
-		<!-- </keep-alive> -->
-
+		<div class="main">
+			<user-supplies></user-supplies>
+			<!-- <keep-alive> -->
+			<component :is="currentMainComponent" @chloc="changeLocation" @setCurComp="setCurComp"></component>
+			<!-- </keep-alive> -->
+		</div>
 		<game-footer @sendMessage="sendMessage" @setCurComp="setCurComp"></game-footer>
 	</template>
 </template>
@@ -17,6 +18,7 @@ import GameHeader from "./GameHeader";
 import GameFooter from "./GameFooter";
 import LocationWrapper from "./LocationWrapper";
 import UserBackpack from "./user/backpack/UserBackpack";
+import UserSupplies from "./user/UserSupplies";
 import TheDebug from "./debug/TheDebug";
 import GameFight from "./fight/GameFight";
 import Api from "../api/api.js";
@@ -32,7 +34,7 @@ const TheHunting = defineAsyncComponent(() =>
 const api = new Api();
 
 export default {
-	components: { GameHeader, GameFooter, LocationWrapper, UserBackpack, TheHunting, TheDebug, GameFight },
+	components: { GameHeader, GameFooter, LocationWrapper, UserBackpack, TheHunting, TheDebug, GameFight, UserSupplies },
 	data() {
 		return {
 			// currentMainComponent: 'LocationWrapper',
@@ -171,7 +173,7 @@ export default {
 
 
 		// cl(this.$store);
-		
+
 		// this.$store.watch(
   //     () => this.$store.state.test,
   //     (q) => {
@@ -184,3 +186,9 @@ export default {
 	}
 };
 </script>
+
+<style>
+.main {
+	position: relative;
+}
+</style>

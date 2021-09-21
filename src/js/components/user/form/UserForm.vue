@@ -61,7 +61,7 @@ export default {
 
 	data() {
 		return {
-			damageShowActive: false
+			damageShowActive: false,
 		}
 	},
 
@@ -122,7 +122,7 @@ export default {
 				if (left > 20 && left < 80) {
 					left += (side === 1 ? -2 : (side === 2 ? 2 : 0));
 				}
-				
+
 				// cl(d1.style.top)
 				try {
 					_('#d-' + id).css({ top: top + '%', left: left + '%' });

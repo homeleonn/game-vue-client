@@ -24,6 +24,8 @@ module.exports = {
     'no-undef': 'off',
     'no-unreachable': 'off',
     'vue/no-mutating-props': 'off',
+    'no-unused-vars': 'off',
+    'prefer-const': 'off',
     'quotes': 'off'
   }
 }
