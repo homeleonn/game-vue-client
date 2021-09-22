@@ -17,26 +17,34 @@
 		</div>
 		<div class="col-md-4 flex fcol fight-panel">
 			<div v-if="isFightEnd"><b>Fight has finished!</b></div>
+			{{botsHits}}
+			<div v-for="(s, idx) in swap" :key="idx">{{idx}}: {{s}}</div>
 			<div><button @click="reset">Reset</button></div>
+			<div><button @click="processBotsTick">NextTick</button></div>
 			<div v-if="turn">
-				<div><button @click="hit(HIT_HEAD)">В голову</button></div>
-				<div><button @click="hit(HIT_CHEST)">В корпус</button></div>
-				<div><button @click="hit(HIT_LEGS)">В ноги</button></div>
+				<div><button @click="hit(user, enemy, HIT_HEAD)">В голову</button></div>
+				<div><button @click="hit(user, enemy, HIT_CHEST)">В корпус</button></div>
+				<div><button @click="hit(user, enemy, HIT_LEGS)">В ноги</button></div>
 			</div>
-			{{swap}}<br>
+			<div v-else-if="enemy">
+				<h3>Ход противника...</h3>
+			</div>
 			{{freeFighters}}
 			<div>{{timer}}</div>
-			<div v-for="log in damageLog" :key="log">
+			<!-- <div v-for="log in damageLog" :key="log">
 				{{log}}
-			</div>
+			</div> -->
 		</div>
-		<div class="col-md-4">
+		<div class="col-md-4 center">
 			<user-form v-if="enemy"
 				:items="[]"
 				:user="enemy"
 				:info="[]"
 				isFight
 			></user-form>
+			<div v-else>
+				<h3>Ожидание противника...</h3>
+			</div>
 			<div class="fighter-list">
 				<div v-for="(f, idx) in teams[1]" :key="idx">
 					<div :class="{'active': enemy?.id == f.id}">{{showFighter(f)}}</div>
@@ -50,7 +58,7 @@ import UserForm from '../user/form/UserForm'
 import { mapGetters } from 'vuex'
 // import { fight } from '../../use/fight/fight'
 
-const enemyProto = { id: 1, name: 'Ящер', level: '0', curhp: '18', maxhp: '18', power: '5', critical: '5', evasion: '0', stamina: '4', aggr: '0', is_undead: '0', image: 'yashcher.jpg', min_damage: 2, max_damage: 8, login: 'Ящер' }
+const botProto = { id: 1, name: 'Ящер', level: '0', curhp: '18', maxhp: '18', power: '5', critical: '5', evasion: '0', stamina: '4', aggr: '0', is_undead: '0', image: 'yashcher.jpg', min_damage: 2, max_damage: 8, login: 'Ящер' }
 const HIT_HEAD = 1;
 const HIT_CHEST = 2;
 const HIT_LEGS = 3;
@@ -61,11 +69,16 @@ const hitVerbs = {
 	[HIT_LEGS]: 'ноги',
 };
 let mdt = null;
-let timer = null;
-const NpcId = 1e7;
+const NpcId = 1e2;
 let NpcIdCounter = NpcId;
 const secondsForHit = 20
-const botsHits = {};
+// let botsHits = {};
+
+const FIGTER_TEAM_0 = 0;
+const FIGTER_TEAM_1 = 1;
+const HIT_TURN = 2;
+const HITS_COUNT = 3;
+let botTimer = null;
 
 export default {
 	data() {
@@ -74,6 +87,7 @@ export default {
 				{}, {}
 			],
 			enemy: null,
+			botsHits: {},
 			swap: {},
 			isFightEnd: false,
 			turn: null,
@@ -116,49 +130,27 @@ export default {
 
 	methods: {
 		reset() {
-			const enemy = enemyProto;
+			const bot = botProto;
+			this.stopTimer();
+			this.stopBotTimer();
+			this.isFightEnd = false;
+			this.botsHits = {};
 			this.swap = {};
 			this.teams = [{}, {}];
 			this.freeFighters = [{}, {}];
 			this.damageLog = [];
-			this.user.team = 0;
-			this.user.lastEnemyId = null;
-			this.teams[this.user.team][this.user.id] = this.user;
-			this.freeFighters[this.user.team][this.user.id] = null;
-			this.createBots(enemy, 2, 1);
-			this.createBots(enemy, 2, 0);
+			// this.initFighter(this.user, 0);
+			this.createBots(bot, 2, 0);
+			this.createBots(bot, 2, 1);
 			this.user.curhp = 100;
 			this.setPairs();
-			// this.timer = secondsForHit;
-			// this.enemy.curhp = this.user.curhp = 100;
 			// for (const k in this.teams[1]) { this.teams[1][k].curhp = 1; }
 
-			// mdt = this.monsterDamageTime();
-
-			// this.doHit();
-
 			this.processBots();
-
-			// this.stopTimer();
-			// timer = setInterval(() => {
-			// 	this.timer--;
-			// 	if (!this.timer) {
-			// 		this.timer = secondsForHit;
-			// 		this.toggleTurn(this.user, this.enemy);
-			// 	}
-
-			// 	if (this.enemyTurn) {
-			// 		if (this.timer < secondsForHit - mdt) {
-			// 			this.hit(rand(1, 3));
-			// 		}
-			// 	}
-			// }, 1000)
 		},
 		
 
 		setPairs() {
-			const prevEnemy = this.enemy?.id;
-			this.enemy = null;
 			const freeTeamFightersIds = [[], []];
 			const getRandFighter = (team, freeTeamFightersIds) => {
 				return this.teams[team][freeTeamFightersIds[rand(0, freeTeamFightersIds.length - 1)]];
@@ -178,69 +170,75 @@ export default {
 				if (!freeTeamFightersIds[1]) return;
 				const fighter1 = getRandFighter(0, freeTeamFightersIds[0]); // Take a fighter from first team free fighters
 				const fighter2 = getRandFighter(1, freeTeamFightersIds[1]); // Select opponent from second free fighters
-				if (fighter1.id === this.user.id) this.enemy = fighter2; // set my enemy
-				if (fighter2.id === this.user.id) this.enemy = fighter1; // set my enemy
+				// if (fighter1.id === this.user.id) this.enemy = fighter2; // set my enemy
+				// else if (fighter2.id === this.user.id) this.enemy = fighter1; // set my enemy
 				delete this.freeFighters[fighter1.team][fighter1.id]; // remove fighter 1 from free
 				delete this.freeFighters[fighter2.team][fighter2.id]; // remove fighter 2 from free
 				this.setSwap(fighter1, fighter2);
 			}
 		},
 
+		createBots(proto, count, team) {
+			while (count--) {
+				const enemyClone = this.initFighter(Object.assign({}, proto, { id: NpcIdCounter++ }), team);
+			}
+		},
+
+		initFighter(f, team) {
+			f.team = team;
+			f.lastEnemyId = null;
+			f.turn = null;
+			this.teams[team][f.id] = f;
+			this.freeFighters[team][f.id] = null;
+
+			return f;
+		},
+
+
+
 		processBots() {
-			setInterval(() => {
-				let hitter, defender;
-				// cl(botsHits)
-				for (const botId in botsHits) {
-					if (this.isBotHitTime(botsHits[botId])) {
-						// cl(1)
-						hitter = this.swap[botId].f1.id === +botId ? 'f1' : 'f2';
-						const team = this.swap[botId][hitter].team;
-						const teamEnemy = !team ? 1 : 0;
-						defender = this.teams[teamEnemy][this.swap[botId].[hitter !== 'f1' ? 'f1' : 'f2'].id];
-						hitter = this.teams[team][botId];
-
-						cl(this.teams, team, botId, hitter, defender);
-
-						this.hit(hitter, defender, rand(1, 3));
-					}
-				}
+			botTimer = setInterval(() => {
+				this.processBotsTick();
 			}, 2000);
 		},
 
-		isBotHitTime(botHitTime) {
-			return getTimeSeconds() <= botHitTime;
+		processBotsTick() {
+			cl('Next bot hit');
+			let hitterTeam, defenderTeam, hitter, defender;
+			for (let botId in this.botsHits) {
+				if (this.isBotHitTime(this.botsHits[botId])) {
+					delete this.botsHits[botId];
+					if (this.swap[botId][FIGTER_TEAM_0] === +botId) {
+						hitterTeam = FIGTER_TEAM_0;
+						defenderTeam = FIGTER_TEAM_1;
+					} else {
+						hitterTeam = FIGTER_TEAM_1;
+						defenderTeam = FIGTER_TEAM_0;
+					}
+
+					hitter = this.teams[hitterTeam][this.swap[botId][hitterTeam]];
+					defender = this.teams[defenderTeam][this.swap[botId][defenderTeam]];
+
+					this.hit(hitter, defender, rand(1, 3));
+				}
+			}
 		},
 
-		// doHit() {
-		// 	const processedSwap = {};
-		// 	for (swap in this.swap) {
-		// 		const s = this.swap[swap];
-		// 		processedSwap[s.f1] = null;
-		// 		processedSwap[s.f2] = null;
+		isBotHitTime(botHitTime) {
+			return getTimeSeconds() >= botHitTime;
+		},
 
-		// 		if (this.isBot(s.f1.id) && !s.turn) {
-		// 			this.botHit()
-		// 		}
-		// 	}
-		// },
 
 		isBot(userId) {
-			return userId > NpcId;
+			return userId >= NpcId;
 		},
 
 		_enemy(enemy) {
 			// this.setPairs();
 		},
 
-		createBots(proto, count, team) {
-			while (count--) {
-				const enemyClone = Object.assign({}, proto, { id: NpcIdCounter++, team: team, lastEnemyId: null });
-				this.teams[team][enemyClone.id] = enemyClone;
-				this.freeFighters[team][enemyClone.id] = null;
-			}
-		},
-
 		hit(hitter, defender, type) {
+			if (hitter.id === this.user.id) this.turn = null;
 			const damage = this.damage(hitter);
 			defender.curhp -= damage;
 			this.setLog(hitter, defender, damage, type);
@@ -264,7 +262,7 @@ export default {
 			this.isFightEnd = !this.checkAliveTeam(this.teams[team]);
 
 			if (this.isFightEnd) {
-				this.stopTimer();
+				this.stopAllTimers();
 			}
 
 			return this.isFightEnd;
@@ -283,12 +281,19 @@ export default {
 		toggleTurn(f1, f2, newEnemy = false) {
 			if (this.isFightEnd) return;
 			if (this.canSwap(f1, f2, newEnemy)) {
+				if (f1.id === this.user.id || f2.id === this.user.id) {
+					this.enemy = null;
+				}
 				this.setPairs();
 			} else {
-				this.swap[f1.id].turn = this.selectTurn(true);
-				const turnFighterId = this.swap[f1.id][!this.swap[f1.id].turn ? 'f1' : 'f2'].id;
+				this.swap[f1.id][HIT_TURN] = this.selectTurn(f1, f2);
+				const turnFighterTeam = this.swap[f1.id][HIT_TURN] ? 1 : 0;
+				const turnFighterId = this.swap[f1.id][turnFighterTeam];
+				if (turnFighterId === this.user.id) {
+					this.turn = true;
+				}
 				if (this.isBot(turnFighterId)) {
-					botsHits[turnFighterId] = this.monsterDamageTime();
+					this.botsHits[turnFighterId] = this.monsterDamageTime();
 				}
 			}
 		},
@@ -298,13 +303,22 @@ export default {
 		},
 
 		stopTimer() {
-			clearInterval(timer);
+			clearInterval(this.timer);
+		},
+
+		stopBotTimer() {
+			clearInterval(botTimer);
+		},
+
+		stopAllTimers() {
+			this.stopTimer();
+			this.stopBotTimer();
 		},
 
 		canSwap(f1, f2, newEnemy) {
-			if (newEnemy || !--this.swap[f1.id].hits) {
-				// delete this.swap[f1.id];
-				// delete this.swap[f2.id];
+			if (newEnemy || !--this.swap[f1.id][HITS_COUNT]) {
+				delete this.swap[f1.id];
+				delete this.swap[f2.id];
 
 				if (f1.curhp > 0) this.freeFighters[f1.team][f1.id] = null;
 				if (f2.curhp > 0) this.freeFighters[f2.team][f2.id] = null;
@@ -316,34 +330,59 @@ export default {
 		},
 
 		setSwap(f1, f2) {
-			let isPrevEnemy = false;
-			if (this.swap[f1.id]) {
-				// Если существует предыдущая пара для данного бойца, проверим:
-					// Если первый боец это он, а второй боец тот же что и пришел, 
-					// или мы это второй боец, а первый тот кто пришел
-						// то деремя дальше и меняем очередь удара на противоположный
-				if ((this.swap[f1.id].f1.id === f1.id && this.swap[f1.id].f2.id === f2.id) || 
-						(this.swap[f1.id].f2.id === f1.id && this.swap[f1.id].f1.id === f2.id)) {
-					isPrevEnemy = true;
-				}
+			const turn = this.selectTurn(f1, f2);
+			const swap = [
+				f1.id,
+				f2.id,
+				turn,
+				2,
+			];
+
+			let hitter, defender;
+			if (!swap[HIT_TURN]) {
+				hitter = f1;
+				defender = f2;
+			} else {
+				hitter = f2;
+				defender = f1;
 			}
-			const swap = {
-				f1: { id: f1.id, team: f1.team },
-				f2: { id: f2.id, team: f2.team },
-				turn: this.selectTurn(isPrevEnemy ? this.swap[f1.id].id : null),
-				hits: 2,
-			};
-			const hitter = !swap.turn ? f1 : f2;
+
+			// Set user enemy
 			if (this.isBot(hitter.id)) {
-				botsHits[hitter.id] = this.monsterDamageTime();
+				this.botsHits[hitter.id] = this.monsterDamageTime();
+			}
+
+			if (hitter.id === this.user.id) {
+				this.enemy = defender;
+				this.turn = true;
+			} else if (defender.id === this.user.id) {
+				this.enemy = hitter;
 			}
 			
+			f1.lastEnemyId = f2.id;
+			f2.lastEnemyId = f1.id;
+
 			this.swap[f1.id] = swap;
 			this.swap[f2.id] = swap;
 		},
 
-		selectTurn(prevTurn = null) {
-			return !prevTurn ? !!rand(0, 1) : !prevTurn.turn;
+		findPreviousEnemy(f1, f2) {
+			let prevEnemy = null;
+			if (this.swap[f1.id][FIGTER_TEAM_0] === f1.id) {
+				prevEnemy = this.swap[f1.id][FIGTER_TEAM_1];
+			} else if (this.swap[f1.id][FIGTER_TEAM_1] === f1.id) {
+				prevEnemy = this.swap[f1.id][FIGTER_TEAM_0];
+			}
+
+			return prevEnemy
+		},
+
+		selectTurn(f1, f2) {
+			const isPrevEnemy = f1.lastEnemyId === f2.id;
+			const turn = !isPrevEnemy ? rand(0, 1) : (f1.turn ? 0 : 1);
+			f1.turn = f2.turn = turn;
+
+			return turn;
 		},
 
 		setLog(hitter, defender, damage, hitType) {
@@ -351,7 +390,8 @@ export default {
 		},
 
 		monsterDamageTime() {
-			return getTimeSeconds() + rand(2, 4);
+			// return getTimeSeconds() + rand(2, 4);
+			return getTimeSeconds() + 1;
 		},
 		
 		showFighter(f) {
