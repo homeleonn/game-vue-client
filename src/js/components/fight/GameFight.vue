@@ -31,9 +31,7 @@
 			</div>
 			{{freeFighters}}
 			<div>{{timer}}</div>
-			<!-- <div v-for="log in damageLog" :key="log">
-				{{log}}
-			</div> -->
+			<div v-for="log in damageLog" :key="log" v-html="log"></div>
 		</div>
 		<div class="col-md-4 center">
 			<user-form v-if="enemy"
@@ -139,8 +137,9 @@ export default {
 			this.teams = [{}, {}];
 			this.freeFighters = [{}, {}];
 			this.damageLog = [];
-			// this.initFighter(this.user, 0);
-			this.createBots(bot, 2, 0);
+			// this.user.max_damage = 20;
+			this.initFighter(this.user, 0);
+			// this.createBots(bot, 2, 0);
 			this.createBots(bot, 2, 1);
 			this.user.curhp = 100;
 			this.setPairs();
@@ -239,9 +238,15 @@ export default {
 
 		hit(hitter, defender, type) {
 			if (hitter.id === this.user.id) this.turn = null;
-			const damage = this.damage(hitter);
+			let [damage, crit] = this.damage(hitter);
+			if (crit) {
+				damage *= 2;
+			}
+			if (defender.curhp < damage) {
+				damage = defender.curhp;
+			}
 			defender.curhp -= damage;
-			this.setLog(hitter, defender, damage, type);
+			this.setLog(hitter, defender, damage, type, crit);
 			const isFighterDeath = this.checkFighterDeath(defender)
 			this.toggleTurn(hitter, defender, isFighterDeath);
 		},
@@ -299,7 +304,7 @@ export default {
 		},
 
 		damage(user) {
-			return rand(user.min_damage, user.max_damage);
+			return [rand(user.min_damage, user.max_damage), !!rand(0, 1)];
 		},
 
 		stopTimer() {
@@ -385,7 +390,8 @@ export default {
 			return turn;
 		},
 
-		setLog(hitter, defender, damage, hitType) {
+		setLog(hitter, defender, damage, hitType, crit = false) {
+			damage = crit ? `<span style="color: red;">${damage}</span>` : damage;
 			this.damageLog.unshift(`${hitter.login}[${hitter.level}] ударил ${defender.login}[${defender.level}] в ${hitVerbs[hitType]} на -${damage}`);
 		},
 
