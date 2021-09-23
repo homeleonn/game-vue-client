@@ -1,5 +1,5 @@
 <template>
-	<div class="fight row">
+	<div class="fight row center">
 		<div class="col-md-4">
 			<user-form
 				:items="[]"
@@ -8,9 +8,10 @@
 				isFight
 				:damage="damageShow"
 			></user-form>
+			<button @click="createBots(null, 1, 0); setPairs();">Добавить бота</button>
 			<div class="fighter-list">
 				<div v-for="(f, idx) in teams[0]" :key="idx">
-					<div>{{showFighter(f)}}</div>
+					<user-short-info :user="f" shrink></user-short-info>
 				</div>
 			</div>
 			<!-- {{user}} -->
@@ -21,7 +22,8 @@
 			<div v-for="(s, idx) in swap" :key="idx">{{idx}}: {{s}}</div>
 			<div><button @click="reset">Reset</button></div>
 			<div><button @click="processBotsTick">NextTick</button></div>
-			<div v-if="turn">
+			<div><button @click="stopAllTimers()">Stop timers</button></div>
+			<div v-if="turn && !isChangingEnemy">
 				<div><button @click="hit(user, enemy, HIT_HEAD)">В голову</button></div>
 				<div><button @click="hit(user, enemy, HIT_CHEST)">В корпус</button></div>
 				<div><button @click="hit(user, enemy, HIT_LEGS)">В ноги</button></div>
@@ -34,26 +36,35 @@
 			<div v-for="log in damageLog" :key="log" v-html="log"></div>
 		</div>
 		<div class="col-md-4 center">
-			<user-form v-if="enemy"
-				:items="[]"
-				:user="enemy"
-				:info="[]"
-				isFight
-			></user-form>
+			<div v-if="enemy">
+				<!-- <div class="changing-enemy icon-spin3 active"></div> -->
+				<div v-if="isChangingEnemy" class="changing-enemy icon-spin3 active"></div>
+				<user-form v-else
+					:items="[]"
+					:user="enemy"
+					:info="[]"
+					isFight
+				></user-form>
+			</div>
 			<div v-else>
 				<h3>Ожидание противника...</h3>
 			</div>
+			<button @click="createBots(null, 1, 1); setPairs();">Добавить бота</button>
 			<div class="fighter-list">
 				<div v-for="(f, idx) in teams[1]" :key="idx">
-					<div :class="{'active': enemy?.id == f.id}">{{showFighter(f)}}</div>
+					<div :class="{'active': enemy?.id == f.id}">
+						<user-short-info :user="f" shrink></user-short-info>
+						<!-- <team-fighter :fighter="f"></team-fighter> -->
+					</div>
 				</div>
 			</div>
 		</div>
 	</div>
 </template>
 <script>
-import UserForm from '../user/form/UserForm'
 import { mapGetters } from 'vuex'
+import UserForm from '../user/form/UserForm'
+import UserShortInfo from '../user/form/UserShortInfo'
 // import { fight } from '../../use/fight/fight'
 
 const botProto = { id: 1, name: 'Ящер', level: '0', curhp: '18', maxhp: '18', power: '5', critical: '5', evasion: '0', stamina: '4', aggr: '0', is_undead: '0', image: 'yashcher.jpg', min_damage: 2, max_damage: 8, login: 'Ящер' }
@@ -76,7 +87,9 @@ const FIGTER_TEAM_0 = 0;
 const FIGTER_TEAM_1 = 1;
 const HIT_TURN = 2;
 const HITS_COUNT = 3;
-let botTimer = null;
+let botTimerId = null;
+let myTimerId = null;
+
 
 export default {
 	data() {
@@ -85,6 +98,7 @@ export default {
 				{}, {}
 			],
 			enemy: null,
+			isChangingEnemy: false,
 			botsHits: {},
 			swap: {},
 			isFightEnd: false,
@@ -111,9 +125,6 @@ export default {
 
 	computed: {
 		...mapGetters(['user']),
-		enemyTurn() {
-			return !this.turn;
-		},
 
 		HIT_HEAD: () => HIT_HEAD,
 		HIT_CHEST: () => HIT_CHEST,
@@ -128,7 +139,6 @@ export default {
 
 	methods: {
 		reset() {
-			const bot = botProto;
 			this.stopTimer();
 			this.stopBotTimer();
 			this.isFightEnd = false;
@@ -139,8 +149,8 @@ export default {
 			this.damageLog = [];
 			// this.user.max_damage = 20;
 			this.initFighter(this.user, 0);
-			// this.createBots(bot, 2, 0);
-			this.createBots(bot, 2, 1);
+			// this.createBots(botProto, 2, 0);
+			this.createBots(botProto, 2, 1);
 			this.user.curhp = 100;
 			this.setPairs();
 			// for (const k in this.teams[1]) { this.teams[1][k].curhp = 1; }
@@ -169,8 +179,6 @@ export default {
 				if (!freeTeamFightersIds[1]) return;
 				const fighter1 = getRandFighter(0, freeTeamFightersIds[0]); // Take a fighter from first team free fighters
 				const fighter2 = getRandFighter(1, freeTeamFightersIds[1]); // Select opponent from second free fighters
-				// if (fighter1.id === this.user.id) this.enemy = fighter2; // set my enemy
-				// else if (fighter2.id === this.user.id) this.enemy = fighter1; // set my enemy
 				delete this.freeFighters[fighter1.team][fighter1.id]; // remove fighter 1 from free
 				delete this.freeFighters[fighter2.team][fighter2.id]; // remove fighter 2 from free
 				this.setSwap(fighter1, fighter2);
@@ -178,6 +186,7 @@ export default {
 		},
 
 		createBots(proto, count, team) {
+			if (!proto) proto = botProto;
 			while (count--) {
 				const enemyClone = this.initFighter(Object.assign({}, proto, { id: NpcIdCounter++ }), team);
 			}
@@ -196,12 +205,13 @@ export default {
 
 
 		processBots() {
-			botTimer = setInterval(() => {
+			botTimerId = setInterval(() => {
 				this.processBotsTick();
 			}, 2000);
 		},
 
 		processBotsTick() {
+			if (!Object.keys(this.botsHits).length) return;
 			cl('Next bot hit');
 			let hitterTeam, defenderTeam, hitter, defender;
 			for (let botId in this.botsHits) {
@@ -237,7 +247,7 @@ export default {
 		},
 
 		hit(hitter, defender, type) {
-			if (hitter.id === this.user.id) this.turn = null;
+			this.removeMyTurn(hitter.id);
 			let [damage, crit] = this.damage(hitter);
 			if (crit) {
 				damage *= 2;
@@ -283,23 +293,42 @@ export default {
 			return false;
 		},
 
-		toggleTurn(f1, f2, newEnemy = false) {
+		toggleTurn(f1, f2, isFighterDeath = false) {
 			if (this.isFightEnd) return;
-			if (this.canSwap(f1, f2, newEnemy)) {
+			if (this.canSwap(f1, f2, isFighterDeath)) {
 				if (f1.id === this.user.id || f2.id === this.user.id) {
 					this.enemy = null;
 				}
 				this.setPairs();
 			} else {
-				this.swap[f1.id][HIT_TURN] = this.selectTurn(f1, f2);
+				this.swap[f1.id][HIT_TURN] = selectTurn(f1, f2);
 				const turnFighterTeam = this.swap[f1.id][HIT_TURN] ? 1 : 0;
 				const turnFighterId = this.swap[f1.id][turnFighterTeam];
-				if (turnFighterId === this.user.id) {
-					this.turn = true;
-				}
+				this.setMyTurn(f1, f2, turnFighterId);
 				if (this.isBot(turnFighterId)) {
-					this.botsHits[turnFighterId] = this.monsterDamageTime();
+					this.botsHits[turnFighterId] = monsterDamageTime(); // todo: in method
 				}
+			}
+		},
+
+		setMyTurn(f1, f2, turnFighterId) {
+			if (turnFighterId === this.user.id) {
+				this.turn = true;
+				this.timer = 10;
+				myTimerId = setInterval(() => {
+					this.timer--;
+					if (!this.timer) {
+						this.removeMyTurn(this.user.id);
+						this.toggleTurn(f1, f2);
+					}
+				}, 1000);
+			}
+		},
+
+		removeMyTurn(turnFighterId) {
+			if (turnFighterId === this.user.id) {
+				this.turn = this.timer = null;
+				this.stopTimer();
 			}
 		},
 
@@ -308,11 +337,11 @@ export default {
 		},
 
 		stopTimer() {
-			clearInterval(this.timer);
+			clearInterval(myTimerId);
 		},
 
 		stopBotTimer() {
-			clearInterval(botTimer);
+			clearInterval(botTimerId);
 		},
 
 		stopAllTimers() {
@@ -335,7 +364,7 @@ export default {
 		},
 
 		setSwap(f1, f2) {
-			const turn = this.selectTurn(f1, f2);
+			const turn = selectTurn(f1, f2);
 			const swap = [
 				f1.id,
 				f2.id,
@@ -354,14 +383,21 @@ export default {
 
 			// Set user enemy
 			if (this.isBot(hitter.id)) {
-				this.botsHits[hitter.id] = this.monsterDamageTime();
+				this.botsHits[hitter.id] = monsterDamageTime();
 			}
 
 			if (hitter.id === this.user.id) {
 				this.enemy = defender;
-				this.turn = true;
+				this.setMyTurn(hitter, defender, hitter.id);
 			} else if (defender.id === this.user.id) {
 				this.enemy = hitter;
+			}
+
+			if (this.enemy && this.user.lastEnemyId !== this.enemy.id) {
+				this.isChangingEnemy = true;
+				setTimeout(() => {
+					this.isChangingEnemy = false;
+				}, 500)
 			}
 			
 			f1.lastEnemyId = f2.id;
@@ -371,42 +407,36 @@ export default {
 			this.swap[f2.id] = swap;
 		},
 
-		findPreviousEnemy(f1, f2) {
-			let prevEnemy = null;
-			if (this.swap[f1.id][FIGTER_TEAM_0] === f1.id) {
-				prevEnemy = this.swap[f1.id][FIGTER_TEAM_1];
-			} else if (this.swap[f1.id][FIGTER_TEAM_1] === f1.id) {
-				prevEnemy = this.swap[f1.id][FIGTER_TEAM_0];
-			}
-
-			return prevEnemy
-		},
-
-		selectTurn(f1, f2) {
-			const isPrevEnemy = f1.lastEnemyId === f2.id;
-			const turn = !isPrevEnemy ? rand(0, 1) : (f1.turn ? 0 : 1);
-			f1.turn = f2.turn = turn;
-
-			return turn;
-		},
-
 		setLog(hitter, defender, damage, hitType, crit = false) {
 			damage = crit ? `<span style="color: red;">${damage}</span>` : damage;
 			this.damageLog.unshift(`${hitter.login}[${hitter.level}] ударил ${defender.login}[${defender.level}] в ${hitVerbs[hitType]} на -${damage}`);
 		},
 
-		monsterDamageTime() {
-			// return getTimeSeconds() + rand(2, 4);
-			return getTimeSeconds() + 1;
-		},
 		
-		showFighter(f) {
-			return `${f.id}:${f.login}[${f.level}](${f.curhp}/${f.maxhp})`;
-		},
 	},
 
-	components: { UserForm }
+	components: {
+		UserForm,
+		UserShortInfo
+	}
 }
+
+
+
+function monsterDamageTime() {
+	// return getTimeSeconds() + rand(2, 4);
+	return getTimeSeconds() + 1;
+}
+
+function selectTurn(f1, f2) {
+	const isPrevEnemy = f1.lastEnemyId === f2.id;
+	const turn = !isPrevEnemy ? rand(0, 1) : (f1.turn ? 0 : 1);
+	f1.turn = f2.turn = turn;
+
+	return turn;
+}
+
+
 </script>
 
 <style lang="scss">
@@ -430,6 +460,17 @@ export default {
 		text-align: center;
 		.active {
 			font-weight: bold;
+		}
+	}
+
+	.changing-enemy {
+		animation: spin 2s linear infinite;
+		margin: 0 auto;
+		margin-top: 20px;
+
+		&:before {
+			display: inline-block;
+			font-size: 200px;
 		}
 	}
 }

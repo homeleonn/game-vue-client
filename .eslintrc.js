@@ -26,6 +26,7 @@ module.exports = {
     'vue/no-mutating-props': 'off',
     'no-unused-vars': 'off',
     'prefer-const': 'off',
+    'vue/no-unused-components': 'off',
     'quotes': 'off'
   }
 }

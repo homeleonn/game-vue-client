@@ -93,11 +93,15 @@ function date(format, date = new Date()) {
 		"Y": 'FullYear',
 		"y": 'FullYear',
 		"m": 'Month',
-		"d": 'Day'
+		"d": 'Date'
 	};
 
 	return format.replace(/([YymdHis])/g, item => {
-		let s = z(date['get' + formats[item]]());
+		itemDate = date['get' + formats[item]]();
+		if (item === 'm') {
+			itemDate += 1;
+		}
+		let s = z(itemDate);
 		return item === 'y' ? s.toString().substr(2, 2) : s;
 	});
 }

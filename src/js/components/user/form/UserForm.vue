@@ -5,10 +5,7 @@
 	>
 		<div class="flex">
 			<div v-if="isFight">
-				<user-short-info
-					:user="user"
-					:hpLineStyle="hpLineStyle"
-				></user-short-info>
+				<user-short-info :user="user"></user-short-info>
 			</div>
 			<div class="user-form">
 				<div class="row">
@@ -87,10 +84,6 @@ export default {
 		image() {
 			return 'img/images/' + (this.user.image ?? this.user.sex + '.png');
 		},
-
-		hpLineStyle() {
-			return setHpLineStyle(this.user.curhp, this.user.maxhp);
-		}
 
 	},
 
