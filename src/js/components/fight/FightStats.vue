@@ -1,5 +1,5 @@
 <template>
-	<div class="fight-stats">
+	<div class="fight-stats" v-if="this.$store.state.fightStats">
 		<h4 class="center">Бой окончен! Вы нанесли <b>{{ user.damage }}</b> урона, убийств: <b>{{ user.kills }}</b>. Получено опыта <b>{{ user.fightExp }}</b>.</h4>
 		<div class="row">
 			<div class="col-md-3">
@@ -23,10 +23,10 @@
 				<div class="row times">
 					<div class="col-md-4">
 						<!-- Начало боя: 23.09.2021 18:01:47 -->
-						Начало боя: {{ startFight }}
+						Начало боя: {{ formattedStartTime }}
 					</div>
 					<div class="col-md-4">
-						Победила {{ !winTeam ? 1 : 2 }}я команда
+						Победила {{ !$store.state.fightStats.winTeam ? 1 : 2 }}я команда
 					</div>
 					<div class="col-md-4">
 						<!-- Длительность: 00 мин 57 сек -->
@@ -47,7 +47,7 @@
 								<th>Урон</th>
 								<th>Убийств</th>
 							</tr>
-							<tr v-for="fighter in teams[0]" :key="fighter.id">
+							<tr v-for="fighter in $store.state.fightStats.teams[0]" :key="fighter.id">
 								<td>{{fighter.login}}[{{fighter.level}}]</td>
 								<td>{{fighter.fightExp}}</td>
 								<td>{{fighter.damage}}</td>
@@ -65,7 +65,7 @@
 								<th>Урон</th>
 								<th>Убийств</th>
 							</tr>
-							<tr v-for="fighter in teams[1]" :key="fighter.id">
+							<tr v-for="fighter in $store.state.fightStats.teams[1]" :key="fighter.id">
 								<td>{{fighter.login}}[{{fighter.level}}]</td>
 								<td>{{fighter.fightExp}}</td>
 								<td>{{fighter.damage}}</td>
@@ -83,39 +83,53 @@
 </template>
 
 <script>
-const user = { id: 1, login: 'Admin', level: 0, fightExp: 10, damage: 55, kills: 2 };
+// const user = { id: 1, login: 'Admin', level: 0, fightExp: 10, damage: 55, kills: 2 };
 export default {
 	// props: ['teams'],
 	emits: ['setCurComp'],
 
 	data() {
 		return {
-			user,
-			teams: [
-				[
-					user,
-				],
-				[
-					{ id: 100, login: 'Ящер', level: 0, fightExp: 0, damage: 70, kills: 0 },
-					{ id: 101, login: 'Ящер', level: 0, fightExp: 150, damage: 70, kills: 1 },
-				],
-			],
-			winTeam: 0,
-			start: Date.now() - 1000 * 2000,
+			user: {},
+			// teams: [
+			// 	[
+			// 		user,
+			// 	],
+			// 	[
+			// 		{ id: 100, login: 'Ящер', level: 0, fightExp: 0, damage: 70, kills: 0 },
+			// 		{ id: 101, login: 'Ящер', level: 0, fightExp: 150, damage: 70, kills: 1 },
+			// 	],
+			// ],
+			// winTeam: 0,
+			// startTime: Date.now() - 1000 * 2000,
 		}
 	},
 
 	computed: {
-		startFight() {
-			return date('Y-m-d H:i:s', new Date(this.start));
+		formattedStartTime() {
+			return date('Y-m-d H:i:s', new Date(this.$store.state.fightStats.startTime));
 		},
 
 		fightDuration() {
-			const fightSecondsLeft = (new Date().getTime() - new Date(this.start)) / 1000;
+			const fightSecondsLeft = (new Date().getTime() - new Date(this.$store.state.fightStats.startTime)) / 1000;
 			return timer(fightSecondsLeft);
 		}
-	}
+	},
 
+	mounted() {
+		if (!this.$store.state.fightStats) return;
+		let isUserFound = false;
+		this.$store.state.fightStats.teams.forEach(team => {
+			if (isUserFound) return;
+			for (const fighterId in team) {
+				if (+fighterId === this.$store.state.user.id) {
+					this.user = team[fighterId];
+					isUserFound = true;
+					return;
+				}
+			}
+		})
+	}
 }
 </script>
 

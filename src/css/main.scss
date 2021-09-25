@@ -25,6 +25,16 @@
     flex-direction: column;
 }
 
+.btn {
+    border: 2px #fcbebe outset;
+    padding: 8px;
+    line-height: 1;
+    border-radius: 5px;
+    background: lightblue;
+    // background: rgba(255, 255, 255, .5);
+    font-weight: bold;
+}
+
 :root {
     --color: #90ee90;
     // --color: #ff0;
@@ -286,7 +296,7 @@ footer {
     }
 
     #messages {
-        width: 100%;
+        flex-grow: 1;
         padding: 3px 0;
         border-right: 1px var(--color) solid;
         overflow-y: auto;

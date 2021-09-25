@@ -39,10 +39,17 @@ export default {
 	data() {
 		return {
 			// currentMainComponent: 'LocationWrapper',
-			currentMainComponent: "FightStats",
+			currentMainComponent: "GameFight",
 			// currentMainComponent: null,
+			// apiReady: true
 			apiReady: false
 		};
+	},
+
+	mounted() {
+		if (!this.apiReady) {
+			api.init();
+		}
 	},
 
 	provide() {
@@ -147,10 +154,6 @@ export default {
 		},
 	},
 
-	mounted() {
-		api.init();
-	},
-
 	created() {
 		this.apiSubscribe(
 			["me", "loc", "addLocUser", "leaveLocUser", "message"],
@@ -191,5 +194,6 @@ export default {
 <style>
 .main {
 	position: relative;
+	padding-left: 70px;
 }
 </style>

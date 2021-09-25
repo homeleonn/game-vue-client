@@ -170,13 +170,24 @@ class Core {
 		return _(selector, this[0]);
 	}
 
+	parent() {
+		return _(this[0].parentNode);
+	}
+
 	toArray(raw = null) {
 		return Array.prototype.slice.call(raw ? raw : this);
 	}
 
 	css(key, value = null) {
 		if (typeof key !== 'object') {
-			if (!value) return this[0].style[key];
+			if (!value) {
+				let val = this[0].style[key];
+				val = val ? val : (getComputedStyle(this[0])[key]);
+				if (value === false) {
+					val = +val.split('px')[0];
+				}
+				return val;
+			}
 			key = {[key]: value};
 		}
 		this.e(el => {

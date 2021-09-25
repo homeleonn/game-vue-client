@@ -1,12 +1,16 @@
 <template>
-	<footer>
+	<footer ref="footer">
 		<div class="resizer">
-			<div class="up">▲</div>
-			<div class="down">▼</div>
+			<div class="up" @click="resize(true)">▲</div>
+			<div class="down" @click="resize(false)">▼</div>
 		</div>
 		<div id="chat">
 			<div class="flex">
 				<div id="messages" ref="messages"></div>
+				<div class="fight-log" v-if="isFightLogVisible">
+					<div v-for="log in $store.state.fightLog" :key="log" v-html="log"></div>
+				</div>
+				<button class="fight-log-toggle btn" :class="{active: isFightLogVisible}" @click="isFightLogVisible = !isFightLogVisible">Лог боя</button>
 				<div id="chat-loc">
 					<div id="location-caption">
 						<span class="name">{{ location.name }}</span>
@@ -75,11 +79,14 @@ export default {
 
 	data() {
 		return {
-			message: ""
+			message: "",
+			isFightLogVisible: false,
 		};
 	},
 
-	computed: mapGetters(["csrf", "location", "locationUsers"]),
+	computed: {
+		...mapGetters(["csrf", "location", "locationUsers"]),
+	},
 
 	methods: {
 		send() {
@@ -93,13 +100,57 @@ export default {
 					curhp: 18
 				}
 			})
+		},
+
+		resize(isUp) {
+			const stepSize = 50;
+			let footerHeight = _footer.css('height', false);
+
+			footerHeight += isUp ? stepSize : -stepSize; 
+			_footer.css('height', footerHeight + 'px');
 		}
 	},
 
 	created() {},
+	mounted() {
+		_footer = _('footer');
+	},
 
 	components: { UserList }
-};
+}
+
+let _footer;
 </script>
 
-<style scoped></style>
+<style lang="scss">
+.fight-log {
+	// width: 500px;
+	flex-basis: 400px;
+	border-right: 1px lightgreen solid;
+	// overflow: hidden;
+	overflow-y: scroll;
+
+	> div {
+		padding: 3px 0 3px 10px;
+
+		&:nth-child(odd) {
+			background: #f1f1f1;
+		}
+	}
+}
+
+.fight-log-toggle {
+	position: absolute;
+	right: 305px;
+	padding: 1px;
+
+	&.btn {
+		padding: 3px;
+	}
+
+	&.active {
+		right: 705px;
+		border-style: inset;
+	}
+}
+</style>

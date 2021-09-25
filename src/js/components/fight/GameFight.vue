@@ -17,12 +17,19 @@
 			<!-- {{user}} -->
 		</div>
 		<div class="col-md-4 flex fcol fight-panel">
-			<div v-if="isFightEnd"><b>Fight has finished!</b></div>
-			{{botsHits}}
-			<div v-for="(s, idx) in swap" :key="idx">{{idx}}: {{s}}</div>
+			<div v-if="isFightEnd">
+				<b>Fight has finished!</b>
+				<button @click="$emit('setCurComp', 'FightStats')">Statistics</button>
+			</div>
+			<!-- {{botsHits}} -->
+			<!-- <div v-for="(s, idx) in swap" :key="idx">{{idx}}: {{s}}</div> -->
 			<div><button @click="reset">Reset</button></div>
-			<div><button @click="processBotsTick">NextTick</button></div>
+			<!-- <div><button @click="processBotsTick">NextTick</button></div> -->
 			<div><button @click="stopAllTimers()">Stop timers</button></div>
+			<div class="fighters">
+				<fighter-model side="right" :damage="damageMe"></fighter-model>
+				<fighter-model side="left" :damage="damageEnemy"></fighter-model>
+			</div>
 			<div v-if="turn && !isChangingEnemy">
 				<div><button @click="hit(user, enemy, HIT_HEAD)">В голову</button></div>
 				<div><button @click="hit(user, enemy, HIT_CHEST)">В корпус</button></div>
@@ -31,9 +38,9 @@
 			<div v-else-if="enemy">
 				<h3>Ход противника...</h3>
 			</div>
-			{{freeFighters}}
+			<!-- {{freeFighters}} -->
 			<div>{{timer}}</div>
-			<div v-for="log in damageLog" :key="log" v-html="log"></div>
+			<!-- <div v-for="log in damageLog" :key="log" v-html="log"></div> -->
 		</div>
 		<div class="col-md-4 center">
 			<div v-if="enemy">
@@ -65,6 +72,7 @@
 import { mapGetters } from 'vuex'
 import UserForm from '../user/form/UserForm'
 import UserShortInfo from '../user/form/UserShortInfo'
+import FighterModel from './FighterModel'
 // import { fight } from '../../use/fight/fight'
 
 const botProto = { id: 1, name: 'Ящер', level: '0', curhp: '18', maxhp: '18', power: '5', critical: '5', evasion: '0', stamina: '4', aggr: '0', is_undead: '0', image: 'yashcher.jpg', min_damage: 2, max_damage: 8, login: 'Ящер' }
@@ -89,6 +97,7 @@ const HIT_TURN = 2;
 const HITS_COUNT = 3;
 let botTimerId = null;
 let myTimerId = null;
+let startTime = new Date().getTime();
 
 
 export default {
@@ -104,6 +113,9 @@ export default {
 			isFightEnd: false,
 			turn: null,
 			timer: null,
+			hitId: 1,
+			damageMe: [],
+			damageEnemy: [],
 			damageLog: [],
 			damageShow: [{ id: rand(1, 200), damage: '-1' }],
 			freeFighters: [
@@ -134,6 +146,7 @@ export default {
 	mounted() {
 		// this.api.doAction('getEnemy', 1);
 		// this._enemy(enemyProto);
+		// setInterval(() => { this.damageTest = rand(1, 100) }, 1000)
 		this.reset();
 	},
 
@@ -147,11 +160,12 @@ export default {
 			this.teams = [{}, {}];
 			this.freeFighters = [{}, {}];
 			this.damageLog = [];
-			// this.user.max_damage = 20;
+			this.user.min_damage = 10;
+			this.user.max_damage = 20;
 			this.initFighter(this.user, 0);
-			// this.createBots(botProto, 2, 0);
-			this.createBots(botProto, 2, 1);
-			this.user.curhp = 100;
+			this.createBots(botProto, 5, 0);
+			this.createBots(botProto, 12, 1);
+			this.user.curhp = 200;
 			this.setPairs();
 			// for (const k in this.teams[1]) { this.teams[1][k].curhp = 1; }
 
@@ -196,6 +210,9 @@ export default {
 			f.team = team;
 			f.lastEnemyId = null;
 			f.turn = null;
+			f.damage = 0;
+			f.fightExp = 0;
+			f.kills = 0;
 			this.teams[team][f.id] = f;
 			this.freeFighters[team][f.id] = null;
 
@@ -247,22 +264,38 @@ export default {
 		},
 
 		hit(hitter, defender, type) {
-			this.removeMyTurn(hitter.id);
-			let [damage, crit] = this.damage(hitter);
-			if (crit) {
-				damage *= 2;
-			}
-			if (defender.curhp < damage) {
-				damage = defender.curhp;
-			}
+			let [damage, crit] = this.damage(hitter, defender);
 			defender.curhp -= damage;
+			this.removeMyTurn(hitter.id);
 			this.setLog(hitter, defender, damage, type, crit);
-			const isFighterDeath = this.checkFighterDeath(defender)
+			const isFighterDeath = this.checkFighterDeath(hitter, defender);
 			this.toggleTurn(hitter, defender, isFighterDeath);
 		},
 
-		checkFighterDeath(defender) {
+		damage(hitter, defender) {
+			let damage = rand(hitter.min_damage, hitter.max_damage);
+			const crit = this.isCrit();
+
+			if (crit) {
+				damage *= 2;
+			}
+
+			if (defender.curhp < damage) {
+				damage = +defender.curhp;
+			}
+
+			hitter.damage += damage;
+
+			return [damage, crit];
+		},
+
+		isCrit() {
+			return !!rand(0, 1)
+		},
+
+		checkFighterDeath(hitter, defender) {
 			if (defender.curhp <= 0) {
+				hitter.kills += 1;
 				defender.curhp = 0;
 				delete this.freeFighters[defender.team][defender.id];
 				this.checkEndFight(defender);
@@ -273,11 +306,31 @@ export default {
 		},
 
 		checkEndFight(defender) {
-			const team = defender.team;
-			this.isFightEnd = !this.checkAliveTeam(this.teams[team]);
+			this.isFightEnd = !this.checkAliveTeam(this.teams[defender.team]);
+			const winTeam = defender.team === 0 ? 1 : 0;
 
 			if (this.isFightEnd) {
 				this.stopAllTimers();
+
+				const teams = [{}, {}];
+				const setTeamFighterForStats = (fighter, winner) => {
+					teams[fighter.team][fighter.id] = {
+						id: fighter.id,
+						login: fighter.login,
+						level: fighter.level,
+						fightExp: (winner ? fighter.damage * 2 : 0),
+						damage: fighter.damage,
+						kills: fighter.kills,
+					}
+				}
+				walkTeam(this.teams[winTeam], fighter => { setTeamFighterForStats(fighter, true) });
+				walkTeam(this.teams[defender.team], fighter => { setTeamFighterForStats(fighter, false) });
+
+				this.$store.commit('SET_FIGHTSTATS', {
+					startTime,
+					winTeam,
+					teams
+				});
 			}
 
 			return this.isFightEnd;
@@ -330,10 +383,6 @@ export default {
 				this.turn = this.timer = null;
 				this.stopTimer();
 			}
-		},
-
-		damage(user) {
-			return [rand(user.min_damage, user.max_damage), !!rand(0, 1)];
 		},
 
 		stopTimer() {
@@ -408,20 +457,36 @@ export default {
 		},
 
 		setLog(hitter, defender, damage, hitType, crit = false) {
-			damage = crit ? `<span style="color: red;">${damage}</span>` : damage;
-			this.damageLog.unshift(`${hitter.login}[${hitter.level}] ударил ${defender.login}[${defender.level}] в ${hitVerbs[hitType]} на -${damage}`);
+			if (!this.isMe(hitter, defender)) return;
+			const d = crit ? `<span style="color: red;">${damage}</span>` : damage;
+			if (hitter.id === this.user.id) {
+				cl(1);
+				this.damageMe = [3, damage, false, this.hitId++];
+				this.damageEnemy = [3, damage, crit, this.hitId++];
+			} else {
+				this.damageMe = [3, damage, crit, this.hitId++];
+				this.damageEnemy = [3, damage, false, this.hitId++];
+			}
+			// this.['damage' + (hitter === this.user.id ? 'Enemy' : 'Me')] = [3, damage, crit, this.hitId++];
+			this.$store.commit('ADD_FIGHT_LOG', `${hitter.login}[${hitter.level}] ударил ${defender.login}[${defender.level}] в ${hitVerbs[hitType]} на -${d}`);
+			if (defender.curhp <= 0) {
+				this.$store.commit('ADD_FIGHT_LOG', `${defender.login}[${defender.level}] погибает.`);
+			}
 		},
+
+		isMe(hitter, defender) {
+			return hitter.id === this.user.id || defender.id === this.user.id;
+		}
 
 		
 	},
 
 	components: {
 		UserForm,
-		UserShortInfo
+		UserShortInfo,
+		FighterModel
 	}
 }
-
-
 
 function monsterDamageTime() {
 	// return getTimeSeconds() + rand(2, 4);
@@ -434,6 +499,12 @@ function selectTurn(f1, f2) {
 	f1.turn = f2.turn = turn;
 
 	return turn;
+}
+
+function walkTeam(team, cb) {
+	for (const fId in team) {
+		cb(team[fId]);
+	}
 }
 
 

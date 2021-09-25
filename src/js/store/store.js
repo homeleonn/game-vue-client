@@ -13,10 +13,20 @@ export default createStore({
 		dbLog: [],
 		isRegenerating: false,
 		needRegeneration: false,
+		fightStats: null,
+		fightLog: [],
 		csrf: ''
 	},
 
 	mutations: {
+		SET_FIGHTSTATS(state, fightStats) {
+			state.fightStats = fightStats;
+		},
+
+		ADD_FIGHT_LOG(state, fightLog) {
+			state.fightLog.unshift(fightLog);
+		},
+
 		SET_USER(state, user) {
 			state.user = toNums(user);
 		},

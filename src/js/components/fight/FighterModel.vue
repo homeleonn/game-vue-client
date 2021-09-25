@@ -1,0 +1,186 @@
+<template>
+	<div class="fighter-wrapper" :class="side">
+		<div class="fighter"></div>
+		<div class="damage"></div>
+	</div>
+</template>
+
+<script>
+export default {
+	props: ['side', 'damage'],
+
+	updated() {
+		if (this.side === 'left') {
+		}
+		_fighter = _(`.fighter-wrapper.${this.side} .fighter`);
+		_damage = _(`.fighter-wrapper.${this.side} .damage`);
+		hit(...this.damage);
+	},
+
+	mounted() {
+		_fighter = _(`.fighter-wrapper.${this.side} .fighter`);
+		_damage = _(`.fighter-wrapper.${this.side} .damage`);
+		// cl(_fighter);
+		initStance(_fighter);
+	}
+}
+
+const HIT_TYPES = {
+	HAND: 3,
+	LEG: 7,
+	EVASION: 4,
+	EVASION1: 2,
+	BLOCK: 1,
+};
+
+const HIT_STEPS = {
+	[HIT_TYPES.HAND]: 3,
+	[HIT_TYPES.LEG]: 5,
+	[HIT_TYPES.EVASION]: 4,
+	[HIT_TYPES.EVASION1]: 5,
+	[HIT_TYPES.BLOCK]: 4,
+};
+
+let _fighter, _damage;
+
+function hit(type, damage = 0, crit = false) {
+	cl(...arguments);
+	// if (!type) return;
+	let steps = HIT_STEPS[type];
+	if (!steps) steps = 0;
+	steps--;
+	const y = (type - 1) * -200;
+	const stepSize = 177;
+	let step = 0;
+	let initX = 0;
+	if (type === HIT_TYPES.HAND) {
+		initX = -stepSize
+		steps--;
+	}
+	let x = initX;
+	let color = 'white';
+	setStance(_fighter, x, y);
+
+	// if (type !== false) {
+	// 	steps = HIT_STEPS[type];
+	// 	if (!steps) steps = 0;
+	// 	steps--;
+	// 	y = (type - 1) * -200;
+	// }
+
+	cl(_fighter);
+
+
+
+	if (type === HIT_TYPES.EVASION) {
+		color = 'lightgreen';
+		damage = 'Уворот';
+	} else if (type === HIT_TYPES.BLOCK) {
+		color = 'black';
+		damage = 'Блок';
+	} else if (damage !== false) {
+		if (crit) {
+			color = 'red';
+		}
+
+		if (isNumeric(damage)) {
+			damage = `-${damage}`;
+		}
+
+		_damage.html(`<span style="color: ${color};">${damage}</span>`).addClass('active');
+	}
+
+	
+	if (type === false) return;
+	const stepAction = (to) => {
+		step++;
+		x += to ? -stepSize : stepSize;
+		setStance(_fighter, x, y);
+	}
+
+	let timerId = setInterval(() => {
+		if (step >= steps) {
+			initStance(_fighter);
+			_damage.removeClass('active');
+			clearInterval(timerId);
+			return;
+		}
+		stepAction(step <= steps);
+	}, 200)
+}
+
+function initStance(el) {
+	// cl(1)
+	setStance(el, 0, -200 * 2)
+}
+
+function setStance(el, x, y) {
+	el.css('backgroundPosition', `${x}px ${y}px`);
+}
+
+</script>
+
+
+<style lang="scss">
+.fighters {
+	position: relative;
+	margin-top: 30px;
+	margin-left: 50px;
+}
+
+.fighter-wrapper {
+	position: relative;
+	display: inline-block;
+
+	&.right {
+		left: -50px;
+	}
+	
+	&, .fighter {
+		width: 170px;
+		height: 197px;
+	}
+
+	.fighter {
+		top: 0;
+		position: absolute;
+		border: 0px transparent solid;
+		background-image: url('/img/fight/ken.png');
+		background-size: 1220px;
+	}
+
+	&.right .fighter {
+		transform: rotateY(180deg); 
+	}
+
+	.damage {
+		position: absolute;
+		font-weight: bold;
+		font-size: 30px;
+		color: white;
+		top: 30%;
+		text-align: center;
+		margin-top: -10px;
+		margin-left: -10px;
+		z-index: 999;
+		left: 45%;
+		display: none;
+
+		&.active {
+			display: block;
+			animation: flyDamage 2s linear infinite;
+		}
+	}
+}
+
+@keyframes flyDamage {
+    from {
+        top: 30%;
+        opacity: 1;
+    }
+    to {
+        top: -20px;
+        opacity: .8;
+    }
+}
+</style>
