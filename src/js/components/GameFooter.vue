@@ -129,9 +129,10 @@ let _footer;
 	border-right: 1px lightgreen solid;
 	// overflow: hidden;
 	overflow-y: scroll;
+	font-size: 10px;
 
 	> div {
-		padding: 3px 0 3px 10px;
+		padding: 1px 0 3px 10px;
 
 		&:nth-child(odd) {
 			background: #f1f1f1;

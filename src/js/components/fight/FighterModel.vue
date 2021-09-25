@@ -9,21 +9,36 @@
 export default {
 	props: ['side', 'damage'],
 
+	beforeUpdate() {
+		// cl(this.side)
+		// blankHit(this.side)((this.damage[0], this.damage[1], this.damage[2], this.damage[3]));
+		// hit;
+	},
+
 	updated() {
-		if (this.side === 'left') {
-		}
-		_fighter = _(`.fighter-wrapper.${this.side} .fighter`);
-		_damage = _(`.fighter-wrapper.${this.side} .damage`);
-		hit(...this.damage);
+		// cl(this.side)
+		// if (this.side === 'left') {
+		// }
+		// side = this.side;
+		// _fighter = _(`.fighter-wrapper.${this.side} .fighter`);
+		// _damage = _(`.fighter-wrapper.${this.side} .damage`);
+		// _fighter = _(`.fighter-wrapper.${this.side} .fighter`);
+		// _damage = _(`.fighter-wrapper.${this.side} .damage`);
 	},
 
 	mounted() {
-		_fighter = _(`.fighter-wrapper.${this.side} .fighter`);
-		_damage = _(`.fighter-wrapper.${this.side} .damage`);
-		// cl(_fighter);
-		initStance(_fighter);
+		// hit = blankHit(this.side)
+	},
+
+	watch: {
+		damage(newDamage) {
+			// cl(this.side, newDamage);
+			blankHit(this.side)(...newDamage);
+		}
 	}
 }
+
+let hit;
 
 const HIT_TYPES = {
 	HAND: 3,
@@ -41,72 +56,78 @@ const HIT_STEPS = {
 	[HIT_TYPES.BLOCK]: 4,
 };
 
-let _fighter, _damage;
+// const _fighter = [];
+// const _damage = [];
 
-function hit(type, damage = 0, crit = false) {
-	cl(...arguments);
-	// if (!type) return;
-	let steps = HIT_STEPS[type];
-	if (!steps) steps = 0;
-	steps--;
-	const y = (type - 1) * -200;
+function blankHit(side) {
+	// cl(side);
+	// let _fighter = [];
+	// let _damage = [];
 	const stepSize = 177;
-	let step = 0;
-	let initX = 0;
-	if (type === HIT_TYPES.HAND) {
-		initX = -stepSize
+	const _fighter = _(`.fighter-wrapper.${side} .fighter`);
+	const _damage = _(`.fighter-wrapper.${side} .damage`);
+	// cl(_fighter);
+	initStance(_fighter);
+
+	return function (type, damage = 0, crit = false) {
+		// cl(side);
+
+		// if (!type) return;
+		// cl(_fighter);
+		let steps = HIT_STEPS[type];
+		if (!steps) steps = 0;
 		steps--;
-	}
-	let x = initX;
-	let color = 'white';
-	setStance(_fighter, x, y);
-
-	// if (type !== false) {
-	// 	steps = HIT_STEPS[type];
-	// 	if (!steps) steps = 0;
-	// 	steps--;
-	// 	y = (type - 1) * -200;
-	// }
-
-	cl(_fighter);
-
-
-
-	if (type === HIT_TYPES.EVASION) {
-		color = 'lightgreen';
-		damage = 'Уворот';
-	} else if (type === HIT_TYPES.BLOCK) {
-		color = 'black';
-		damage = 'Блок';
-	} else if (damage !== false) {
-		if (crit) {
-			color = 'red';
+		const y = (type - 1) * -200;
+		let step = 0;
+		let initX = 0;
+		if (type === HIT_TYPES.HAND) {
+			initX = -stepSize
+			steps--;
 		}
+		let x = initX;
+		let color = 'white';
 
-		if (isNumeric(damage)) {
-			damage = `-${damage}`;
+
+		if (type === HIT_TYPES.EVASION) {
+			color = 'lightgreen';
+			damage = 'Уворот';
+		} else if (type === HIT_TYPES.BLOCK) {
+			color = 'black';
+			damage = 'Блок';
+		} else if (damage !== false) {
+			if (crit) {
+				color = 'red';
+			}
+
+			if (isNumeric(damage)) {
+				damage = `-${damage}`;
+			}
+
+			_damage.html(`<span style="color: ${color};">${damage}</span>`).addClass('active');
+			setTimeout(() => {
+				_damage.removeClass('active');
+			}, 1000);
 		}
+			// _damage.html(`<span style="color: ${color};">${damage}</span>`).addClass('active');
 
-		_damage.html(`<span style="color: ${color};">${damage}</span>`).addClass('active');
-	}
-
-	
-	if (type === false) return;
-	const stepAction = (to) => {
-		step++;
-		x += to ? -stepSize : stepSize;
+		
+		if (type === false) return;
 		setStance(_fighter, x, y);
-	}
-
-	let timerId = setInterval(() => {
-		if (step >= steps) {
-			initStance(_fighter);
-			_damage.removeClass('active');
-			clearInterval(timerId);
-			return;
+		const stepAction = (to) => {
+			step++;
+			x += to ? -stepSize : stepSize;
+			setStance(_fighter, x, y);
 		}
-		stepAction(step <= steps);
-	}, 200)
+
+		let timerId = setInterval(() => {
+			if (step >= steps) {
+				initStance(_fighter);
+				clearInterval(timerId);
+				return;
+			}
+			stepAction(step <= steps);
+		}, 200)
+	}
 }
 
 function initStance(el) {
@@ -124,8 +145,8 @@ function setStance(el, x, y) {
 <style lang="scss">
 .fighters {
 	position: relative;
-	margin-top: 30px;
-	margin-left: 50px;
+	// margin-top: 30px;
+	// margin-left: 50px;
 }
 
 .fighter-wrapper {
@@ -168,7 +189,7 @@ function setStance(el, x, y) {
 
 		&.active {
 			display: block;
-			animation: flyDamage 2s linear infinite;
+			animation: flyDamage 1s linear infinite;
 		}
 	}
 }

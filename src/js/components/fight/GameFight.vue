@@ -1,6 +1,6 @@
 <template>
 	<div class="fight row center">
-		<div class="col-md-4">
+		<div class="col-md-2">
 			<user-form
 				:items="[]"
 				:user="user"
@@ -8,27 +8,20 @@
 				isFight
 				:damage="damageShow"
 			></user-form>
-			<button @click="createBots(null, 1, 0); setPairs();">Добавить бота</button>
+			<!-- <button @click="createBots(null, 1, 0); setPairs();">Добавить бота</button>
 			<div class="fighter-list">
 				<div v-for="(f, idx) in teams[0]" :key="idx">
 					<user-short-info :user="f" shrink></user-short-info>
 				</div>
-			</div>
+			</div> -->
 			<!-- {{user}} -->
 		</div>
 		<div class="col-md-4 flex fcol fight-panel">
-			<div v-if="isFightEnd">
-				<b>Fight has finished!</b>
-				<button @click="$emit('setCurComp', 'FightStats')">Statistics</button>
-			</div>
-			<!-- {{botsHits}} -->
-			<!-- <div v-for="(s, idx) in swap" :key="idx">{{idx}}: {{s}}</div> -->
-			<div><button @click="reset">Reset</button></div>
-			<!-- <div><button @click="processBotsTick">NextTick</button></div> -->
-			<div><button @click="stopAllTimers()">Stop timers</button></div>
 			<div class="fighters">
-				<fighter-model side="right" :damage="damageMe"></fighter-model>
-				<fighter-model side="left" :damage="damageEnemy"></fighter-model>
+				<div class="timer">{{timer}}</div>
+				<img :src="'/img/locations/' + $store.state.location.image">
+				<fighter-model side="left" :damage="damageMe" :key="1"></fighter-model>
+				<fighter-model side="right" :damage="damageEnemy" :key="2" class="enemy-fighter" :class="{change: isChangingEnemy}"></fighter-model>
 			</div>
 			<div v-if="turn && !isChangingEnemy">
 				<div><button @click="hit(user, enemy, HIT_HEAD)">В голову</button></div>
@@ -39,10 +32,18 @@
 				<h3>Ход противника...</h3>
 			</div>
 			<!-- {{freeFighters}} -->
-			<div>{{timer}}</div>
+			<div v-if="isFightEnd">
+				<b>Fight has finished!</b>
+				<button @click="$emit('setCurComp', 'FightStats')">Statistics</button>
+			</div>
+			<!-- {{botsHits}} -->
+			<!-- <div v-for="(s, idx) in swap" :key="idx">{{idx}}: {{s}}</div> -->
+			<div><button @click="reset">Reset</button></div>
+			<!-- <div><button @click="processBotsTick">NextTick</button></div> -->
+			<div><button @click="stopAllTimers()">Stop timers</button></div>
 			<!-- <div v-for="log in damageLog" :key="log" v-html="log"></div> -->
 		</div>
-		<div class="col-md-4 center">
+		<div class="col-md-2 center">
 			<div v-if="enemy">
 				<!-- <div class="changing-enemy icon-spin3 active"></div> -->
 				<div v-if="isChangingEnemy" class="changing-enemy icon-spin3 active"></div>
@@ -56,13 +57,28 @@
 			<div v-else>
 				<h3>Ожидание противника...</h3>
 			</div>
-			<button @click="createBots(null, 1, 1); setPairs();">Добавить бота</button>
-			<div class="fighter-list">
-				<div v-for="(f, idx) in teams[1]" :key="idx">
-					<div :class="{'active': enemy?.id == f.id}">
-						<user-short-info :user="f" shrink></user-short-info>
-						<!-- <team-fighter :fighter="f"></team-fighter> -->
+		</div>
+		<div class="col-md-4">
+			<div class="teams row">
+				<div class="col-md-6">
+					<div class="fighter-list">
+						<div v-for="(f, idx) in teams[0]" :key="idx">
+							<div :class="{'active': enemy?.id == f.id}">
+								<user-short-info :user="f" shrink></user-short-info>
+							</div>
+						</div>
 					</div>
+					<button @click="createBots(null, 1, 0); setPairs();">Добавить бота</button>
+				</div>
+				<div class="col-md-6">
+					<div class="fighter-list">
+						<div v-for="(f, idx) in teams[1]" :key="idx">
+							<div :class="{'active': enemy?.id == f.id}">
+								<user-short-info :user="f" shrink></user-short-info>
+							</div>
+						</div>
+					</div>
+					<button @click="createBots(null, 1, 1); setPairs();">Добавить бота</button>
 				</div>
 			</div>
 		</div>
@@ -73,6 +89,7 @@ import { mapGetters } from 'vuex'
 import UserForm from '../user/form/UserForm'
 import UserShortInfo from '../user/form/UserShortInfo'
 import FighterModel from './FighterModel'
+// import FighterModel1 from './FighterModel'
 // import { fight } from '../../use/fight/fight'
 
 const botProto = { id: 1, name: 'Ящер', level: '0', curhp: '18', maxhp: '18', power: '5', critical: '5', evasion: '0', stamina: '4', aggr: '0', is_undead: '0', image: 'yashcher.jpg', min_damage: 2, max_damage: 8, login: 'Ящер' }
@@ -116,7 +133,6 @@ export default {
 			hitId: 1,
 			damageMe: [],
 			damageEnemy: [],
-			damageLog: [],
 			damageShow: [{ id: rand(1, 200), damage: '-1' }],
 			freeFighters: [
 				{}, {}
@@ -152,6 +168,7 @@ export default {
 
 	methods: {
 		reset() {
+			this.$store.commit('CLEAR_FIGHT_LOG');
 			this.stopTimer();
 			this.stopBotTimer();
 			this.isFightEnd = false;
@@ -159,13 +176,12 @@ export default {
 			this.swap = {};
 			this.teams = [{}, {}];
 			this.freeFighters = [{}, {}];
-			this.damageLog = [];
-			this.user.min_damage = 10;
-			this.user.max_damage = 20;
+			this.user.min_damage = 5;
+			this.user.max_damage = 10;
 			this.initFighter(this.user, 0);
-			this.createBots(botProto, 5, 0);
-			this.createBots(botProto, 12, 1);
-			this.user.curhp = 200;
+			this.createBots(botProto, 0, 0);
+			this.createBots(botProto, 3, 1);
+			this.user.curhp = 400;
 			this.setPairs();
 			// for (const k in this.teams[1]) { this.teams[1][k].curhp = 1; }
 
@@ -175,8 +191,12 @@ export default {
 
 		setPairs() {
 			const freeTeamFightersIds = [[], []];
-			const getRandFighter = (team, freeTeamFightersIds) => {
-				return this.teams[team][freeTeamFightersIds[rand(0, freeTeamFightersIds.length - 1)]];
+			const shiftRandFighter = (team, freeTeamFightersIds) => {
+				const fighterIdKey = rand(0, freeTeamFightersIds.length - 1);
+				const fighterId = freeTeamFightersIds[fighterIdKey];
+				freeTeamFightersIds.splice(fighterIdKey, 1);
+
+				return this.teams[team][fighterId];
 			}
 
 			const getFreeTeamFightersIds = team => {
@@ -184,17 +204,18 @@ export default {
 				return ids.length ? ids : false;
 			}
 
-			freeTeamFightersIds[0] = getFreeTeamFightersIds(0);
+			const allFreeTeamFightersIds = getFreeTeamFightersIds(0);
+			if (!allFreeTeamFightersIds) return;
+			freeTeamFightersIds[0] = [...allFreeTeamFightersIds];
+			freeTeamFightersIds[1] = getFreeTeamFightersIds(1);
+			// if (!freeTeamFightersIds[0] || !freeTeamFightersIds[1]) return;
 
-			for (let i = 0; i < freeTeamFightersIds[0].length; i++) {
-				freeTeamFightersIds[0] = getFreeTeamFightersIds(0); // Get free fighters id from first team
-				if (!freeTeamFightersIds[0]) return;								// if no free figters then stop finding
-				freeTeamFightersIds[1] = getFreeTeamFightersIds(1); // Get free fighters id from second team
-				if (!freeTeamFightersIds[1]) return;
-				const fighter1 = getRandFighter(0, freeTeamFightersIds[0]); // Take a fighter from first team free fighters
-				const fighter2 = getRandFighter(1, freeTeamFightersIds[1]); // Select opponent from second free fighters
-				delete this.freeFighters[fighter1.team][fighter1.id]; // remove fighter 1 from free
-				delete this.freeFighters[fighter2.team][fighter2.id]; // remove fighter 2 from free
+			for (let i = 0; i <= allFreeTeamFightersIds.length; i++) {
+				if (!freeTeamFightersIds[0].length || !freeTeamFightersIds[1].length) return;
+				const fighter1 = shiftRandFighter(0, freeTeamFightersIds[0]); // Take a fighter from first team free fighters
+				const fighter2 = shiftRandFighter(1, freeTeamFightersIds[1]); // Select opponent from second free fighters
+				delete this.freeFighters[fighter1.team][+fighter1.id]; // remove fighter 1 from free
+				delete this.freeFighters[fighter2.team][+fighter2.id]; // remove fighter 2 from free
 				this.setSwap(fighter1, fighter2);
 			}
 		},
@@ -413,6 +434,9 @@ export default {
 		},
 
 		setSwap(f1, f2) {
+			// if (f1.id === this.user.id || f2.id === this.user.id) {
+			// 	cl(11111);
+			// }
 			const turn = selectTurn(f1, f2);
 			const swap = [
 				f1.id,
@@ -446,7 +470,7 @@ export default {
 				this.isChangingEnemy = true;
 				setTimeout(() => {
 					this.isChangingEnemy = false;
-				}, 500)
+				}, 1000)
 			}
 			
 			f1.lastEnemyId = f2.id;
@@ -460,15 +484,15 @@ export default {
 			if (!this.isMe(hitter, defender)) return;
 			const d = crit ? `<span style="color: red;">${damage}</span>` : damage;
 			if (hitter.id === this.user.id) {
-				cl(1);
-				this.damageMe = [3, damage, false, this.hitId++];
-				this.damageEnemy = [3, damage, crit, this.hitId++];
+				// cl(1);
+				this.damageEnemy = [false, damage, crit, this.hitId++];
+				this.damageMe = [3, false, crit, this.hitId++];
 			} else {
-				this.damageMe = [3, damage, crit, this.hitId++];
-				this.damageEnemy = [3, damage, false, this.hitId++];
+				this.damageMe = [false, damage, crit, this.hitId++];
+				this.damageEnemy = [3, false, crit, this.hitId++];
 			}
 			// this.['damage' + (hitter === this.user.id ? 'Enemy' : 'Me')] = [3, damage, crit, this.hitId++];
-			this.$store.commit('ADD_FIGHT_LOG', `${hitter.login}[${hitter.level}] ударил ${defender.login}[${defender.level}] в ${hitVerbs[hitType]} на -${d}`);
+			this.$store.commit('ADD_FIGHT_LOG', `${hitter.login}[${hitter.level}] ударил ${defender.login}[${defender.level}] в ${hitVerbs[hitType]} на -${d}(${defender.curhp}/${defender.maxhp})`);
 			if (defender.curhp <= 0) {
 				this.$store.commit('ADD_FIGHT_LOG', `${defender.login}[${defender.level}] погибает.`);
 			}
@@ -484,7 +508,8 @@ export default {
 	components: {
 		UserForm,
 		UserShortInfo,
-		FighterModel
+		FighterModel,
+		// FighterModel1
 	}
 }
 
@@ -543,6 +568,43 @@ function walkTeam(team, cb) {
 			display: inline-block;
 			font-size: 200px;
 		}
+	}
+
+	.fighters {
+		position: relative;
+		overflow: hidden;
+		padding: 50px;
+
+		.fighter {
+			margin-left: 30px;
+		}
+
+		img {
+			margin-left: -20px;
+			position: absolute;
+			top: -180%;
+			left: -100%;
+			width: 300%;
+		}
+
+		.timer {
+			position: absolute;
+			left: 0;
+			right: 0;
+			top: 0;
+			font-size: 30px;
+			font-weight: bold;
+			color: white;
+			z-index: 999;
+		}
+	}
+
+	.enemy-fighter {
+		transition: left .2s;
+	}
+
+	.change {
+		left: 500px;
 	}
 }
 </style>

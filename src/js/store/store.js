@@ -27,6 +27,10 @@ export default createStore({
 			state.fightLog.unshift(fightLog);
 		},
 
+		CLEAR_FIGHT_LOG(state) {
+			state.fightLog = [];
+		},
+
 		SET_USER(state, user) {
 			state.user = toNums(user);
 		},
