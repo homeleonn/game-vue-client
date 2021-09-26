@@ -5,7 +5,7 @@
 				:items="[]"
 				:user="user"
 				:info="[]"
-				isFight
+				:isFight="false"
 				:damage="damageShow"
 			></user-form>
 			<!-- <button @click="createBots(null, 1, 0); setPairs();">Добавить бота</button>
@@ -18,18 +18,29 @@
 		</div>
 		<div class="col-md-4 flex fcol fight-panel">
 			<div class="fighters">
-				<div class="timer">{{timer}}</div>
-				<img :src="'/img/locations/' + $store.state.location.image">
+				<div class="stats-wrapper">
+					<div class="stats">
+						<div class="user-stats col-md-5">
+							<user-short-info :user="user"></user-short-info>
+						</div>
+						<div class="col-md-2 damage-score">
+							<div>Нанесено урона</div>
+							<div>{{user.damage}}</div>
+						</div>
+						<div class="enemy-stats col-md-5" v-if="enemy  && !isChangingEnemy">
+							<user-short-info :user="enemy"></user-short-info>
+						</div>
+					</div>
+					<div class="timer" v-if="enemy && timer">{{time}}</div>
+					<div class="controls" v-if="enemy && turn && !isChangingEnemy">
+						<div><button @click="hit(user, enemy, HIT_HEAD)">&rarr;</button></div>
+						<div><button @click="hit(user, enemy, HIT_CHEST)">&rarr;</button></div>
+						<div><button @click="hit(user, enemy, HIT_LEGS)">&rarr;</button></div>
+					</div>
+				</div>
+				<img :src="'/img/locations/' + $store.state.location.image" class="location">
 				<fighter-model side="left" :damage="damageMe" :key="1"></fighter-model>
-				<fighter-model side="right" :damage="damageEnemy" :key="2" class="enemy-fighter" :class="{change: isChangingEnemy}"></fighter-model>
-			</div>
-			<div v-if="turn && !isChangingEnemy">
-				<div><button @click="hit(user, enemy, HIT_HEAD)">В голову</button></div>
-				<div><button @click="hit(user, enemy, HIT_CHEST)">В корпус</button></div>
-				<div><button @click="hit(user, enemy, HIT_LEGS)">В ноги</button></div>
-			</div>
-			<div v-else-if="enemy">
-				<h3>Ход противника...</h3>
+				<fighter-model side="right" :damage="damageEnemy" :key="2" class="enemy-fighter" :class="{change: !enemy ||isChangingEnemy}"></fighter-model>
 			</div>
 			<!-- {{freeFighters}} -->
 			<div v-if="isFightEnd">
@@ -37,21 +48,20 @@
 				<button @click="$emit('setCurComp', 'FightStats')">Statistics</button>
 			</div>
 			<!-- {{botsHits}} -->
-			<!-- <div v-for="(s, idx) in swap" :key="idx">{{idx}}: {{s}}</div> -->
+			<div v-for="(s, idx) in swap" :key="idx">{{idx}}: {{s}}</div>
 			<div><button @click="reset">Reset</button></div>
 			<!-- <div><button @click="processBotsTick">NextTick</button></div> -->
 			<div><button @click="stopAllTimers()">Stop timers</button></div>
-			<!-- <div v-for="log in damageLog" :key="log" v-html="log"></div> -->
 		</div>
 		<div class="col-md-2 center">
-			<div v-if="enemy">
+			<div v-if="enemy" class="center">
 				<!-- <div class="changing-enemy icon-spin3 active"></div> -->
 				<div v-if="isChangingEnemy" class="changing-enemy icon-spin3 active"></div>
 				<user-form v-else
 					:items="[]"
 					:user="enemy"
 					:info="[]"
-					isFight
+					:isFight="false"
 				></user-form>
 			</div>
 			<div v-else>
@@ -59,21 +69,23 @@
 			</div>
 		</div>
 		<div class="col-md-4">
-			<div class="teams row">
-				<div class="col-md-6">
+			<div class="teams myblock row center">
+				<div class="col-md-6 team1">
+					<div class="team-title">Команда 1<hr></div>
 					<div class="fighter-list">
 						<div v-for="(f, idx) in teams[0]" :key="idx">
-							<div :class="{'active': enemy?.id == f.id}">
+							<div :class="{active: enemy?.id == f.id}">
 								<user-short-info :user="f" shrink></user-short-info>
 							</div>
 						</div>
 					</div>
 					<button @click="createBots(null, 1, 0); setPairs();">Добавить бота</button>
 				</div>
-				<div class="col-md-6">
+				<div class="col-md-6 team2">
+					<div class="team-title">Команда 2<hr></div>
 					<div class="fighter-list">
 						<div v-for="(f, idx) in teams[1]" :key="idx">
-							<div :class="{'active': enemy?.id == f.id}">
+							<div :class="{active: enemy?.id == f.id}">
 								<user-short-info :user="f" shrink></user-short-info>
 							</div>
 						</div>
@@ -92,7 +104,7 @@ import FighterModel from './FighterModel'
 // import FighterModel1 from './FighterModel'
 // import { fight } from '../../use/fight/fight'
 
-const botProto = { id: 1, name: 'Ящер', level: '0', curhp: '18', maxhp: '18', power: '5', critical: '5', evasion: '0', stamina: '4', aggr: '0', is_undead: '0', image: 'yashcher.jpg', min_damage: 2, max_damage: 8, login: 'Ящер' }
+const botProto = { id: 1, name: 'Ящер', level: '0', curhp: '18', maxhp: '18', power: '5', critical: '5', evasion: '0', stamina: '4', aggr: '0', is_undead: '0', image: 'yashcher.jpg', min_damage: 1, max_damage: 2, login: 'Ящер' }
 const HIT_HEAD = 1;
 const HIT_CHEST = 2;
 const HIT_LEGS = 3;
@@ -146,9 +158,9 @@ export default {
 	],
 
 	created() {
-		this.apiSubscribe([
-			'_enemy'
-		], this);
+		// this.apiSubscribe([
+		// 	'_enemy'
+		// ], this);
 	},
 
 	computed: {
@@ -157,6 +169,14 @@ export default {
 		HIT_HEAD: () => HIT_HEAD,
 		HIT_CHEST: () => HIT_CHEST,
 		HIT_LEGS: () => HIT_LEGS,
+
+		time() {
+			return timer(this.timer, 'i:s');
+		}
+	},
+
+	unmounted() {
+			this.stopAllTimers();
 	},
 
 	mounted() {
@@ -168,22 +188,25 @@ export default {
 
 	methods: {
 		reset() {
+			this.stopAllTimers();
 			this.$store.commit('CLEAR_FIGHT_LOG');
-			this.stopTimer();
-			this.stopBotTimer();
+			this.enemy = null;
+			this.isChangingEnemy = false;
 			this.isFightEnd = false;
 			this.botsHits = {};
 			this.swap = {};
 			this.teams = [{}, {}];
 			this.freeFighters = [{}, {}];
-			this.user.min_damage = 5;
-			this.user.max_damage = 10;
-			this.initFighter(this.user, 0);
-			this.createBots(botProto, 0, 0);
-			this.createBots(botProto, 3, 1);
-			this.user.curhp = 400;
+			this.user.min_damage = 2;
+			this.user.max_damage = 2;
+			this.initFighter(this.user, 1);
+			this.createBots(botProto, 1, 0);
+			this.createBots(botProto, 1, 1);
+			this.user.curhp = this.user.maxhp = 400;
 			this.setPairs();
-			// for (const k in this.teams[1]) { this.teams[1][k].curhp = 1; }
+			for (const k in this.teams[0]) { 
+				this.teams[0][k].curhp = this.teams[0][k].maxhp = 100; 
+			}
 
 			this.processBots();
 		},
@@ -249,8 +272,8 @@ export default {
 		},
 
 		processBotsTick() {
+			cl('Next bot hit', Object.keys(this.botsHits).length);
 			if (!Object.keys(this.botsHits).length) return;
-			cl('Next bot hit');
 			let hitterTeam, defenderTeam, hitter, defender;
 			for (let botId in this.botsHits) {
 				if (this.isBotHitTime(this.botsHits[botId])) {
@@ -371,9 +394,14 @@ export default {
 			if (this.isFightEnd) return;
 			if (this.canSwap(f1, f2, isFighterDeath)) {
 				if (f1.id === this.user.id || f2.id === this.user.id) {
-					this.enemy = null;
+					setTimeout(() => {
+						this.enemy = null;
+						// this.user.lastEnemyId = null;
+						this.setPairs();
+					}, 1000);
+				} else {
+					this.setPairs();
 				}
-				this.setPairs();
 			} else {
 				this.swap[f1.id][HIT_TURN] = selectTurn(f1, f2);
 				const turnFighterTeam = this.swap[f1.id][HIT_TURN] ? 1 : 0;
@@ -386,12 +414,14 @@ export default {
 		},
 
 		setMyTurn(f1, f2, turnFighterId) {
-			if (turnFighterId === this.user.id) {
-				this.turn = true;
+			if (this.isMe(f1, f2)) {
+				if (turnFighterId === this.user.id) {
+					this.turn = true;
+				}
 				this.timer = 10;
 				myTimerId = setInterval(() => {
 					this.timer--;
-					if (!this.timer) {
+					if (!this.timer && turnFighterId === this.user.id) {
 						this.removeMyTurn(this.user.id);
 						this.toggleTurn(f1, f2);
 					}
@@ -400,10 +430,15 @@ export default {
 		},
 
 		removeMyTurn(turnFighterId) {
-			if (turnFighterId === this.user.id) {
+			if (turnFighterId === this.user.id || turnFighterId === this.user.lastEnemyId) {
 				this.turn = this.timer = null;
 				this.stopTimer();
 			}
+		},
+
+
+		setTimer() {
+
 		},
 
 		stopTimer() {
@@ -455,22 +490,36 @@ export default {
 			}
 
 			// Set user enemy
+			cl(hitter.id);
 			if (this.isBot(hitter.id)) {
 				this.botsHits[hitter.id] = monsterDamageTime();
 			}
 
+			let enemy;
+			let isHitter = false;
 			if (hitter.id === this.user.id) {
-				this.enemy = defender;
-				this.setMyTurn(hitter, defender, hitter.id);
+				enemy = defender;
+				isHitter = true;
 			} else if (defender.id === this.user.id) {
-				this.enemy = hitter;
+				enemy = hitter;
 			}
 
-			if (this.enemy && this.user.lastEnemyId !== this.enemy.id) {
-				this.isChangingEnemy = true;
-				setTimeout(() => {
-					this.isChangingEnemy = false;
-				}, 1000)
+			if (enemy) {
+				this.enemy = enemy;
+				this.setMyTurn(hitter, defender, hitter.id);
+				// if (isHitter) {
+				// 	this.setMyTurn(hitter, defender, hitter.id);
+				// }
+				if (this.user.lastEnemyId && this.user.lastEnemyId !== enemy.id) {
+					this.isChangingEnemy = true;
+					setTimeout(() => {
+						this.isChangingEnemy = false;
+					}, 1000)
+				}
+
+				// setTimeout(() => {
+				// 		this.isChangingEnemy = false;
+				// 	}, 1000)
 			}
 			
 			f1.lastEnemyId = f2.id;
@@ -537,18 +586,39 @@ function walkTeam(team, cb) {
 
 <style lang="scss">
 .fight {
+	padding-top: 20px;
+	justify-content: space-between;
+
 	.user-form-wrapper {
 		margin: 0 auto;
 	}
-	justify-content: space-between;
 
 	.fight-panel {
 		text-align: center;
-		margin-top: 20px;
+		// margin-top: 20px;
 		button {
 			min-width: 100px;
 			display: block;
 			margin: 10px auto;
+		}
+	}
+
+	.teams {
+		.team-title {
+			font-weight: bold;
+			padding: 0 10px;
+
+			hr {
+				margin: 5px 0;
+			}
+		}
+
+		.team1 .team-title {
+			color: red;
+		}
+
+		.team2 .team-title {
+			color: blue;
 		}
 	}
 
@@ -562,7 +632,7 @@ function walkTeam(team, cb) {
 	.changing-enemy {
 		animation: spin 2s linear infinite;
 		margin: 0 auto;
-		margin-top: 20px;
+		// margin-top: 20px;
 
 		&:before {
 			display: inline-block;
@@ -573,29 +643,20 @@ function walkTeam(team, cb) {
 	.fighters {
 		position: relative;
 		overflow: hidden;
-		padding: 50px;
+		padding: 80px;
+		// margin-top: 30px;
 
 		.fighter {
 			margin-left: 30px;
+			margin-top: 40px;
 		}
 
-		img {
+		img.location {
 			margin-left: -20px;
 			position: absolute;
-			top: -180%;
+			top: -130%;
 			left: -100%;
 			width: 300%;
-		}
-
-		.timer {
-			position: absolute;
-			left: 0;
-			right: 0;
-			top: 0;
-			font-size: 30px;
-			font-weight: bold;
-			color: white;
-			z-index: 999;
 		}
 	}
 
@@ -606,5 +667,91 @@ function walkTeam(team, cb) {
 	.change {
 		left: 500px;
 	}
+
+	.stats-wrapper {
+		position: absolute;
+		top: 0px;
+		left: 0px;
+		z-index: 9;
+		width: 100%;
+
+		.stats {
+			display: flex;
+			// top: 5px;
+
+			> div {
+				// width: 100px;
+				// top: 0px;
+				// position: relative;
+				// float: left;
+				// width: 50%;
+				color: white;
+				background: rgba(0, 0, 0, .3);
+			}
+
+			.user-stats {
+				left: 5px;
+			}
+
+			.enemy-stats {
+				right: 5px;
+			}
+		}
+
+		.damage-score {
+			font-weight: bold;
+			font-size: 18px;
+
+			> div:first-child {
+				font-size: 11px;
+			}
+		}
+
+		.timer {
+			// position: absolute;
+			left: 0;
+			right: 0;
+			top: 0;
+			font-size: 30px;
+			font-weight: bold;
+			color: white;
+			z-index: 999;
+		}
+
+		.controls {
+			// position: absolute;
+			// bottom: 0;
+			margin-top: 50px;
+			margin-left: 10px;
+			button {
+				background: rgba(0, 0, 0, .5);
+				// background: #000;
+				// background: transparent;
+				color: white;
+				border: 0;
+				border-radius: 50%;
+				width: 34px;
+				height: 34px;
+				display: inline-block;
+				min-width: inherit;
+				border: 2px rgba(255, 255, 255, .8) solid;
+				font-weight: bold;
+				font-size: 20px;
+				// padding: 5px;
+				// opacity: .6;
+
+			}
+
+			& > div:nth-child(1) {
+				transform: rotate(-35deg);
+			}
+
+			& > div:nth-child(3) {
+				transform: rotate(35deg);
+			}
+		}
+	}
+
+	
 }
 </style>

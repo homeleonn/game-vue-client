@@ -1,7 +1,7 @@
 <template>
 	<div class="info-wrapper" :class="{shrink}">
 		<div class="info">
-			<div class="align"><img src="img/aligns/99.gif" /></div>
+			<!-- <div class="align"><img src="img/aligns/99.gif" /></div> -->
 			<div class="clan"><img src="img/clans/developers.png" /></div>
 			<div class="login">{{ user.login ?? user.name }}[{{ user.level }}]</div>
 		</div>
@@ -59,7 +59,13 @@ export default {
 				display: none;	
 			}
 		}
-}
+	}
+
+	.clan {
+		img {
+			// width: 15px !important;
+		}
+	}
 }
 .hp-wrapper {
 	margin: 0 auto;

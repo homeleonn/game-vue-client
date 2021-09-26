@@ -2,18 +2,30 @@ function z(num) {
 	return +num > 9 ? num : '0' + num;
 }
 
-function timer(seconds, callback = false) {
-	const hours = seconds / 3600;
+function timer(seconds, format = 'H:i:s') {
+	const delimiter = ':';
+	const times = {};
+	times.hours = seconds / 3600;
 	seconds = seconds % 3600;
-	const minutes = seconds / 60;
+	times.minutes = seconds / 60;
 	seconds = seconds % 60;
-
-	const time = [hours, minutes, seconds].map((item) => {
-		return z(Math.floor(item));
-	});
+	times.seconds = seconds;
 
 
-	return time.join(':');
+	const formats = {
+		'H': 'hours',
+		'i': 'minutes',
+		's': 'seconds',
+	}
+
+	const result = format.split(delimiter).map(f => {
+		return z(Math.floor(times[formats[f]]))
+	}).join(delimiter)
+
+	return result;
+	// const time = [hours, minutes, seconds].map((item) => {
+	// 	return z(Math.floor(item));
+	// });
 }
 
 function fnOnTimeout(callback, delay = 1000) {

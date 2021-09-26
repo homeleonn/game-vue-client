@@ -151,7 +151,7 @@ function setStance(el, x, y) {
 
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .fighters {
 	position: relative;
 	margin-top: 30px;

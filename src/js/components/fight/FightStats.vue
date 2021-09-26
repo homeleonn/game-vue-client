@@ -1,11 +1,11 @@
 <template>
-	<div class="fight-stats" v-if="this.$store.state.fightStats">
+	<div class="fight-stats " v-if="this.$store.state.fightStats">
 		<h4 class="center">Бой окончен! Вы нанесли <b>{{ user.damage }}</b> урона, убийств: <b>{{ user.kills }}</b>. Получено опыта <b>{{ user.fightExp }}</b>.</h4>
 		<div class="row">
 			<div class="col-md-3">
 				<img src="/img/fight/5.jpg">
 			</div>
-			<div class="col-md-6 stats center">
+			<div class="col-md-6 stats myblock center">
 				<div class="row buttons">
 					<div class="col-md-4">
 						<button class="btn" @click="$emit('setCurComp', 'LocationWrapper')">В локацию</button>
@@ -147,13 +147,6 @@ export default {
 	}
 
 	.stats {
-		margin: 20px 0;
-		padding: 20px;
-		border: 5px lightgreen outset;
-		border-radius: 10px;
-		box-shadow: 0 0 20px green;
-		background: linear-gradient(to right bottom, #bfffbf, #fff);
-
 		.row {
 			margin-bottom: 20px;
 		}
