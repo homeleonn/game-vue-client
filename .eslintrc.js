@@ -27,6 +27,7 @@ module.exports = {
     'no-unused-vars': 'off',
     'prefer-const': 'off',
     'vue/no-unused-components': 'off',
+    'key-spacing': 'off',
     'quotes': 'off'
   }
 }

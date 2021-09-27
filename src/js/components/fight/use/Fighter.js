@@ -2,8 +2,7 @@ let myTimerId;
 let fight;
 let isMe;
 
-class Fighter
-{
+export default class Fighter {
 	constructor(fighter, _fight, _isMe = false) {
 		fight = _fight;
 		isMe = _isMe;
@@ -12,94 +11,133 @@ class Fighter
 		}
 	}
 
-	pullEnemy(freeEnemiesIds) {
-		const enemyTeam 			= fight.getEnemyTeam(team);
+	pullEnemy() {
+		const enemyTeam 			= fight.getEnemyTeam(this.team);
 		const freeEnemiesIds 	= fight.freeFightersIds[enemyTeam];
-		const freeMembersIds 	= fight.freeFightersIds[team];
-		const myIdKey			 		= freeMembersIds.find(id => +id === +this.id);
-		const enemyIdKey	 		= rand(0, freeEnemiesIds.length - 1);
-		const fighterId 			= fight.freeEnemiesIds[enemyIdKey];
+		const freeMembersIds 	= fight.freeFightersIds[this.team];
+		const myIdIndex			 	= freeMembersIds.indexOf(+this.id);
+		const enemyIdIndex	 	= rand(0, freeEnemiesIds.length - 1);
+		const fighterId 			= freeEnemiesIds[enemyIdIndex];
 		this.enemy 						= fight.teams[enemyTeam][fighterId];
 		this.enemy.enemy 			= this;
 
-		fight.removeFreeFighter(enemyIdKey, this);
-		fight.removeFreeFighter(enemyIdKey, this.enemy);
+		fight.removeFreeFighter(myIdIndex, this);
+		fight.removeFreeFighter(enemyIdIndex, this.enemy);
+
+		this.setSwap();
 	}
 
-	setMyEnemy(hitter, defender) {
-		if (!this.isMyPair(hitter, defender)) return;
-		let isHitter = hitter.isMe();
+	hit(type) {
+		const [hitter, defender] = setRoles(this);
+		const [damage, crit] = this.calcDamage();
+		defender.curhp -= damage;
+		this.removeTurn(hitter.id);
+		// this.setLog(hitter, defender, damage, type, crit);
+		const isFighterDeath = this.checkFighterDeath(hitter, defender);
+		fight.toggleTurn(hitter, defender, isFighterDeath);
+	}
 
-		this.setMyTurn(hitter, defender, isHitter);
-		if (this.lastEnemyId && this.lastEnemyId !== enemy.id) {
-			this.isChangingEnemy.value = true;
-			setTimeout(() => {
-				this.isChangingEnemy.value = false;
-			}, 1000)
+	calcDamage() {
+		let damage = rand(this.min_damage, this.max_damage);
+		const crit = this.isCrit();
+
+		if (crit) {
+			damage *= 2;
+		}
+		if (this.enemy.curhp < damage) {
+			damage = +this.enemy.curhp;
+		}
+		this.damage += damage;
+
+		return [damage, crit];
+	}
+
+	isCrit() {
+		return !!rand(0, 1)
+	}
+
+	checkFighterDeath(hitter, defender) {
+		if (defender.curhp <= 0) {
+			hitter.kills += 1;
+			defender.curhp = 0;
+			delete fight.freeFighters[defender.team][defender.id];
+			fight.checkEndFight(defender);
+			return true;
+		}
+
+		return false;
+	}
+
+	selectTurn(f1, f2) {
+		const isPrevEnemy = this.lastEnemyId === this.enemy.id;
+		const turn = !isPrevEnemy ? rand(0, 1) : (this.turn ? 0 : 1);
+		const [hitter, defender] = setRoles(this);
+		this.turn = this.enemy.turn = turn;
+
+		return [turn, hitter, defender];
+	}
+
+	isHitter() {
+		return this.team === this.turn;
+	}
+
+	setSwap() {
+		const [turn, hitter, defender] = this.selectTurn();
+		const swap = [this.id, this.enemy.id, turn, 2];
+
+		fight.handleBot(hitter.id);
+		this.setMyEnemy(hitter, defender);
+
+		// cl(this, this.enemy); return;
+		
+		this.lastEnemyId = this.enemy.id;
+		this.enemy.lastEnemyId = this.id;
+
+		fight.swap[this.id] = swap;
+		fight.swap[this.enemy.id] = swap;
+	}
+
+	setMyEnemy(f1, f2) {
+		if (!fight.isMyPair(f1, f2)) return;
+		let isHitter = f1.isMe();
+
+		this.setMyTurn(f1, f2, isHitter);
+		if (this.lastEnemyId && this.lastEnemyId !== this.enemy.id) {
+			fight.isChangingEnemy.value = true;
+			setTimeout(() => { fight.isChangingEnemy.value = false; }, 1000)
 		}
 	}
 
-	isMyPair(f1, f2) {
-		return f1.isMe() || f2.isMe();
-	}
-
 	setMyTurn(f1, f2, isMyTurn) {
-		this.turn = isMyTurn;
-		this.timer.value = 10;
+		if (!fight.isMyPair(f1, f2)) return;
+		fight.turn = isMyTurn;
+		fight.timer.value = 10;
 
 		myTimerId = setInterval(() => {
-			this.timer.value--;
-			if (!this.timer.value && isMyTurn) {
-				this.removeMyTurn(true);
-				this.toggleTurn(f1, f2);
+			fight.timer.value--;
+			if (!fight.timer.value && isMyTurn) {
+				this.removeTurn(true);
+				fight.toggleTurn(f1, f2);
 			}
 		}, 1000);
 	}
 
-
-
-	toggleTurn(f1, f2, isFighterDeath = false) {
-		if (this.isFightEnd) return;
-		if (fight.canSwap(f1, f2, isFighterDeath)) {
-			if (this.isMyPair(f1, f2)) {
-				setTimeout(() => {
-					this.enemy = null;
-					fight.setPairs();
-				}, 1000);
-			} else {
-				fight.setPairs();
-			}
-		} else {
-			fight.swap[f1.id][HIT_TURN] = f1.selectTurn(f1, f2);
-			const turnFighterTeam = fight.swap[f1.id][HIT_TURN] ? 1 : 0;
-			const turnFighterId = fight.swap[f1.id][turnFighterTeam];
-			this.setMyTurn(f1, f2, turnFighterId);
-			if (this.isBot(turnFighterId)) {
-				this.botsHits[turnFighterId] = monsterDamageTime(); // todo: in method
-			}
-		}
-	}
-
-	removeMyTurn(turnFighterId = true) {
-		if (turnFighterId === true || turnFighterId === this.user.lastEnemyId) {
-			this.turn = this.timer = null;
+	removeTurn(turnFighterId = true) {
+		if (turnFighterId === true || this.isMe(turnFighterId) || turnFighterId === fight.user.lastEnemyId) {
+			this.turn = fight.timer.value = null;
 			stopTimer();
 		}
 	}
 
-	selectTurn() {
-		const isPrevEnemy = this.lastEnemyId === this.enemy.id;
-		const turn = !isPrevEnemy ? rand(0, 1) : (this.turn ? 0 : 1);
-		this.turn = turn;
-
-		return turn;
-	}
-
-	isMe() {
-		return isMe;
+	isMe(id = null) {
+		return !id ? isMe : id === this.id;
 	}
 }
 
 function stopTimer() {
 	clearInterval(myTimerId);
+}
+
+function setRoles(f) {
+	return f.isHitter() ? [f, f.enemy] : [f.enemy, f];
 }

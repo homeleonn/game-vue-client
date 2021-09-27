@@ -2,7 +2,11 @@
 	<div class="test">
 		<button @click="add">Add new player</button>
 		<button @click="changeName">changeName</button>
-		{{ game }} {{counter}}
+		<button @click="changeA">changeA</button>
+		
+
+		<div>{{ game }} {{ players }} {{counter}}</div>
+		<div>{{ a }}</div>
 	</div>
 	<div class="debug" v-if="false">
 		<h1 class="center">DEBUG</h1>
@@ -33,7 +37,7 @@
 </template>
 
 <script>
-import { setup, reactive } from 'vue';
+import { setup, ref, reactive, getCurrentInstance } from 'vue';
 
 class Player {
 	constructor(name) {
@@ -44,35 +48,47 @@ class Player {
 class Game {
 	constructor(name) {
 		this.name = name;
-		// this.players = reactive([]);
-		this.players = [];
+		this.players = reactive([]);
+		// this.players = [];
 	}
 
 	addPlayer(player) {
-		this.players.push(player)
+		this.players.unshift(player)
 	}
 }
 
 export default {
 	setup() {
-		// const game = new Game('Test');
-		const game = reactive(new Game('Test'));
-		let counter = 0;
+		const game = new Game('Test');
+		const a = [1];
+		// const a = reactive([1]);
+		// const game = reactive(new Game('Test'));
+		let counter = ref(0);
+		console.log(getCurrentInstance());
 
 		function add() {
-			game.addPlayer(new Player('Test-' + ++counter));
+			game.addPlayer(new Player('Test-' + ++counter.value));
 		}
 
 		function changeName() {
 			game.players[0].name = 'Woow';
 			game.name = '111'
+			a[0] = 3;
+			// counter = counter + 1;
+		}
+
+		function changeA() {
+			a[1] = 4;
 		}
 
 		return {
+			a,
 			game,
+			players: game.players,
 			add,
 			changeName,
-			counter
+			changeA,
+			counter: counter
 		}
 	}
 

@@ -458,6 +458,7 @@ export default {
 			if (newEnemy || !--this.swap[f1.id][HITS_COUNT]) {
 				delete this.swap[f1.id];
 				delete this.swap[f2.id];
+				f1.swap = f2.swap = null;
 
 				if (f1.curhp > 0) this.freeFighters[f1.team][f1.id] = null;
 				if (f2.curhp > 0) this.freeFighters[f2.team][f2.id] = null;

@@ -21,6 +21,7 @@ import UserBackpack from "./user/backpack/UserBackpack";
 import UserSupplies from "./user/UserSupplies";
 import TheDebug from "./debug/TheDebug";
 import GameFight from "./fight/GameFight";
+import GameFight1 from "./fight/GameFight1";
 import FightStats from "./fight/FightStats";
 import Api from "../api/api.js";
 
@@ -35,11 +36,11 @@ const TheHunting = defineAsyncComponent(() =>
 const api = new Api();
 
 export default {
-	components: { GameHeader, GameFooter, LocationWrapper, UserBackpack, TheHunting, TheDebug, GameFight, UserSupplies, FightStats },
+	components: { GameHeader, GameFooter, LocationWrapper, UserBackpack, TheHunting, TheDebug, GameFight, GameFight1, UserSupplies, FightStats },
 	data() {
 		return {
 			// currentMainComponent: 'LocationWrapper',
-			currentMainComponent: "TheDebug",
+			currentMainComponent: "GameFight",
 			// currentMainComponent: null,
 			// apiReady: true
 			apiReady: false
