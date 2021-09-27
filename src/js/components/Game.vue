@@ -39,7 +39,7 @@ export default {
 	data() {
 		return {
 			// currentMainComponent: 'LocationWrapper',
-			currentMainComponent: "GameFight",
+			currentMainComponent: "TheDebug",
 			// currentMainComponent: null,
 			// apiReady: true
 			apiReady: false
