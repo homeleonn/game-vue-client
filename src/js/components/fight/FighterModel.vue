@@ -8,28 +8,6 @@
 <script>
 export default {
 	props: ['side', 'damage'],
-
-	beforeUpdate() {
-		// cl(this.side)
-		// blankHit(this.side)((this.damage[0], this.damage[1], this.damage[2], this.damage[3]));
-		// hit;
-	},
-
-	updated() {
-		// cl(this.side)
-		// if (this.side === 'left') {
-		// }
-		// side = this.side;
-		// _fighter = _(`.fighter-wrapper.${this.side} .fighter`);
-		// _damage = _(`.fighter-wrapper.${this.side} .damage`);
-		// _fighter = _(`.fighter-wrapper.${this.side} .fighter`);
-		// _damage = _(`.fighter-wrapper.${this.side} .damage`);
-	},
-
-	mounted() {
-		// hit = blankHit(this.side)
-	},
-
 	watch: {
 		damage(newDamage) {
 			// cl(this.side, newDamage);
@@ -104,11 +82,18 @@ function blankHit(side) {
 			}
 
 			_damage.html(`<span style="color: ${color};">${damage}</span>`).addClass('active');
+			// setTimeout(() => {
+			// 	_damage.removeClass('active');
+			// }, 1000);
+		}
+
+		if (type !== false && damage !== false) {
+			_damage.html(`<span style="color: ${color};">${damage}</span>`).addClass('active');
+		}
+
 			setTimeout(() => {
 				_damage.removeClass('active');
 			}, 1000);
-		}
-			// _damage.html(`<span style="color: ${color};">${damage}</span>`).addClass('active');
 
 		
 		if (type === false) return;

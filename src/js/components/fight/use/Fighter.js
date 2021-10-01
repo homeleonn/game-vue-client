@@ -1,3 +1,5 @@
+import { ref } from 'vue'
+import { damageCalculate } from './damageCalculate.js'
 let myTimerId;
 let fight;
 const TURN_TIME = 4;
@@ -10,9 +12,16 @@ const HITS_COUNT = 3;
 export default class Fighter {
 	constructor(fighter, _fight) {
 		fight = _fight;
-		for (const prop in fighter) {
-			this[prop] = fighter[prop];
-		}
+		Object.assign(this, fighter, {
+			lastEnemyId: null,
+			turn: null,
+			damage: 0,
+			fightExp: 0,
+			kills: 0,
+			delay: false,
+			timeoutTicks: 0,
+			swap: null
+		});
 	}
 
 	getEnemy() {
@@ -22,31 +31,56 @@ export default class Fighter {
 	setEnemy(fighter) {
 		this.e 		= fighter.id;
 		fighter.e = this.id;
-		// cl(this, fighter); return;
 	}
 
 	getTimeTurnLeft() {
-		return Math.round((this.swap[TURN_TIME] - (Date.now() - TURN_TIME_TIMEOUT)) / 1000);
+		return !this.swap ? null : Math.round((this.swap[TURN_TIME] - (Date.now() - TURN_TIME_TIMEOUT)) / 1000);
 	}
 
 	hit(type) {
-		const [damage, crit] = this.calcDamage();
+		const [damage, crit, block, evasion] = this.calcDamage();
+		this.resetTimeoutTicks();
 		this.getEnemy().curhp -= damage;
-		fight.setLog(this, this.getEnemy(), damage, type, crit);
+		fight.setLog(this, this.getEnemy(), damage, type, crit, block, evasion);
 		const isFighterDeath = this.checkFighterDeath();
 		if (fight.isFightEnd.value) return;
+		this.setDelay();
 		this.toggleTurn(isFighterDeath);
 	}
 
+	delayFn(cb, delay = 1000) {	setTimeout(() => { cb(); }, delay) };
+	setDelay() {
+		this.foreachEnemy(f => {	f.delay = true; this.delayFn(() => { f.delay = false; }) });
+	}
+
+	resetTimeoutTicks() {
+		this.timeoutTicks = 0;
+	}
+
+	nextTimeoutTicks() {
+		return ++this.timeoutTicks;
+	}
+
+	checkFighterTimeoutDeath() {
+		return this.nextTimeoutTicks() === 3;
+	}
+
+	// callback for both enemies
+	foreachEnemy(cb) {
+		[this, this.getEnemy()].forEach(fighter => cb(fighter));
+	}
+
 	toggleTurn(isFighterDeath = false) {
-		if (this.canSwap(isFighterDeath)) {
-			fight.setPairs();
-		} else {
-			const [turn] = this.selectTurn();
-			this.swap[HIT_TURN] = turn;
-			this.swap[TURN_TIME] = Date.now();
-			fight.handleBot(this.getEnemy().id);
-		}
+		this.delayFn(() => {
+			if (this.canSwap(isFighterDeath)) {
+				fight.setPairs();
+			} else {
+				const [turn] = this.selectTurn();
+				this.swap[HIT_TURN] = turn;
+				this.swap[TURN_TIME] = Date.now();
+				fight.handleBot(this.getEnemy().id);
+			}
+		}, 500);
 	}
 
 	setSwap() {
@@ -55,20 +89,19 @@ export default class Fighter {
 
 		fight.handleBot(hitter.id);
 
-		[this, this.getEnemy()].forEach(f => {
+		this.foreachEnemy(f => {
 			f.lastEnemyId = f.getEnemy().id;
 			f.swap = swap;
 			fight.swap[f.id] = swap;
-		})
+		});
 	}
 
 	canSwap(isEnemyDeath) {
 		// if hit swap was held or enemy defeated
 		if (!--this.swap[HITS_COUNT] || isEnemyDeath) {
-			[this, this.getEnemy()].forEach(f => {
+			this.foreachEnemy(f => {
 				f.e = f.swap = null;
 				delete fight.swap[f.id];
-
 				if (f.curhp > 0) fight.addToFreeFighters(f);
 			});
 
@@ -78,35 +111,62 @@ export default class Fighter {
 		return false;
 	}
 
-	calcDamage() {
-		let damage = rand(this.min_damage, this.max_damage);
-		const crit = this.isCrit();
+	checkChance(chance) {
+		const multiplier = 10;
+		const randNum = rand(0, 100 * multiplier);
+		console.log(randNum, chance * multiplier)
+		return randNum < chance * multiplier;
+	}
 
-		if (crit) {
-			damage *= 2;
+	calcDamage() {
+		let crit = this.checkChance(damageCalculate(this, this.getEnemy(), 'critical', 'evasion', 'defence')[0]);
+		const evasion = this.checkChance(damageCalculate(this, this.getEnemy(), 'evasion', 'critical', 'defence')[1]);
+		let block;
+		if (!evasion) {
+			block = this.checkChance(damageCalculate(this, this.getEnemy(), 'defence', 'critical', 'evasion')[1]);
 		}
+
+
+		let damage = rand(this.min_damage, this.max_damage);
+
+		// If critical is active then block noesn't work
+		if (evasion) {
+			damage = 0;
+			crit = false;
+		} else if (crit) {
+			damage *= 2;
+		} else if (block) {
+			damage = 0;
+			crit = false;
+		}
+
 		if (this.getEnemy().curhp < damage) {
 			damage = +this.getEnemy().curhp;
 		}
 		this.damage += damage;
 
-		return [damage, crit];
+		return [damage, crit, block, evasion];
 	}
 
 	isCrit() {
 		return !!rand(0, 1)
 	}
 
-	checkFighterDeath() {
+	checkFighterDeath(byTimeout = false) {
 		const fighter = this.getEnemy();
 		if (fighter.curhp <= 0) {
 			this.kills += 1;
-			fighter.curhp = 0;
-			fight.checkEndFight(fighter);
+			fighter.kill();
 			return true;
 		}
 
 		return false;
+	}
+
+	kill() {
+		this.curhp = 0;
+		this.swap = null;
+		fight.checkEndFight(this);
 	}
 
 	selectTurn() {
@@ -121,26 +181,6 @@ export default class Fighter {
 	isHitter() {
 		return this.team === this.turn;
 	}
-
-	isMe(id = null) {
-		return !id ? isMe : id === this.id;
-	}
-
-	// get enemy() {
-	// 	if (!this.e) return {};
-	// 	const user = {};
-	// 	// cl(this); return;
-	// 	Object.keys(this.e).forEach(k => {
-	// 		if (k === 'e') return;
-	// 		user[k] = this.e[k];
-	// 	});
-	// 	// cl(user);
-	// 	return user;
-	// }
-
-	// set enemy(enemy) {
-	// 	this.e = enemy;
-	// }
 }
 
 function stopTimer() {

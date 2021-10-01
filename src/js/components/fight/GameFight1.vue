@@ -1,9 +1,11 @@
 <template>
-	{{fight.freeFightersIds}}<button @click="fight.botNextTick()"> next tick</button><br>
+	<button @click="fight.botNextTick()"> next tick</button><br>
+	{{isChangingEnemy}}
+	<!-- {{fight.freeFightersIds}}
 	{{fight.botsHits}}<br>
 	{{fight.swap}}<br>
 	{{renderUser}}<br>
-	{{turn}}<br>
+	{{turn}}<br> -->
 	<!-- {{fight.teams}}<br> -->
 	<div class="fight row center">
 		<div class="col-md-2">
@@ -25,32 +27,33 @@
 							<div>Нанесено урона</div>
 							<div>{{user.damage}}</div>
 						</div>
-						<div class="enemy-stats col-md-5" v-if="user.getEnemy()">
+						<div class="enemy-stats col-md-5" v-if="user.getEnemy() && !isChangingEnemy">
 							<user-short-info :user="user.getEnemy()"></user-short-info>
 						</div>
 					</div>
-					<div class="timer" v-if="user.getEnemy()">{{ user.getTimeTurnLeft() }}</div>
-					<div class="controls" v-if="user.getEnemy() && turn">
+					<div class="timer" v-if="user.getEnemy() && !user.delay && !isChangingEnemy">{{ timer }}</div>
+					<div class="controls" v-if="user.getEnemy() && turn && !user.delay && !isChangingEnemy && !fight.isFightEnd.value">
 						<div><button @click="user.hit(1)">&rarr;</button></div>
 						<div><button @click="user.hit(2)">&rarr;</button></div>
 						<div><button @click="user.hit(3)">&rarr;</button></div>
 					</div>
+					<div class="end-fight" v-if="fight.isFightEnd.value">
+						<div class="title">Бой окончен</div>
+						<div class="content">{{ user.team === fight.winTeam ? 'Победа' : 'Поражение'}}</div>
+						<button class="fight-exit" @click="toStatistics">Выход</button>
+					</div>
 				</div>
 				<img :src="'/img/locations/lake.jpeg'" class="location">
-				<fighter-model side="left" :key="1"></fighter-model>
-				<fighter-model side="right" :damage="damageEnemy" :key="2" class="enemy-fighter" :class="{change: !user.getEnemy()}"></fighter-model>
+				<fighter-model side="left" :damage="fight.damageMe" :key="1"></fighter-model>
+				<fighter-model side="right" :damage="fight.damageEnemy" :key="2" class="enemy-fighter" :class="{change: !user.getEnemy() || isChangingEnemy}"></fighter-model>
 			</div>
-			<div v-if="fight.isFightEnd.value">
-				<b>Fight has finished!</b>
-				<button @click="toStatistics">Statistics</button>
-			</div>
-			<div v-for="(s, idx) in fight.swap" :key="idx">{{idx}}: {{s}}</div>
+			<!-- <div v-for="(s, idx) in fight.swap" :key="idx">{{idx}}: {{s}}</div> -->
 			<div><button @click="reset">Reset</button></div>
 			<div><button @click="stopAllTimers()">Stop timers</button></div>
 		</div>
 		<div class="col-md-2 center">
 			<div v-if="user.getEnemy()" class="center">
-				<div v-if="false" class="changing-enemy icon-spin3 active"></div>
+				<div v-if="isChangingEnemy" class="changing-enemy icon-spin3 active"></div>
 				<user-form v-else
 					:items="[]"
 					:user="user.getEnemy()"
@@ -70,7 +73,6 @@
 						<div v-for="(f, idx) in fight.teams[0]" :key="idx">
 							<div :class="{active: user.getEnemy()?.id == f.id}">
 								<!-- <div>{{ normalize(f) }}</div> -->
-								{{f.curhp}} / {{f.maxhp}}
 								<user-short-info :user="f" shrink></user-short-info>
 							</div>
 						</div>
@@ -80,9 +82,8 @@
 				<div class="col-md-6 team2">
 					<div class="team-title">Команда 2<hr></div>
 					<div class="fighter-list">
-						<div v-for="(f, idx) in teams[1]" :key="idx">
+						<div v-for="(f, idx) in fight.teams[1]" :key="idx">
 							<div :class="{active: user.getEnemy()?.id == f.id}">
-								{{f.curhp}} / {{f.maxhp}}
 								<user-short-info :user="f" shrink></user-short-info>
 							</div>
 						</div>
@@ -94,7 +95,7 @@
 	</div>
 </template>
 <script>
-import { setup, computed, watch } from 'vue'
+import { setup, computed, watch, ref, toRef, onMounted } from 'vue'
 import UserForm from '../user/form/UserForm'
 import UserShortInfo from '../user/form/UserShortInfo'
 import FighterModel from './FighterModel'
@@ -106,39 +107,45 @@ export default {
 
 	setup(props, { emit }) {
 		const fight = new Fight();
-
 		const turn = computed(() => fight.user.turn === fight.user.team);
-		// const isChangingEnemy = watch(() => fight.user.getTimeTurnLeft()) 
-		const renderUser = computed(() => {
-			// console.log(fight.user);
-			return normalize(fight.user);
+		const isChangingEnemy = ref(false);
+		let lastEnemyId = fight.user.lastEnemyId;
+		let isChangingEnemyTimer = null;
+		let timer1 = ref('');
+
+		watch(fight.user, (newV, oldV) => {
+			if (newV.lastEnemyId === lastEnemyId) return
+			lastEnemyId = newV.lastEnemyId;
+			isChangingEnemy.value = true;
+			clearTimeout(isChangingEnemyTimer);
+			isChangingEnemyTimer = setTimeout(() => {	isChangingEnemy.value = false; }, 1000);
 		});
 
-		function normalize(fighter) {
-			const user = {};
-			Object.keys(fighter).forEach(k => {
-				if (k === 'enemy') return;
-				user[k] = fighter[k];
-			});
-
-			return user;
+		function runTimer() {
+			setInterval(() => {
+				const timeout = fight.user.getTimeTurnLeft();
+				timer1.value = timeout === null ? timeout : timer(timeout > 0 ? timeout : 0, 'i:s');
+			}, 1000)
 		}
+
+		onMounted(() => {
+			runTimer();
+		});
 
 		function toStatistics() {
 			emit('setCurComp', 'FightStats');
 		}
-
 
 		return {
 			toStatistics,
 			turn,
 			fight,
 			user: 							fight.user,
-			renderUser,
-			normalize,
-			teams: 							fight.teams,
+			timer: timer1,
+			// isFightEnd: toRef(fight, 'isFightEnd'),
+			// teams: 							fight.teams,
 			// isFightEnd: 				fight.isFightEnd,
-			// isChangingEnemy: 		fight.isChangingEnemy,
+			isChangingEnemy,
 			// timer: 							fight.timer,
 			// createBots: 				fight.createBots,
 

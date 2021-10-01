@@ -91,6 +91,7 @@ export const userInfo = {
 	power: 'Сила',
 	critical: 'Интуиция',
 	evasion: 'Ловкость',
+	defence: 'Защита',
 	stamina: 'Выносливость',
 	gold: 'Золото',
 	exp: 'Опыт',

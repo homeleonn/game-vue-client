@@ -3,7 +3,7 @@ import { ref, reactive } from 'vue'
 import { useStore } from 'vuex'
 import Fighter from './Fighter';
 
-const botProto = { id: 1, name: 'Ящер', level: '0', curhp: '18', maxhp: '18', power: '5', critical: '5', evasion: '0', stamina: '4', aggr: '0', is_undead: '0', image: 'yashcher.jpg', min_damage: 1, max_damage: 2, login: 'Ящер' };
+const botProto = { id: 1, name: 'Ящер', level: '0', curhp: '18', maxhp: '18', power: '5', critical: '5', evasion: '5', defence: '5', stamina: '5', aggr: '0', is_undead: '0', image: 'yashcher.jpg', min_damage: 1, max_damage: 2, login: 'Ящер' };
 
 const HIT_HEAD = 1;
 const HIT_CHEST = 2;
@@ -25,7 +25,15 @@ const HIT_TURN = 2;
 const HITS_COUNT = 3;
 let botTimerId = null;
 let myTimerId = null;
+let fightTimerId = null;
 let startTime = new Date().getTime();
+const HIT_TYPES = {
+	HAND: 3,
+	LEG: 7,
+	EVASION: 4,
+	EVASION1: 2,
+	BLOCK: 1,
+};
 
 
 function checkAliveTeam(team) {
@@ -67,6 +75,10 @@ function stopTimer() {
 	clearInterval(myTimerId);
 }
 
+function stopFightTimer() {
+	clearInterval(fightTimerId);
+}
+
 function stopBotTimer() {
 	clearInterval(botTimerId);
 }
@@ -74,6 +86,7 @@ function stopBotTimer() {
 function stopAllTimers() {
 	stopTimer();
 	stopBotTimer();
+	stopFightTimer();
 }
 
 export default class Fight {
@@ -83,31 +96,40 @@ export default class Fight {
 	}
 
 	init() {
-		// cl(this.store.state.user);
-		// cl(111);
-		this.store.state.user = this.store.state.user instanceof Fighter ? this.store.state.user : new Fighter(this.store.state.user, this, true);
 		stopAllTimers();
+		this.store.state.user = this.store.state.user instanceof Fighter ? this.store.state.user : new Fighter(this.store.state.user, this, true);
 		this.user							= this.store.state.user;
-		// cl(this.teams)
+		// this.user.e 					= reactive(null);
 		this.fighters 				= {};
-		this.teams 						= [{}, {}];
-		// cl(this.teams)
-		this.freeFighters 		= reactive([{}, {}]);
-		this.freeFightersIds 	= reactive([[], []]);
-		this.botsHits 				= reactive({});
-		this.swap 						= reactive({});
+		this.teams 						= reactive([{}, {}]);
+		this.freeFighters 		= [{}, {}];
+		this.freeFightersIds 	= [[], []];
+		this.botsHits 				= {};
+		this.swap 						= {};
+		// this.isFightEnd 			= false;
 		this.isFightEnd 			= ref(false);
+		this.damageEnemy 			= null;
+		this.damageMe 				= null;
+		this.winTeam 					= null;
+		// this.freeFighters 		= reactive([{}, {}]);
+		// this.freeFightersIds 	= reactive([[], []]);
+		// this.botsHits 				= reactive({});
+		// this.swap 						= reactive({});
 
 		this.initFighter(this.user, 1);
-		this.createBots(botProto, 7, 0);
-		this.createBots(botProto, 5, 1);
+		this.createBots(botProto, 1, 0);
+		// this.createBots(botProto, 1, 1);
 		this.user.curhp = this.user.maxhp = 400;
-		// for (const k in this.teams[0]) { 
-		// 	this.teams[0][k].curhp = this.teams[0][k].maxhp = 100; 
-		// }
+		this.user.critical = 5;
+		this.user.evasion = 200;
+		for (const k in this.teams[0]) { 
+			this.teams[0][k].curhp = this.teams[0][k].maxhp = 100; 
+			this.teams[0][k].defence = 200; 
+		}
 
 		this.setPairs();
-		this.processBots();
+		this.run();
+		// this.processBots();
 	}
 
 	createBots(proto, count, team) {
@@ -119,14 +141,7 @@ export default class Fight {
 
 	initFighter(f, team) {
 		f.team = team;
-		f.lastEnemyId = null;
-		f.turn = null;
-		f.damage = 0;
-		f.fightExp = 0;
-		f.kills = 0;
-
 		this.addFighter(reactive(f));
-
 		return f;
 	}
 
@@ -173,6 +188,28 @@ export default class Fight {
 		delete this.freeFighters[fighter.team][fighter.id];
 	}
 
+	run() {
+		fightTimerId = setInterval(() => {
+			this.checkToggleTurn();
+			this.processBotsTick();
+		}, 2000); 
+	}
+
+	checkToggleTurn() {
+		for (const fId in this.teams[0]) {
+			const f = this.teams[0][fId];
+			if (!f.swap || f.getTimeTurnLeft() > 1) continue;
+			cl(f.isHitter());
+			const passFighter = f.isHitter() ? f : f.getEnemy();
+			const death = passFighter.checkFighterTimeoutDeath();
+			if (death) {
+				passFighter.kill();
+			}
+			this.handleBot(f.id);
+			f.toggleTurn(death);
+		}
+	}
+
 	botNextTick() {
 		this.processBotsTick();
 	}
@@ -185,7 +222,6 @@ export default class Fight {
 
 	processBotsTick() {
 		const botsHitsCount = Object.keys(this.botsHits).length;
-		// cl('Next bot hit', botsHitsCount);
 		if (!botsHitsCount) return;
 
 		for (let botId in this.botsHits) {
@@ -207,7 +243,7 @@ export default class Fight {
 
 	checkEndFight(defender) {
 		this.isFightEnd.value = !checkAliveTeam(this.teams[defender.team]);
-		const winTeam = defender.getEnemy().team;
+		const winTeam = this.winTeam = defender.getEnemy().team;
 
 		if (this.isFightEnd.value) {
 			stopAllTimers();
@@ -233,18 +269,19 @@ export default class Fight {
 			});
 		}
 
-		return this.isFightEnd.value;
+		return this.isFightEnd;
 	}
 
-	setLog(hitter, defender, damage, hitType, crit = false) {
+	setLog(hitter, defender, damage, hitType, crit = false, block = false, evasion = false) {
 		if (!this.isMyPair(hitter, defender)) return;
 		const d = crit ? `<span style="color: red;">${damage}</span>` : damage;
+		const defenceType = evasion ? HIT_TYPES.EVASION : (block ? HIT_TYPES.BLOCK : false);
 		if (hitter.id === this.user.id) {
 			// cl(1);
-			this.damageEnemy = [false, damage, crit, this.hitId++];
+			this.damageEnemy = [defenceType, damage, crit, this.hitId++];
 			this.damageMe = [3, false, crit, this.hitId++];
 		} else {
-			this.damageMe = [false, damage, crit, this.hitId++];
+			this.damageMe = [defenceType, damage, crit, this.hitId++];
 			this.damageEnemy = [3, false, crit, this.hitId++];
 		}
 		// this.['damage' + (hitter === this.user.id ? 'Enemy' : 'Me')] = [3, damage, crit, this.hitId++];

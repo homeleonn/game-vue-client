@@ -78,7 +78,7 @@ export default {
 		},
 
 		getLangInfoKeys() {
-			return this.info ? this.info : ['power', 'critical', 'evasion', 'stamina', 'win', 'defeat', 'draw', 'exp', 'gold'];
+			return this.info ? this.info : ['power', 'critical', 'evasion', 'defence', 'stamina', 'win', 'defeat', 'draw', 'exp', 'gold'];
 		},
 
 		image() {
