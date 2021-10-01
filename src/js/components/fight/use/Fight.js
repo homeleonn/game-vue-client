@@ -84,24 +84,27 @@ export default class Fight {
 
 	init() {
 		// cl(this.store.state.user);
-		cl(111);
+		// cl(111);
 		this.store.state.user = this.store.state.user instanceof Fighter ? this.store.state.user : new Fighter(this.store.state.user, this, true);
 		stopAllTimers();
 		this.user							= this.store.state.user;
-		cl(this.teams)
-		this.teams 						= reactive([{}, {}]);
-		cl(this.teams)
+		// cl(this.teams)
+		this.fighters 				= {};
+		this.teams 						= [{}, {}];
+		// cl(this.teams)
 		this.freeFighters 		= reactive([{}, {}]);
 		this.freeFightersIds 	= reactive([[], []]);
 		this.botsHits 				= reactive({});
 		this.swap 						= reactive({});
 		this.isFightEnd 			= ref(false);
-		this.isChangingEnemy 	= ref(false);
-		this.timer 						= ref(0);
 
 		this.initFighter(this.user, 1);
-		this.createBots(botProto, 2, 0);
-		this.createBots(botProto, 1, 1);
+		this.createBots(botProto, 7, 0);
+		this.createBots(botProto, 5, 1);
+		this.user.curhp = this.user.maxhp = 400;
+		// for (const k in this.teams[0]) { 
+		// 	this.teams[0][k].curhp = this.teams[0][k].maxhp = 100; 
+		// }
 
 		this.setPairs();
 		this.processBots();
@@ -122,12 +125,13 @@ export default class Fight {
 		f.fightExp = 0;
 		f.kills = 0;
 
-		this.addFighter(f);
+		this.addFighter(reactive(f));
 
 		return f;
 	}
 
 	addFighter(fighter) {
+		this.fighters[fighter.id] = fighter;
 		this.teams[fighter.team][fighter.id] = fighter;
 		this.addToFreeFighters(fighter);
 	}
@@ -139,47 +143,38 @@ export default class Fight {
 
 	setPairs() {
 		const activeTeam = 0;
+		const passiveTeam = 1;
 		const allFreeTeamFightersIds = [...this.freeFightersIds[activeTeam]];
 
 		for (let i = 0; i <= allFreeTeamFightersIds.length; i++) {
-			if (!this.freeFightersIds[activeTeam].length || !this.freeFightersIds[1].length) return;
+			if (!this.freeFightersIds[activeTeam].length || !this.freeFightersIds[passiveTeam].length) return;
 			const fighter = this.getRandomFighter(activeTeam);
-			fighter.pullEnemy();
+			fighter.setEnemy(this.getRandomFighter(passiveTeam));
+			fighter.setSwap();
 		}
 	}
 
-	isMyPair(f1, f2) {
-		return this.user.id === f1.id || this.user.id === f2.id;
+	getRandomFighter(team) {
+		const fighterIdKey = rand(0, this.freeFightersIds[team].length - 1);
+		const fighterId = this.freeFightersIds[team][fighterIdKey];
+		const fighter = this.teams[team][fighterId];
+
+		this.removeFreeFighter(fighter, fighterIdKey);
+
+		return fighter;
 	}
 
-	toggleTurn(f1, f2, isFighterDeath = false) {
-		if (this.isFightEnd.value) return;
-		if (this.canSwap(f1, f2, isFighterDeath)) {
-			if (this.isMyPair(f1, f2)) {
-				this.user.enemy = null;
-			}
-			this.setPairs();
-		} else {
-			const [turn, hitter, defender] = f1.selectTurn(f1, f2);
-			this.swap[f1.id][HIT_TURN] = turn;
-			this.user.setMyTurn(f1, f2, this.user.isMe(hitter.id));
-			this.handleBot(hitter.id);
+	removeFreeFighter(fighter, fighterIdKey = null) {
+		if (fighterIdKey === null) {
+			fighterIdKey = this.freeFightersIds[fighter.team].indexOf(fighter.id);
+			if (fighterIdKey === -1) return;
 		}
+		this.freeFightersIds[fighter.team].splice(fighterIdKey, 1);
+		delete this.freeFighters[fighter.team][fighter.id];
 	}
 
-	canSwap(f1, f2, newEnemy) {
-		if (newEnemy || !--this.swap[f1.id][HITS_COUNT]) {
-			delete this.swap[f1.id];
-			delete this.swap[f2.id];
-			// cl(111);
-			if (f1.curhp > 0) this.addToFreeFighters(f1);
-			if (f2.curhp > 0) this.addToFreeFighters(f2);
-		
-
-			return true;
-		}
-
-		return false;
+	botNextTick() {
+		this.processBotsTick();
 	}
 
 	processBots() {
@@ -190,23 +185,14 @@ export default class Fight {
 
 	processBotsTick() {
 		const botsHitsCount = Object.keys(this.botsHits).length;
-		cl('Next bot hit', botsHitsCount);
+		// cl('Next bot hit', botsHitsCount);
 		if (!botsHitsCount) return;
 
 		for (let botId in this.botsHits) {
 			if (isBotHitTime(this.botsHits[botId])) {
 				delete this.botsHits[botId];
-				let hitterTeam, defenderTeam;
-				if (this.swap[botId][0] === +botId) {
-					hitterTeam = 0;
-					defenderTeam = 1;
-				} else {
-					hitterTeam = 1;
-					defenderTeam = 0;
-				}
-
-				const hitter = this.teams[hitterTeam][this.swap[botId][hitterTeam]];
-				// defender = this.teams[defenderTeam][this.swap[botId][defenderTeam]];
+				const bot = this.fighters[botId];
+				const hitter = bot.isHitter() ? bot : bot.getEnemy();
 
 				hitter.hit(rand(1, 3));
 			}
@@ -214,34 +200,17 @@ export default class Fight {
 	}
 
 	handleBot(fighterId) {
-		cl(fighterId);
 		if (isBot(fighterId)) {
 			this.botsHits[fighterId] = monsterDamageTime();
 		}
 	}
 
-	getRandomFighter(team) {
-		const fighterId = this.freeFightersIds[team][rand(0, this.freeFightersIds[team].length - 1)];
-		const fighter = this.teams[team][fighterId];
-
-		return fighter;
-	}
-
-	getEnemyTeam(team) {
-		return team === 0 ? 1 : 0;
-	}
-
-	removeFreeFighter(fighterIdKey, fighter) {
-		this.freeFightersIds[fighter.team].splice(fighterIdKey, 1);
-		delete this.freeFighters[fighter.team][fighter.id];
-	}
-
 	checkEndFight(defender) {
-		this.isFightEnd = !checkAliveTeam(this.teams[defender.team]);
-		const winTeam = defender.team === 0 ? 1 : 0;
+		this.isFightEnd.value = !checkAliveTeam(this.teams[defender.team]);
+		const winTeam = defender.getEnemy().team;
 
-		if (this.isFightEnd) {
-			this.stopAllTimers();
+		if (this.isFightEnd.value) {
+			stopAllTimers();
 
 			const teams = [{}, {}];
 			const setTeamFighterForStats = (fighter, winner) => {
@@ -257,13 +226,35 @@ export default class Fight {
 			walkTeam(this.teams[winTeam], fighter => { setTeamFighterForStats(fighter, true) });
 			walkTeam(this.teams[defender.team], fighter => { setTeamFighterForStats(fighter, false) });
 
-			this.$store.commit('SET_FIGHTSTATS', {
+			this.store.commit('SET_FIGHTSTATS', {
 				startTime,
 				winTeam,
 				teams
 			});
 		}
 
-		return this.isFightEnd;
+		return this.isFightEnd.value;
+	}
+
+	setLog(hitter, defender, damage, hitType, crit = false) {
+		if (!this.isMyPair(hitter, defender)) return;
+		const d = crit ? `<span style="color: red;">${damage}</span>` : damage;
+		if (hitter.id === this.user.id) {
+			// cl(1);
+			this.damageEnemy = [false, damage, crit, this.hitId++];
+			this.damageMe = [3, false, crit, this.hitId++];
+		} else {
+			this.damageMe = [false, damage, crit, this.hitId++];
+			this.damageEnemy = [3, false, crit, this.hitId++];
+		}
+		// this.['damage' + (hitter === this.user.id ? 'Enemy' : 'Me')] = [3, damage, crit, this.hitId++];
+		this.store.commit('ADD_FIGHT_LOG', `${hitter.login}[${hitter.level}] ударил ${defender.login}[${defender.level}] в ${hitVerbs[hitType]} на -${d}(${defender.curhp}/${defender.maxhp})`);
+		if (defender.curhp <= 0) {
+			this.store.commit('ADD_FIGHT_LOG', `${defender.login}[${defender.level}] погибает.`);
+		}
+	}
+
+	isMyPair(f1, f2) {
+		return [f1, f2].some(f => f.id === this.user.id);
 	}
 }

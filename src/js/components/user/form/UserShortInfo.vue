@@ -9,7 +9,7 @@
 			<div class="hp-back">
 				<div class="hp-line" :style="hpLineStyle"></div>
 			</div>
-			<div class="hp">{{ user.curhp }} / {{ user.maxhp }}</div><span class="icon-spin3 active" v-if="isRegenerating"></span>
+			<div class="hp">{{ hp }}</div><span class="icon-spin3 active" v-if="isRegenerating"></span>
 		</div>
 	</div>
 </template>
