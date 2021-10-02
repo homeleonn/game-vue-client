@@ -42,6 +42,7 @@
 						<div class="content">{{ user.team === fight.winTeam ? 'Победа' : 'Поражение'}}</div>
 						<button class="fight-exit" @click="toStatistics">Выход</button>
 					</div>
+					<div class="super-hit" v-if="fight.superHit">Супер-удар</div>
 				</div>
 				<img :src="'/img/locations/lake.jpeg'" class="location">
 				<fighter-model side="left" :damage="fight.damageMe" :key="1"></fighter-model>
@@ -49,7 +50,7 @@
 			</div>
 			<!-- <div v-for="(s, idx) in fight.swap" :key="idx">{{idx}}: {{s}}</div> -->
 			<div><button @click="reset">Reset</button></div>
-			<div><button @click="stopAllTimers()">Stop timers</button></div>
+			<div><button @click="fight.stopAllTimers()">Stop timers</button></div>
 		</div>
 		<div class="col-md-2 center">
 			<div v-if="user.getEnemy()" class="center">
@@ -156,3 +157,16 @@ export default {
 
 
 </script>
+
+<style lang="scss">
+.fight {
+	.super-hit {
+		font-size: 50px;
+		color: gold;
+		position: absolute;
+		top: 50px;
+		left: 0;
+		right: 0;
+	}
+}
+</style>

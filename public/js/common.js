@@ -1,3 +1,16 @@
+/*HOOKS*/
+const hooks = {};
+
+function addAction(actionName, cb) {
+	if (!hooks[actionName]) hooks[actionName] = [];
+	hooks[actionName].push(cb);
+}
+
+function doAction(actionName, ...args) {
+	hooks[actionName]?.forEach(cb => cb(...args));
+}
+/*--HOOKS*/
+
 function z(num) {
 	return +num > 9 ? num : '0' + num;
 }

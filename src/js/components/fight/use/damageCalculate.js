@@ -1,5 +1,46 @@
 const min = 5;
-export function damageCalculate(u1, u2, stat1, stat2, stat3) {
+
+export function checkAttack(u1, u2, type, superHitLevel) {
+	let crit = checkChance(damageCalculate(u1, u2, 'critical', 'evasion', 'defence')[0]);
+	let evasion = checkChance(damageCalculate(u1, u2, 'evasion', 'critical', 'defence')[1]);
+	let block = false;
+	if (!evasion) {
+		block = checkChance(damageCalculate(u1, u2, 'defence', 'critical', 'evasion')[1]);
+	}
+
+	if (superHitLevel && cancelDefenceBySuperHit(u1.level, superHitLevel)) {
+		evasion = block = false;
+	}
+
+	return [crit, evasion, block, superHitLevel];
+}
+
+function cancelDefenceBySuperHit(userLevel, superHitLevel) {
+	let chance;
+	const diffLevel = userLevel - superHitLevel;
+
+	if (diffLevel < 1) {
+		return true;
+	} else if (diffLevel === 1) {
+		chance = 70;
+	} else if (diffLevel === 2) {
+		chance = 40;
+	} else if (diffLevel === 3) {
+		chance = 10;
+	}
+
+	return checkChance(chance);
+}
+
+
+// @check must be in range 0-100
+function checkChance(chance) {
+	const multiplier = 10;
+	const randNum = rand(0, 100 * multiplier);
+	return randNum < chance * multiplier;
+}
+
+function damageCalculate(u1, u2, stat1, stat2, stat3) {
 	let r1 = 0;
 	let r2 = 0;
 	let cr1, cr2;

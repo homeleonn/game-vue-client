@@ -1,5 +1,6 @@
 import { ref } from 'vue'
-import { damageCalculate } from './damageCalculate.js'
+import { checkAttack } from './damageCalculate.js'
+import { checkSuperHit } from './fighterDamage.js'
 let myTimerId;
 let fight;
 const TURN_TIME = 4;
@@ -38,10 +39,11 @@ export default class Fighter {
 	}
 
 	hit(type) {
-		const [damage, crit, block, evasion] = this.calcDamage();
+		doAction('beforeHit', type);
+		const [damage, crit, block, evasion, superHit] = this.calcDamage(type);
 		this.resetTimeoutTicks();
 		this.getEnemy().curhp -= damage;
-		fight.setLog(this, this.getEnemy(), damage, type, crit, block, evasion);
+		fight.setLog(this, this.getEnemy(), damage, type, crit, block, evasion, superHit);
 		const isFighterDeath = this.checkFighterDeath();
 		if (fight.isFightEnd.value) return;
 		this.setDelay();
@@ -62,7 +64,7 @@ export default class Fighter {
 	}
 
 	checkFighterTimeoutDeath() {
-		return this.nextTimeoutTicks() === 3;
+		return this.nextTimeoutTicks() >= 3;
 	}
 
 	// callback for both enemies
@@ -111,22 +113,10 @@ export default class Fighter {
 		return false;
 	}
 
-	checkChance(chance) {
-		const multiplier = 10;
-		const randNum = rand(0, 100 * multiplier);
-		console.log(randNum, chance * multiplier)
-		return randNum < chance * multiplier;
-	}
 
-	calcDamage() {
-		let crit = this.checkChance(damageCalculate(this, this.getEnemy(), 'critical', 'evasion', 'defence')[0]);
-		const evasion = this.checkChance(damageCalculate(this, this.getEnemy(), 'evasion', 'critical', 'defence')[1]);
-		let block;
-		if (!evasion) {
-			block = this.checkChance(damageCalculate(this, this.getEnemy(), 'defence', 'critical', 'evasion')[1]);
-		}
-
-
+	calcDamage(type) {
+		const superHitLevel = this.checkSuperHit(type);
+		let [crit, evasion, block, superHit] = checkAttack(this, this.getEnemy(), type, superHitLevel);
 		let damage = rand(this.min_damage, this.max_damage);
 
 		// If critical is active then block noesn't work
@@ -145,7 +135,7 @@ export default class Fighter {
 		}
 		this.damage += damage;
 
-		return [damage, crit, block, evasion];
+		return [damage, crit, block, evasion, superHitLevel];
 	}
 
 	isCrit() {
@@ -182,6 +172,9 @@ export default class Fighter {
 		return this.team === this.turn;
 	}
 }
+
+
+Fighter.prototype.checkSuperHit = checkSuperHit;
 
 function stopTimer() {
 	clearInterval(myTimerId);

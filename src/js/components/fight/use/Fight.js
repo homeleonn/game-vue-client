@@ -2,8 +2,9 @@
 import { ref, reactive } from 'vue'
 import { useStore } from 'vuex'
 import Fighter from './Fighter';
+import { extra } from './fighterDamage.js';
 
-const botProto = { id: 1, name: 'Ящер', level: '0', curhp: '18', maxhp: '18', power: '5', critical: '5', evasion: '5', defence: '5', stamina: '5', aggr: '0', is_undead: '0', image: 'yashcher.jpg', min_damage: 1, max_damage: 2, login: 'Ящер' };
+const botProto = { id: 1, name: 'Ящер', level: '0', curhp: '18', maxhp: '18', power: '5', critical: '5', evasion: '5', defence: '5', stamina: '5', aggr: '0', is_undead: '0', image: 'yashcher.jpg', min_damage: 1, max_damage: 2, login: 'Ящер', super_hits: {} };
 
 const HIT_HEAD = 1;
 const HIT_CHEST = 2;
@@ -27,12 +28,15 @@ let botTimerId = null;
 let myTimerId = null;
 let fightTimerId = null;
 let startTime = new Date().getTime();
-const HIT_TYPES = {
+
+
+// number means attack sprite line (how the attack must look)
+export const HIT_TYPES = {
 	HAND: 3,
 	LEG: 7,
 	EVASION: 4,
-	EVASION1: 2,
 	BLOCK: 1,
+	SUPER: 7,
 };
 
 
@@ -116,12 +120,12 @@ export default class Fight {
 		// this.botsHits 				= reactive({});
 		// this.swap 						= reactive({});
 
+
 		this.initFighter(this.user, 1);
 		this.createBots(botProto, 1, 0);
 		// this.createBots(botProto, 1, 1);
-		this.user.curhp = this.user.maxhp = 400;
-		this.user.critical = 5;
-		this.user.evasion = 200;
+		extra(this.user);
+
 		for (const k in this.teams[0]) { 
 			this.teams[0][k].curhp = this.teams[0][k].maxhp = 100; 
 			this.teams[0][k].defence = 200; 
@@ -230,7 +234,7 @@ export default class Fight {
 				const bot = this.fighters[botId];
 				const hitter = bot.isHitter() ? bot : bot.getEnemy();
 
-				hitter.hit(rand(1, 3));
+				hitter?.hit(rand(1, 3));
 			}
 		}
 	}
@@ -272,26 +276,53 @@ export default class Fight {
 		return this.isFightEnd;
 	}
 
-	setLog(hitter, defender, damage, hitType, crit = false, block = false, evasion = false) {
+	setLog(hitter, defender, damage, hitType, crit, block, evasion, superHit) {
 		if (!this.isMyPair(hitter, defender)) return;
-		const d = crit ? `<span style="color: red;">${damage}</span>` : damage;
-		const defenceType = evasion ? HIT_TYPES.EVASION : (block ? HIT_TYPES.BLOCK : false);
+		let logDamage;
+		let damageType = HIT_TYPES.HAND;
+		let defenceType = false;
+		let attackType = '-';
+		let color = 'black';
+		if (evasion) {
+			defenceType = HIT_TYPES.EVASION;
+			logDamage = 'уворот'
+			color = 'green';
+		} else if (block) {
+			defenceType = HIT_TYPES.BLOCK;
+			logDamage = 'блок';
+			color = 'blue';
+		} else {
+			if (superHit) {
+				this.trigger('superHit');
+				damageType = HIT_TYPES.SUPER;
+				attackType = 'супер-удар';
+			} else {
+				attackType = 'ударил';
+			}
+
+			if (crit) {
+				color = 'red';
+			}
+
+			logDamage = `в ${hitVerbs[hitType]} на -<span style="color: ${color};">${damage}</span>(${defender.curhp}/${defender.maxhp})`;
+		}
 		if (hitter.id === this.user.id) {
-			// cl(1);
 			this.damageEnemy = [defenceType, damage, crit, this.hitId++];
-			this.damageMe = [3, false, crit, this.hitId++];
+			this.damageMe = [damageType, false, crit, this.hitId++];
 		} else {
 			this.damageMe = [defenceType, damage, crit, this.hitId++];
-			this.damageEnemy = [3, false, crit, this.hitId++];
+			this.damageEnemy = [damageType, false, crit, this.hitId++];
 		}
-		// this.['damage' + (hitter === this.user.id ? 'Enemy' : 'Me')] = [3, damage, crit, this.hitId++];
-		this.store.commit('ADD_FIGHT_LOG', `${hitter.login}[${hitter.level}] ударил ${defender.login}[${defender.level}] в ${hitVerbs[hitType]} на -${d}(${defender.curhp}/${defender.maxhp})`);
-		if (defender.curhp <= 0) {
-			this.store.commit('ADD_FIGHT_LOG', `${defender.login}[${defender.level}] погибает.`);
-		}
+		this.store.commit('ADD_FIGHT_LOG', `${hitter.login}[${hitter.level}] ${attackType} ${defender.login}[${defender.level}] ${logDamage}`);
+		
+		if (defender.curhp <= 0) this.store.commit('ADD_FIGHT_LOG', `${defender.login}[${defender.level}] погибает.`);
 	}
 
 	isMyPair(f1, f2) {
 		return [f1, f2].some(f => f.id === this.user.id);
+	}
+
+	trigger(prop, value = true, delay = 1000) {
+		this[prop] = value; setTimeout(() => { this[prop] = !value }, delay);
 	}
 }

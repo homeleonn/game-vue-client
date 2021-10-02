@@ -6,6 +6,8 @@
 </template>
 
 <script>
+import { HIT_TYPES } from './use/Fight';
+
 export default {
 	props: ['side', 'damage'],
 	watch: {
@@ -17,21 +19,13 @@ export default {
 }
 
 let hit;
-
-const HIT_TYPES = {
-	HAND: 3,
-	LEG: 7,
-	EVASION: 4,
-	EVASION1: 2,
-	BLOCK: 1,
-};
-
+// number means how many sprite steps need to do for attack animation
 const HIT_STEPS = {
 	[HIT_TYPES.HAND]: 3,
 	[HIT_TYPES.LEG]: 5,
 	[HIT_TYPES.EVASION]: 4,
-	[HIT_TYPES.EVASION1]: 5,
 	[HIT_TYPES.BLOCK]: 4,
+	[HIT_TYPES.SUPER]: 5,
 };
 
 // const _fighter = [];
@@ -77,6 +71,10 @@ function blankHit(side) {
 				color = 'red';
 			}
 
+			if (type === HIT_TYPES.SUPER) {
+				color = 'gold';
+			} 
+
 			if (isNumeric(damage)) {
 				damage = `-${damage}`;
 			}
@@ -91,9 +89,9 @@ function blankHit(side) {
 			_damage.html(`<span style="color: ${color};">${damage}</span>`).addClass('active');
 		}
 
-			setTimeout(() => {
-				_damage.removeClass('active');
-			}, 1000);
+		setTimeout(() => {
+			_damage.removeClass('active');
+		}, 1000);
 
 		
 		if (type === false) return;

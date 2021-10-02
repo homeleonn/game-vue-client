@@ -28,6 +28,7 @@ module.exports = {
     'prefer-const': 'off',
     'vue/no-unused-components': 'off',
     'key-spacing': 'off',
+    'no-unused-expressions': 'off',
     'quotes': 'off'
   }
 }
