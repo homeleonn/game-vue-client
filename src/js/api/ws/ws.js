@@ -12,6 +12,10 @@ export class Server {
 
 	connect() {
 		if (!this.tryConnection--) return;
+		if (this.token.match(/\n/g)) {
+			console.log('Invalid token:', this.token);
+			return;
+		}
 		this.server = new WebSocket(`${this.to}${this.token}`);
 	}
 
