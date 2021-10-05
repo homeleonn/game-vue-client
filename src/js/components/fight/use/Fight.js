@@ -1,10 +1,11 @@
-
 import { ref, reactive } from 'vue'
 import { useStore } from 'vuex'
 import Fighter from './Fighter';
 import { extra } from './fighterDamage.js';
 
-const botProto = { id: 1, name: 'Ящер', level: '0', curhp: '18', maxhp: '18', power: '5', critical: '5', evasion: '5', defence: '5', stamina: '5', aggr: '0', is_undead: '0', image: 'yashcher.jpg', min_damage: 1, max_damage: 2, login: 'Ящер', super_hits: {} };
+
+// (fId) is a fighter id for current fight
+const botProto = { fId: 0, name: 'Ящер', level: '0', curhp: '18', maxhp: '18', power: '5', critical: '5', evasion: '5', defence: '5', stamina: '5', aggr: '0', is_undead: '0', image: 'yashcher.jpg', min_damage: 1, max_damage: 2, login: 'Ящер', super_hits: {}, isBot: 1 };
 
 const HIT_HEAD = 1;
 const HIT_CHEST = 2;
@@ -65,10 +66,6 @@ function isBotHitTime(botHitTime) {
 }
 
 
-function isBot(userId) {
-	return userId >= NpcId;
-}
-
 function walkTeam(team, cb) {
 	for (const fId in team) {
 		cb(team[fId]);
@@ -106,7 +103,7 @@ export default class Fight {
 		// this.user.e 					= reactive(null);
 		this.fighters 				= {};
 		this.teams 						= reactive([{}, {}]);
-		this.freeFighters 		= [{}, {}];
+		// this.freeFighters 		= [{}, {}];
 		this.freeFightersIds 	= [[], []];
 		this.botsHits 				= {};
 		this.swap 						= {};
@@ -115,6 +112,7 @@ export default class Fight {
 		this.damageEnemy 			= null;
 		this.damageMe 				= null;
 		this.winTeam 					= null;
+		this.fighterIdCounter = 1;
 		// this.freeFighters 		= reactive([{}, {}]);
 		// this.freeFightersIds 	= reactive([[], []]);
 		// this.botsHits 				= reactive({});
@@ -127,8 +125,8 @@ export default class Fight {
 		extra(this.user);
 
 		for (const k in this.teams[0]) { 
-			this.teams[0][k].curhp = this.teams[0][k].maxhp = 100; 
-			this.teams[0][k].defence = 200; 
+			this.teams[0][k].curhp = this.teams[0][k].maxhp = 1; 
+			this.teams[0][k].defence = 5; 
 		}
 
 		this.setPairs();
@@ -139,25 +137,26 @@ export default class Fight {
 	createBots(proto, count, team) {
 		if (!proto) proto = botProto;
 		while (count--) {
-			this.initFighter(new Fighter(Object.assign({}, proto, { id: NpcIdCounter++ }), this), team);
+			this.initFighter(new Fighter(Object.assign({}, proto), this), team);
 		}
 	}
 
 	initFighter(f, team) {
 		f.team = team;
+		f.fId = this.fighterIdCounter++;
 		this.addFighter(reactive(f));
 		return f;
 	}
 
 	addFighter(fighter) {
-		this.fighters[fighter.id] = fighter;
-		this.teams[fighter.team][fighter.id] = fighter;
+		this.fighters[fighter.fId] = fighter;
+		this.teams[fighter.team][fighter.fId] = fighter;
 		this.addToFreeFighters(fighter);
 	}
 
 	addToFreeFighters(fighter) {
-		this.freeFighters[fighter.team][fighter.id] = null;
-		this.freeFightersIds[fighter.team].push(fighter.id);
+		// this.freeFighters[fighter.team][fighter.fId] = null;
+		this.freeFightersIds[fighter.team].push(fighter.fId);
 	}
 
 	setPairs() {
@@ -165,7 +164,7 @@ export default class Fight {
 		const passiveTeam = 1;
 		const allFreeTeamFightersIds = [...this.freeFightersIds[activeTeam]];
 
-		for (let i = 0; i <= allFreeTeamFightersIds.length; i++) {
+		for (let i = 0; i < allFreeTeamFightersIds.length; i++) {
 			if (!this.freeFightersIds[activeTeam].length || !this.freeFightersIds[passiveTeam].length) return;
 			const fighter = this.getRandomFighter(activeTeam);
 			fighter.setEnemy(this.getRandomFighter(passiveTeam));
@@ -185,11 +184,11 @@ export default class Fight {
 
 	removeFreeFighter(fighter, fighterIdKey = null) {
 		if (fighterIdKey === null) {
-			fighterIdKey = this.freeFightersIds[fighter.team].indexOf(fighter.id);
+			fighterIdKey = this.freeFightersIds[fighter.team].indexOf(fighter.fId);
 			if (fighterIdKey === -1) return;
 		}
 		this.freeFightersIds[fighter.team].splice(fighterIdKey, 1);
-		delete this.freeFighters[fighter.team][fighter.id];
+		// delete this.freeFighters[fighter.team][fighter.fId];
 	}
 
 	run() {
@@ -197,21 +196,6 @@ export default class Fight {
 			this.checkToggleTurn();
 			this.processBotsTick();
 		}, 2000); 
-	}
-
-	checkToggleTurn() {
-		for (const fId in this.teams[0]) {
-			const f = this.teams[0][fId];
-			if (!f.swap || f.getTimeTurnLeft() > 1) continue;
-			cl(f.isHitter());
-			const passFighter = f.isHitter() ? f : f.getEnemy();
-			const death = passFighter.checkFighterTimeoutDeath();
-			if (death) {
-				passFighter.kill();
-			}
-			this.handleBot(f.id);
-			f.toggleTurn(death);
-		}
 	}
 
 	botNextTick() {
@@ -222,6 +206,20 @@ export default class Fight {
 		botTimerId = setInterval(() => {
 			this.processBotsTick();
 		}, 2000);
+	}
+
+	checkToggleTurn() {
+		for (const fId in this.teams[0]) {
+			const f = this.teams[0][fId];
+			if (!f.swap || f.getTimeTurnLeft() > 1) continue;
+			const passFighter = f.isHitter() ? f : f.getEnemy();
+			const death = passFighter.checkTimeoutDeath();
+			if (death) {
+				passFighter.kill();
+			}
+			this.handleBot(f);
+			f.toggleTurn(death);
+		}
 	}
 
 	processBotsTick() {
@@ -239,41 +237,46 @@ export default class Fight {
 		}
 	}
 
-	handleBot(fighterId) {
-		if (isBot(fighterId)) {
-			this.botsHits[fighterId] = monsterDamageTime();
+	handleBot(fighter) {
+		if (fighter.isBot) {
+			this.botsHits[fighter.fId] = monsterDamageTime();
 		}
 	}
 
-	checkEndFight(defender) {
-		this.isFightEnd.value = !checkAliveTeam(this.teams[defender.team]);
-		const winTeam = this.winTeam = defender.getEnemy().team;
+	isEnd(defender) {
+		if (checkAliveTeam(this.teams[defender.team])) return false;
+		
+		stopAllTimers();
+		this.isFightEnd.value = true;
+		this.winTeam = defender.getEnemy().team;
+		this.setStatistics(this.winTeam);
 
-		if (this.isFightEnd.value) {
-			stopAllTimers();
+		return true;
+	}
 
-			const teams = [{}, {}];
-			const setTeamFighterForStats = (fighter, winner) => {
-				teams[fighter.team][fighter.id] = {
-					id: fighter.id,
-					login: fighter.login,
-					level: fighter.level,
-					fightExp: (winner ? fighter.damage * 2 : 0),
-					damage: fighter.damage,
-					kills: fighter.kills,
-				}
+	setStatistics(winTeam) {
+		const teamsStatisticts = [{}, {}];
+		const setTeamFighterForStats = (fighter, isWinner) => {
+			teamsStatisticts[fighter.team][fighter.fId] = {
+				fId: fighter.fId,
+				login: fighter.login,
+				level: fighter.level,
+				fightExp: (isWinner ? fighter.damage * 2 : 0),
+				damage: fighter.damage,
+				kills: fighter.kills,
 			}
-			walkTeam(this.teams[winTeam], fighter => { setTeamFighterForStats(fighter, true) });
-			walkTeam(this.teams[defender.team], fighter => { setTeamFighterForStats(fighter, false) });
-
-			this.store.commit('SET_FIGHTSTATS', {
-				startTime,
-				winTeam,
-				teams
-			});
 		}
+		
+		this.teams.forEach((team, idx) => {
+			const isWinner = idx === winTeam;
+			walkTeam(team, fighter => { setTeamFighterForStats(fighter, isWinner) });
+		});
 
-		return this.isFightEnd;
+		this.store.commit('SET_FIGHTSTATS', {
+			startTime,
+			winTeam: this.winTeam,
+			teamsStatisticts
+		});
 	}
 
 	setLog(hitter, defender, damage, hitType, crit, block, evasion, superHit) {
@@ -306,7 +309,7 @@ export default class Fight {
 
 			logDamage = `в ${hitVerbs[hitType]} на -<span style="color: ${color};">${damage}</span>(${defender.curhp}/${defender.maxhp})`;
 		}
-		if (hitter.id === this.user.id) {
+		if (hitter.fId === this.user.fId) {
 			this.damageEnemy = [defenceType, damage, crit, this.hitId++];
 			this.damageMe = [damageType, false, crit, this.hitId++];
 		} else {
@@ -319,7 +322,7 @@ export default class Fight {
 	}
 
 	isMyPair(f1, f2) {
-		return [f1, f2].some(f => f.id === this.user.id);
+		return [f1, f2].some(f => f.fId === this.user.fId);
 	}
 
 	trigger(prop, value = true, delay = 1000) {

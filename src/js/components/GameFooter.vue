@@ -7,8 +7,8 @@
 		<div id="chat">
 			<div class="flex">
 				<div id="messages" ref="messages"></div>
-				<div class="fight-log" v-if="isFightLogVisible">
-					<div v-for="log in $store.state.fightLog" :key="log" v-html="log"></div>
+				<div class="fight-log" v-show="isFightLogVisible">
+					<div v-for="(log, idx) in $store.state.fightLog" :key="log" v-html="idx + '. ' + log"></div>
 				</div>
 				<button class="fight-log-toggle btn" :class="{active: isFightLogVisible}" @click="isFightLogVisible = !isFightLogVisible">Лог боя</button>
 				<div id="chat-loc">
@@ -67,6 +67,7 @@
 <script>
 import { mapGetters } from "vuex";
 import UserList from "./location/UserList";
+let _footer;
 
 export default {
 	name: "GameFooter",
@@ -114,12 +115,16 @@ export default {
 	created() {},
 	mounted() {
 		_footer = _('footer');
+		let _fightLog = document.querySelector('.fight-log');
+
+		this.$store.watch((state) => state.fightLog, () => {
+			// let _fightLog = document.querySelector('.fight-log');
+			setTimeout(() => { _fightLog.scroll(0, _fightLog.scrollHeight + 100); }, 0);
+		}, { deep: true })
 	},
 
 	components: { UserList }
 }
-
-let _footer;
 </script>
 
 <style lang="scss">
@@ -133,6 +138,7 @@ let _footer;
 
 	> div {
 		padding: 1px 0 3px 10px;
+		font-weight: bold;
 
 		&:nth-child(odd) {
 			background: #f1f1f1;

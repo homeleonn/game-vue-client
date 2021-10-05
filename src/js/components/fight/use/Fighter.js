@@ -30,8 +30,8 @@ export default class Fighter {
 	}
 
 	setEnemy(fighter) {
-		this.e 		= fighter.id;
-		fighter.e = this.id;
+		this.e 		= fighter.fId;
+		fighter.e = this.fId;
 	}
 
 	getTimeTurnLeft() {
@@ -63,7 +63,7 @@ export default class Fighter {
 		return ++this.timeoutTicks;
 	}
 
-	checkFighterTimeoutDeath() {
+	checkTimeoutDeath() {
 		return this.nextTimeoutTicks() >= 3;
 	}
 
@@ -80,21 +80,21 @@ export default class Fighter {
 				const [turn] = this.selectTurn();
 				this.swap[HIT_TURN] = turn;
 				this.swap[TURN_TIME] = Date.now();
-				fight.handleBot(this.getEnemy().id);
+				fight.handleBot(this.getEnemy());
 			}
 		}, 500);
 	}
 
 	setSwap() {
 		const [turn, hitter] = this.selectTurn();
-		const swap = [this.id, this.getEnemy().id, turn, 2, Date.now()];
+		const swap = [this.fId, this.getEnemy().fId, turn, 2, Date.now()];
 
-		fight.handleBot(hitter.id);
+		fight.handleBot(hitter);
 
 		this.foreachEnemy(f => {
-			f.lastEnemyId = f.getEnemy().id;
+			f.lastEnemyId = f.getEnemy().fId;
 			f.swap = swap;
-			fight.swap[f.id] = swap;
+			fight.swap[f.fId] = swap;
 		});
 	}
 
@@ -103,7 +103,7 @@ export default class Fighter {
 		if (!--this.swap[HITS_COUNT] || isEnemyDeath) {
 			this.foreachEnemy(f => {
 				f.e = f.swap = null;
-				delete fight.swap[f.id];
+				delete fight.swap[f.fId];
 				if (f.curhp > 0) fight.addToFreeFighters(f);
 			});
 
@@ -156,11 +156,11 @@ export default class Fighter {
 	kill() {
 		this.curhp = 0;
 		this.swap = null;
-		fight.checkEndFight(this);
+		fight.isEnd(this);
 	}
 
 	selectTurn() {
-		const isPrevEnemy = this.lastEnemyId === this.getEnemy().id;
+		const isPrevEnemy = this.lastEnemyId === this.getEnemy().fId;
 		const turn = (!isPrevEnemy ? rand(0, 1) : (this.turn ? 0 : 1)) + 0;
 		this.turn = this.getEnemy().turn = turn;
 		const [hitter, defender] = setRoles(this);

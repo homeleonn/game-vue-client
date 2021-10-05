@@ -24,7 +24,7 @@ export default createStore({
 		},
 
 		ADD_FIGHT_LOG(state, fightLog) {
-			state.fightLog.unshift(fightLog);
+			state.fightLog.push(fightLog);
 		},
 
 		CLEAR_FIGHT_LOG(state) {
