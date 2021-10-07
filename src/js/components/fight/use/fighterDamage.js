@@ -27,7 +27,7 @@ export function checkSuperHit(type) {
 		if (checkStep(h, type)) {
 			h.step++;
 			if (h.step === h.hit.length) {
-				console.log('SUPER-HIT')
+				console.log('SUPER-HIT', level)
 				h.step = 0;
 				return +level;
 			}

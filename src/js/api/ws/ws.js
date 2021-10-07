@@ -50,7 +50,7 @@ export class WS {
 			'removeItem',
 			'wearItem',
 			'getLocMonsters',
-			'attack',
+			'attackMonster',
 			'getEnemy',
 		];
 

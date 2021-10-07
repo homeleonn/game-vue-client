@@ -47,7 +47,7 @@
 								<th>Урон</th>
 								<th>Убийств</th>
 							</tr>
-							<tr v-for="fighter in $store.state.fightStats.teams[0]" :key="fighter.id">
+							<tr v-for="fighter in $store.state.fightStats.teamsStatisticts[0]" :key="fighter.id">
 								<td>{{fighter.login}}[{{fighter.level}}]</td>
 								<td>{{fighter.fightExp}}</td>
 								<td>{{fighter.damage}}</td>
@@ -65,7 +65,7 @@
 								<th>Урон</th>
 								<th>Убийств</th>
 							</tr>
-							<tr v-for="fighter in $store.state.fightStats.teams[1]" :key="fighter.id">
+							<tr v-for="fighter in $store.state.fightStats.teamsStatisticts[1]" :key="fighter.id">
 								<td>{{fighter.login}}[{{fighter.level}}]</td>
 								<td>{{fighter.fightExp}}</td>
 								<td>{{fighter.damage}}</td>
@@ -119,7 +119,7 @@ export default {
 	mounted() {
 		if (!this.$store.state.fightStats) return;
 		let isUserFound = false;
-		this.$store.state.fightStats.teams.forEach(team => {
+		this.$store.state.fightStats.teamsStatisticts.forEach(team => {
 			if (isUserFound) return;
 			for (const fighterId in team) {
 				if (+fighterId === this.$store.state.user.id) {

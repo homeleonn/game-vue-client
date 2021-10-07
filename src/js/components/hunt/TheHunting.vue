@@ -27,7 +27,8 @@ export default {
 
 	created() {
 		this.apiSubscribe([
-			'locMonsters'
+			'locMonsters',
+			'fight',
 		], this);
 	},
 
@@ -41,8 +42,8 @@ export default {
 		},
 
 		attack(monsterId) {
-			this.$emit('setCurComp', 'GameFight');
-			// this.api.doAction('attack', monsterId);
+			// this.$emit('setCurComp', 'GameFight');
+			this.api.doAction('attackMonster', monsterId);
 		}
 	}
 }
