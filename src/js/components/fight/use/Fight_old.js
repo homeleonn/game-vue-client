@@ -107,7 +107,6 @@ export default class Fight {
 		this.isFightEnd 			= ref(false);
 		this.damageEnemy 			= null;
 		this.damageMe 				= null;
-		this.winTeam 					= null;
 		this.fighterIdCounter = 1;
 		// this.freeFighters 		= reactive([{}, {}]);
 		// this.freeFightersIds 	= reactive([[], []]);
@@ -244,8 +243,8 @@ export default class Fight {
 		
 		stopAllTimers();
 		this.isFightEnd.value = true;
-		this.winTeam = defender.getEnemy().team;
-		this.setStatistics(this.winTeam);
+		winTeam = defender.getEnemy().team;
+		this.setStatistics(winTeam);
 
 		return true;
 	}
@@ -270,7 +269,7 @@ export default class Fight {
 
 		this.store.commit('SET_FIGHTSTATS', {
 			startTime,
-			winTeam: this.winTeam,
+			winTeam,
 			teamsStatisticts
 		});
 	}

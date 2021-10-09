@@ -52,6 +52,8 @@ export class WS {
 			'getLocMonsters',
 			'attackMonster',
 			'getEnemy',
+			'getFight',
+			'hit',
 		];
 
 		this.validActions.push('debug', 'admin_user');

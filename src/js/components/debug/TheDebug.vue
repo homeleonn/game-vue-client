@@ -1,14 +1,9 @@
 <template>
 	<div class="test">
-		<button @click="add">Add new player</button>
-		<button @click="changeName">changeName</button>
-		<button @click="changeA">changeA</button>
-		
-
 		<div>{{ game }} {{ players }} {{counter}}</div>
 		<div>{{ a }}</div>
 	</div>
-	<div class="debug" v-if="false">
+	<div class="debug" v-if="true">
 		<h1 class="center">DEBUG</h1>
 		<button @click="getAppData">Update</button>
 		<div class="row">
@@ -34,99 +29,81 @@
 		</div>
 	</div>
 	<!-- {{key}}{{debugData}} -->
+	<!-- {{fighters}}<br> -->
+	<!-- {{teams}}<br> -->
+	<div v-for="f in teams" :key="f">
+		{{f}}
+	</div>
+	<button @click="addFighter({ id: 1, level: 1 })">addFighter</button>
+	<button @click="changeFighter()">changeFighter</button>
 </template>
 
 <script>
-import { setup, ref, reactive, getCurrentInstance } from 'vue';
+// import { setup, ref, reactive } from 'vue';
 
-class Player {
-	constructor(name) {
-		this.name = name;
-	}
-}
-
-class Game {
-	constructor(name) {
-		this.name = name;
-		this.players = reactive([]);
-		// this.players = [];
-	}
-
-	addPlayer(player) {
-		this.players.unshift(player)
-	}
-}
 
 export default {
-	setup() {
-		const game = new Game('Test');
-		const a = [1];
-		// const a = reactive([1]);
-		// const game = reactive(new Game('Test'));
-		let counter = ref(0);
-		console.log(getCurrentInstance());
+	// setup() {
+	// 	// cl({});
+	// 	// const fighters = {};
+	// 	const fighters = reactive({});
+	// 	// const teams = reactive([{}, {}]);
+	// 	const teams = [{}, {}];
 
-		function add() {
-			game.addPlayer(new Player('Test-' + ++counter.value));
-		}
+	// 	function addFighter(fighter) {
+	// 		fighters[fighter.id] = fighter;
+	// 		teams[0][fighter.id] = fighter;
+	// 	}
 
-		function changeName() {
-			game.players[0].name = 'Woow';
-			game.name = '111'
-			a[0] = 3;
-			// counter = counter + 1;
-		}
+	// 	function changeFighter() {
+	// 		fighters[1].level = 2;
+	// 		// teams[0][1].level = 2;
+	// 		cl(fighters, teams);
+	// 	}
 
-		function changeA() {
-			a[1] = 4;
-		}
-
-		return {
-			a,
-			game,
-			players: game.players,
-			add,
-			changeName,
-			changeA,
-			counter: counter
-		}
-	}
-
-
-
-	// inject: [
-	// 	'api',
-	// 	'apiSubscribe'
-	// ],
-
-	// data() {
 	// 	return {
-	// 		appData: null
+	// 		fighters,
+	// 		teams,
+	// 		addFighter,
+	// 		changeFighter,
 	// 	}
-	// },
+	// }
 
-	// mounted() {
-	// 	this.apiSubscribe([
-	// 		'debug'
-	// 	], this);
-	// },
 
-	// computed: {
+
+	inject: [
+		'api',
+		'apiSubscribe'
+	],
+
+	data() {
+		return {
+			appData: null
+		}
+	},
+
+	mounted() {
+		this.apiSubscribe([
+			'debug'
+		], this);
+	},
+
+	computed: {
 		
-	// },
+	},
 
-	// updated() {
-	// },
+	updated() {
+	},
 
-	// methods: {
-	// 	debug(appData) {
-	// 		this.appData = appData;
-	// 	},
+	methods: {
+		debug(appData) {
+			this.appData = appData;
+		},
 
-	// 	getAppData() {
-	// 		this.api.doAction('debug');
-	// 	}
-	// },
+		getAppData() {
+			this.api.doAction('debug');
+		}
+	},
 }
 
 

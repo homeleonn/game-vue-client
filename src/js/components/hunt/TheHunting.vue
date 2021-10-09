@@ -26,10 +26,18 @@ export default {
 	},
 
 	created() {
-		this.apiSubscribe([
-			'locMonsters',
-			'fight',
-		], this);
+		// this.apiSubscribe([
+		// 	'locMonsters',
+		// 	'fight',
+		// ], {
+		// 	locMonsters: (monsters) => { this.monsters = monsters },
+		// 	fight: (action) => { cl(this, action) },
+		// });
+
+		this.apiSubscribe({
+			locMonsters: (monsters) => { this.monsters = monsters },
+			fight: (action) => { cl(this, action) },
+		});
 	},
 
 	mounted() {
@@ -37,14 +45,10 @@ export default {
 	},
 
 	methods: {
-		locMonsters(monsters) {
-			this.monsters = monsters;
-		},
-
 		attack(monsterId) {
 			// this.$emit('setCurComp', 'GameFight');
 			this.api.doAction('attackMonster', monsterId);
-		}
+		},
 	}
 }
 </script>
