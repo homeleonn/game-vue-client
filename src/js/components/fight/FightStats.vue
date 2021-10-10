@@ -107,11 +107,11 @@ export default {
 
 	computed: {
 		formattedStartTime() {
-			return date('Y-m-d H:i:s', new Date(this.$store.state.fightStats.startTime));
+			return date('Y-m-d H:i:s', new Date(this.$store.state.fightStats.startTime * 1000));
 		},
 
 		fightDuration() {
-			const fightSecondsLeft = (new Date().getTime() - new Date(this.$store.state.fightStats.startTime)) / 1000;
+			const fightSecondsLeft = (new Date().getTime() - new Date(this.$store.state.fightStats.startTime) * 1000) / 1000;
 			return timer(fightSecondsLeft);
 		}
 	},

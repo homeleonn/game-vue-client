@@ -101,6 +101,7 @@
 </template>
 <script>
 import { setup, computed, watch, ref, toRef, onMounted, onCreated, inject } from 'vue'
+import { useStore } from 'vuex'
 import UserForm from '../user/form/UserForm'
 import UserShortInfo from '../user/form/UserShortInfo'
 import FighterModel from './FighterModel'
@@ -110,6 +111,7 @@ export default {
 	components: { UserShortInfo, UserForm, FighterModel },
 
 	setup(props, { emit }) {
+		const store = useStore();
 		const HIT_TURN = 2;
 		const api = inject('api');
 		const apiSubscribe = inject('apiSubscribe');
@@ -123,20 +125,47 @@ export default {
 
 		let hitter, defender;
 		apiSubscribe({
-			_fight: (fightData) => { 
-				if (fightData.fighters) {
-					fight.setFighters(fightData.fighters);
-				} else if (fightData.hit) {
-					cl(fightData.hit);
-					if (fightData.hit.defender === fight.user.swap[1]) {
-						hitter = fight.user;
-						defender = fight.fighters[fightData.hit.defender];
-					} else if (fightData.hit.defender === fight.user.swap[0]) {
-						hitter = fight.fighters[fightData.hit.defender];
-						defender = fight.user;
+			_fight: (fightData) => {
+				const d = fightData;
+				if (d.fighters) {
+					fight.setFighters(d.fighters);
+				} 
+
+				if (d.hit) {
+					// if (d.hit.defender === fight.user.swap[1]) {
+					// 	defender = fight.fighters[d.hit.defender];
+					// 	hitter = defender.getEnemy();
+					// } else if (d.hit.defender === fight.user.swap[0]) {
+					// 	hitter = fight.fighters[d.hit.defender];
+					// 	defender = hitter.getEnemy();
+					// }
+
+					defender = fight.fighters[d.hit.defender]
+					hitter = defender.getEnemy();
+					if (d.hit.defender == fight.user.swap[0] || d.hit.defender == fight.user.swap[1]) {
+						if (typeof defender.aggr != "undefined" && defender.id == fight.user.id) {
+							fight.user.curhp -= d.hit.damage;
+							fight.user.getEnemy().damage += d.hit.damage;
+						} else {
+							fight.user.damage += d.hit.damage;
+							fight.user.getEnemy().curhp -= d.hit.damage;
+						}
+						// cl(hitter, defender);
+						fight.setLog(hitter, defender, d.hit.damage, d.hit.type, d.hit.crit, d.hit.block, d.hit.evasion, d.hit.superHit);
+					} else {
+						defender.curhp -= d.hit.damage;
+						hitter.damage += d.hit.damage;
 					}
-					defender.curhp -= fightData.hit.damage;
-					fight.setLog(hitter, defender, fightData.hit.damage, fightData.hit.type, fightData.hit.crit, fightData.hit.block, fightData.hit.evasion, fightData.hit.superHit);
+				}
+
+				if (d.swap) {
+					d.swap.forEach((value, idx) => { fight.user.swap[idx] = value; })
+				}
+
+				if (d.statistics) {
+					fight.winTeam = d.statistics.winTeam;
+					fight.isFightEnd.value = true;
+					store.commit('SET_FIGHTSTATS', d.statistics);
 				}
 			},
 		});
@@ -151,9 +180,9 @@ export default {
 
 		function runTimer() {
 			setInterval(() => {
-				const timeout = fight.user.getTimeTurnLeft();
-				// timer1.value = timeout === null ? timeout : timer(timeout > 0 ? timeout : 0, 'i:s');
-				timer1.value = timeout === null ? timeout : timer(timeout, 'i:s');
+				let timeout = fight.user.getTimeTurnLeft();
+				timer1.value = timeout === null ? timeout : timer(timeout > 0 ? timeout : 0, 'i:s', false);
+				// timer1.value = timeout === null ? timeout : timer(timeout, 'i:s');
 			}, 1000)
 		}
 

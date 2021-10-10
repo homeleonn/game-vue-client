@@ -51,6 +51,7 @@ export default class Fight {
 			damageMe: null,
 			damageEnemy: null,
 		}, this));
+		this.hitId = 1;
 	}
 
 	setFighters(users) {
@@ -99,12 +100,14 @@ export default class Fight {
 			logDamage = `в ${hitVerbs[hitType]} на -<span style="color: ${color};">${damage}</span>(${defender.curhp}/${defender.maxhp})`;
 		}
 		if (hitter.fId === this.user.fId) {
-			this.damageEnemy = [defenceType, damage, crit, this.hitId++];
-			this.damageMe = [damageType, false, crit, this.hitId++];
+			this.user.damageEnemy = [defenceType, damage, crit, this.hitId++];
+			this.user.damageMe = [damageType, false, crit, this.hitId++];
 		} else {
-			this.damageMe = [defenceType, damage, crit, this.hitId++];
-			this.damageEnemy = [damageType, false, crit, this.hitId++];
+			this.user.damageMe = [defenceType, damage, crit, this.hitId++];
+			this.user.damageEnemy = [damageType, false, crit, this.hitId++];
 		}
+			// this.user.damageEnemy = [defenceType, damage, crit, this.hitId++];
+			// this.user.damageMe = [damageType, false, crit, this.hitId++];
 		this.store.commit('ADD_FIGHT_LOG', `${hitter.login}[${hitter.level}] ${attackType} ${defender.login}[${defender.level}] ${logDamage}`);
 		
 		if (defender.curhp <= 0) this.store.commit('ADD_FIGHT_LOG', `${defender.login}[${defender.level}] погибает.`);
