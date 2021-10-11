@@ -34,38 +34,41 @@ function stopAllTimers() {
 export default class Fight {
 	constructor() {
 		this.store 						= useStore();
+		this.userId 					= this.store.state.user.id;
 		this.fighters 				= reactive({});
 		this.teams 						= reactive([{}, {}]);
 		this.isFightEnd 			= ref(false);
 		// this.swap 						= {};
 		this.winTeam 					= ref(null);
+		this.hitId = 1;
+		// this.user 						= null;
+		// this.user 						= ref(new Fighter({}, this));
 		this.user 						= reactive(new Fighter({
-			lastEnemyId: null,
+			lastEnemyfId: null,
 			turn: null,
 			damage: 0,
 			fightExp: 0,
 			kills: 0,
 			delay: false,
-			swap: null,
 			superHit: null,
 			damageMe: null,
 			damageEnemy: null,
 		}, this));
-		this.hitId = 1;
 	}
 
 	setFighters(users) {
 		Object.entries(users).forEach(([fId, u]) => {
-			const fighter = new Fighter(u, this)
+			let fighter = new Fighter(u, this);
+
+			if (fighter.isMe()) {
+				Object.assign(this.user, fighter);
+				this.user.lastEnemyfId = this.user.enemyfId;
+				fighter = this.user;
+			}
+
 			this.fighters[fighter.fId] = fighter;
 			this.teams[fighter.team][fighter.fId] = fighter;
-			
-			if (!this.user.fId && fighter.id == this.store.state.user.id) {
-				Object.assign(this.user, fighter);
-				this.user.lastEnemyId = this.user.enemyfId;
-				this.user.normalizeTurnTime();
-			}
-		})
+		});
 	}
 
 

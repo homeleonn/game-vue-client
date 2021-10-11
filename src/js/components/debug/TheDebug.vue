@@ -3,7 +3,7 @@
 		<div>{{ game }} {{ players }} {{counter}}</div>
 		<div>{{ a }}</div>
 	</div>
-	<div class="debug" v-if="true">
+	<div class="debug" v-if="false">
 		<h1 class="center">DEBUG</h1>
 		<button @click="getAppData">Update</button>
 		<div class="row">
@@ -36,6 +36,7 @@
 	</div>
 	<button @click="addFighter({ id: 1, level: 1 })">addFighter</button>
 	<button @click="changeFighter()">changeFighter</button>
+	{{ user }}
 </template>
 
 <script>
@@ -78,7 +79,9 @@ export default {
 
 	data() {
 		return {
-			appData: null
+			appData: null,
+			user: { id: 2 },
+			users: [{ id: 2 }, { id: 3 }],
 		}
 	},
 
@@ -86,6 +89,8 @@ export default {
 		this.apiSubscribe([
 			'debug'
 		], this);
+
+		setTimeout(() => { cl(1); this.user = this.users[1] }, 2000)
 	},
 
 	computed: {
@@ -101,7 +106,7 @@ export default {
 		},
 
 		getAppData() {
-			this.api.doAction('debug');
+			// this.api.doAction('debug');
 		}
 	},
 }

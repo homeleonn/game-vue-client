@@ -34,6 +34,18 @@ export default class Fighter {
 		fight.tempToggle.call(this, 'delay');
 		// this.swap[HIT_TURN] = this.swap[HIT_TURN] ? 0 : 1;
 	}
+
+	isBot() {
+		return typeof this.aggr != "undefined";
+	}
+
+	isMe() {
+		return !this.isBot() && this.id == fight.userId;
+	}
+
+	isMyPair() {
+		return this.id == fight.userId || this.getEnemy().id == fight.userId;
+	}
 }
 
 function stopTimer() {
