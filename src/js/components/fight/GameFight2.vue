@@ -135,11 +135,6 @@ export default {
 					fight.setFighters(d.fighters);
 					loaded.value = true;
 					enemyTeam = fight.user.team == 0 ? 1 : 0;
-				} 
-
-				if (d.swap) {
-					fight.user.swap = d.swap;
-					changeEnemy(d.swap);
 				}
 
 				if (d.hit) {
@@ -153,6 +148,19 @@ export default {
 					}
 				}
 
+				if (d.kill) {
+					const fId = d.kill.fId;
+					fight.fighters[fId].curhp = 0;
+					if (fight.user.enemyfId == fId) {
+						fight.user.swap = []
+					}
+				}
+
+				if (d.swap) {
+					fight.user.swap = d.swap;
+					changeEnemy(d.swap);
+				}
+
 				if (d.statistics) {
 					fight.winTeam = d.statistics.winTeam;
 					fight.isFightEnd.value = true;
@@ -163,7 +171,7 @@ export default {
 
 		function changeEnemy(swap) {
 			const enemyfId = swap[enemyTeam];
-			if (fight.user.lastEnemyfId == null || fight.user.lastEnemyfId == enemyfId) return;
+			if (!fight.user.lastEnemyfId || fight.user.lastEnemyfId == enemyfId) return;
 			
 			fight.user.lastEnemyfId = enemyfId;
 			clearTimeout(isChangingEnemyTimer);
