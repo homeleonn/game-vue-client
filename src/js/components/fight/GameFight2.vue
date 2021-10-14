@@ -7,8 +7,8 @@
 	{{renderUser}}<br>
 	{{turn}}<br> -->
 	<!-- {{fight.teams}}<br> -->
-	{{getEnemy1}}
-	{{user.enemyfId}}
+	<!-- {{getEnemy1}} -->
+	<!-- {{user.enemyfId}} -->
 	<div class="fight row center" v-if="loaded">
 		<div class="col-md-2">
 			<user-form
@@ -74,7 +74,7 @@
 					<div class="team-title">Команда 1<hr></div>
 					<div class="fighter-list">
 						<div v-for="(f, idx) in fight.teams[0]" :key="idx">
-							<div :class="{active: user.getEnemy()?.id == f.id}">
+							<div :class="{active: user.getEnemy()?.fId == f.fId}" class="fighter-list-item">
 								<user-short-info :user="f" shrink></user-short-info>
 							</div>
 						</div>
@@ -85,7 +85,7 @@
 					<div class="team-title">Команда 2<hr></div>
 					<div class="fighter-list">
 						<div v-for="(f, idx) in fight.teams[1]" :key="idx">
-							<div :class="{active: user.getEnemy()?.id == f.id}">
+							<div :class="{active: user.getEnemy()?.fId == f.fId}" class="fighter-list-item">
 								<user-short-info :user="f" shrink></user-short-info>
 							</div>
 						</div>
@@ -115,17 +115,20 @@ export default {
 	setup(props, { emit }) {
 		const store = useStore();
 		const HIT_TURN = 2;
+		const HITS_COUNT = 3;
 		const api = inject('api');
 		const apiSubscribe = inject('apiSubscribe');
 
 		const fight = new Fight();
-		const turn = computed(() => fight.user.swap[HIT_TURN] === fight.user.team);
+		const user = fight.user;
+		const turn = computed(() => user.swap && user.swap[HIT_TURN] === user.team && user.hitsExist());
 		const isChangingEnemy = ref(false);
 		const timer1 = ref('');
 		const loaded = ref(false);
 		let isChangingEnemyTimer = null;
 		let timerId;
 		let enemyTeam;
+		let clearEnemyTimer;
 
 		let hitter, defender;
 		apiSubscribe({
@@ -134,30 +137,37 @@ export default {
 				if (d.fighters) {
 					fight.setFighters(d.fighters);
 					loaded.value = true;
-					enemyTeam = fight.user.team == 0 ? 1 : 0;
+					enemyTeam = user.team == 0 ? 1 : 0;
 				}
 
 				if (d.hit) {
+					hitter = fight.fighters[d.hit.hitter];
 					defender = fight.fighters[d.hit.defender];
-					hitter = defender.getEnemy();
 					defender.curhp -= d.hit.damage;
 					hitter.damage += d.hit.damage;
 
-					if (defender.isMyPair()) {
+					if (hitter.isMe() || defender.isMe()) {
 						fight.setLog(hitter, defender, d.hit.damage, d.hit.type, d.hit.crit, d.hit.block, d.hit.evasion, d.hit.superHit);
+
+						user.swapTick();
+						if (!user.hitsExist()) {
+							clearEnemyTimer = user.clearEnemy();
+						}
 					}
 				}
 
 				if (d.kill) {
 					const fId = d.kill.fId;
 					fight.fighters[fId].curhp = 0;
-					if (fight.user.enemyfId == fId) {
-						fight.user.swap = []
+					if (user.fId == fId || user.enemyfId == fId) {
+						clearTimeout(clearEnemyTimer);
+						clearEnemyTimer = user.clearEnemy();
 					}
 				}
 
-				if (d.swap) {
-					fight.user.swap = d.swap;
+				if (d.swap && fight.loaded) {
+					clearTimeout(clearEnemyTimer);
+					user.swap = d.swap;
 					changeEnemy(d.swap);
 				}
 
@@ -171,23 +181,30 @@ export default {
 
 		function changeEnemy(swap) {
 			const enemyfId = swap[enemyTeam];
-			if (!fight.user.lastEnemyfId || fight.user.lastEnemyfId == enemyfId) return;
-			
-			fight.user.lastEnemyfId = enemyfId;
+			if (user.lastEnemyfId == enemyfId) return;
+			if (user.lastEnemyfId == null) {
+				user.setEnemy(fight.fighters[enemyfId]);
+				user.lastEnemyfId = enemyfId;
+				return;
+			} else {
+				user.lastEnemyfId = enemyfId;
+			}
 			clearTimeout(isChangingEnemyTimer);
-			
 			setTimeout(() => { isChangingEnemy.value = true; }, 500)
 			isChangingEnemyTimer = setTimeout(() => {	
 				isChangingEnemy.value = false;
-				fight.user.setEnemy(fight.fighters[enemyfId]);
-				// fight.user.swap = swap;
+				user.setEnemy(fight.fighters[enemyfId]);
 			}, 1000);
 		}
 
-		// watch(fight.user.swap, (newV, oldV) => {
+		function changeEnemyAnimation() {
+
+		}
+
+		// watch(user.swap, (newV, oldV) => {
 		// 	cl(newV)
 		// });
-		const getEnemy1 = computed(() => fight.user.getEnemy());
+		const getEnemy1 = computed(() => user.getEnemy());
 
 		function runTimer() {
 			timerId = setInterval(() => {
@@ -196,7 +213,7 @@ export default {
 					clearInterval(timerId);
 					return;
 				}
-				let timeout = fight.user.getTimeTurnLeft();
+				let timeout = user.getTimeTurnLeft();
 				timer1.value = timeout === null ? timeout : timer(timeout > 0 ? timeout : 0, 'i:s', false);
 				// timer1.value = timeout === null ? timeout : timer(timeout, 'i:s');
 			}, 1000)
@@ -211,17 +228,22 @@ export default {
 			emit('setCurComp', 'FightStats');
 		}
 
+		function hit(type) {
+			api.doAction('hit', type); 
+			user.hit(type);
+		}
+
 		return {
 			fight,
 			toStatistics,
 			turn,
-			user: 							fight.user,
+			user,
 			timer: timer1,
 			isChangingEnemy,
 			loaded,
 			getEnemy1,
 
-			hit: (type) => { api.doAction('hit', type); fight.user.hit(type) },
+			hit,
 
 		// 	reset: () => { fight.init() },
 		}

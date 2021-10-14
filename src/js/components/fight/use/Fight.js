@@ -38,11 +38,9 @@ export default class Fight {
 		this.fighters 				= reactive({});
 		this.teams 						= reactive([{}, {}]);
 		this.isFightEnd 			= ref(false);
-		// this.swap 						= {};
 		this.winTeam 					= ref(null);
-		this.hitId = 1;
-		// this.user 						= null;
-		// this.user 						= ref(new Fighter({}, this));
+		this.hitId 						= 1;
+		this.loaded						= false;
 		this.user 						= reactive(new Fighter({
 			lastEnemyfId: null,
 			turn: null,
@@ -69,9 +67,9 @@ export default class Fight {
 			this.fighters[fighter.fId] = fighter;
 			this.teams[fighter.team][fighter.fId] = fighter;
 		});
+
+		this.loaded = true;
 	}
-
-
 
 	setLog(hitter, defender, damage, hitType, crit, block, evasion, superHit) {
 		let logDamage;

@@ -723,9 +723,20 @@ area:hover {
 
 	.fighter-list {
 		text-align: center;
-		.active {
-			font-weight: bold;
+
+		.fighter-list-item {
+			display: inline-block;
+			// border: 1px transparent solid;
+			// border-radius: 4px;
+			// padding: 1px;
+
+			&.active {
+				// font-weight: bold;
+				// border: 1px lightgray solid;
+			}
 		}
+
+		
 	}
 
 	.changing-enemy {

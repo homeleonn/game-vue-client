@@ -3,7 +3,7 @@
 		<div class="info">
 			<!-- <div class="align"><img src="img/aligns/99.gif" /></div> -->
 			<div class="clan"><img src="img/clans/developers.png" /></div>
-			<div class="login">{{ user.login ?? user.name }}[{{ user.level }}]</div>
+			<div class="login">{{ user.login ?? user.name }}[{{ user.level }}]<span class="icon-ok"></span></div>
 		</div>
 		<div class="hp-wrapper">
 			<div class="hp-back">
@@ -40,6 +40,12 @@ export default {
 </script>
 
 <style lang="scss">
+.icon-ok {
+	display: none;
+}
+.active .info-wrapper .icon-ok {
+	display: inline;
+}
 .info-wrapper {
 	&.shrink {
 		font-size: 12px;

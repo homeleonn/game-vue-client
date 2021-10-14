@@ -14,7 +14,7 @@ export default class Fighter {
 	}
 
 	getEnemy() {
-		return fight.fighters[this.enemyfId];
+		return this.swap && fight.fighters[this.enemyfId];
 	}
 
 	setEnemy(fighter) {
@@ -22,8 +22,12 @@ export default class Fighter {
 		fighter.enemyfId = this.fId;
 	}
 
-	normalizeTurnTime() {
-		// this.swap[TURN_TIME] *= 1000;
+	clearEnemy() {
+		return setTimeout(() => {
+			this.enemyfId = null;
+			this.swap = null;
+			this.lastEnemyfId = null;
+		}, 1000);
 	}
 
 	getTimeTurnLeft() {
@@ -43,8 +47,22 @@ export default class Fighter {
 		return !this.isBot() && this.id == fight.userId;
 	}
 
-	isMyPair() {
-		return this.id == fight.userId || this.getEnemy().id == fight.userId;
+	// isMyPair() {
+	// 	return this.isMe() || this.getEnemy()?.isMe();
+	// }
+
+	shiftHit() {
+		this.swap[HITS_COUNT]--;
+	}
+
+	hitsExist() {
+		return this.swap[HITS_COUNT] ?? null;
+	}
+
+	swapTick() {
+		this.swap[HITS_COUNT]--;
+		this.swap[HIT_TURN] = this.swap[HIT_TURN] ? 0 : 1;
+		this.swap[TURN_TIME] = Date.now() / 1000;
 	}
 }
 
