@@ -30,6 +30,7 @@ module.exports = {
     'key-spacing': 'off',
     'no-unused-expressions': 'off',
     'eqeqeq': 'off',
+    'camelcase': 'off',
     'quotes': 'off'
   }
 }

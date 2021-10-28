@@ -40,8 +40,8 @@ export default {
 	components: { GameHeader, GameFooter, LocationWrapper, UserBackpack, TheHunting, TheDebug, GameFight2, UserSupplies, FightStats },
 	data() {
 		return {
-			// currentMainComponent: 'LocationWrapper',
-			currentMainComponent: "GameFight2",
+			currentMainComponent: 'LocationWrapper',
+			// currentMainComponent: "GameFight2",
 			// currentMainComponent: "TheHunting",
 			// currentMainComponent: "TheDebug",
 			// currentMainComponent: null,

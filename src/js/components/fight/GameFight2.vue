@@ -191,7 +191,7 @@ export default {
 			}
 			clearTimeout(isChangingEnemyTimer);
 			setTimeout(() => { isChangingEnemy.value = true; }, 500)
-			isChangingEnemyTimer = setTimeout(() => {	
+			isChangingEnemyTimer = setTimeout(() => {
 				isChangingEnemy.value = false;
 				user.setEnemy(fight.fighters[enemyfId]);
 			}, 1000);
@@ -229,7 +229,7 @@ export default {
 		}
 
 		function hit(type) {
-			api.doAction('hit', type); 
+			api.doAction('hit', type);
 			user.hit(type);
 		}
 

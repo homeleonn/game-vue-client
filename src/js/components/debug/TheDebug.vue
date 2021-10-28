@@ -3,7 +3,7 @@
 		<div>{{ game }} {{ players }} {{counter}}</div>
 		<div>{{ a }}</div>
 	</div>
-	<div class="debug" v-if="false">
+	<div class="debug" v-if="true">
 		<h1 class="center">DEBUG</h1>
 		<button @click="getAppData">Update</button>
 		<div class="row">
@@ -94,7 +94,7 @@ export default {
 	},
 
 	computed: {
-		
+
 	},
 
 	updated() {
@@ -106,7 +106,7 @@ export default {
 		},
 
 		getAppData() {
-			// this.api.doAction('debug');
+			this.api.doAction('debug');
 		}
 	},
 }
