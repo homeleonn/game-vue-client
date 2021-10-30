@@ -15,10 +15,15 @@ export default createStore({
 		needRegeneration: false,
 		fightStats: null,
 		fightLog: [],
-		csrf: ''
+		csrf: '',
+		modal: null
 	},
 
 	mutations: {
+		SET_MODAL(state, modal) {
+			state.modal = modal;
+		},
+
 		SET_FIGHTSTATS(state, fightStats) {
 			state.fightStats = fightStats;
 		},

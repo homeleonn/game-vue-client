@@ -16,7 +16,7 @@ export function timer(seconds, callback = false) {
 	return time.join(':');
 }
 
-export function fnOnTimeout(callback, delay = 1000) {
+export function fnOnTimeout(clb, delay = 1000) {
 	var timeout = false;
 
 	return function() {
@@ -24,20 +24,20 @@ export function fnOnTimeout(callback, delay = 1000) {
 			timeout = true;
 
 			setTimeout(() => {
-				callback(...arguments);
+				clb(...arguments);
 				timeout = false;
 			}, delay);
 		}
 	}
 }
 
-export function cl(){
+export function cl() {
 	console.log(...arguments, ' / ' + new Error().stack.split(/\n/)[1].split('/').pop());
 }
 
 export function getCookie(name) {
 	let matches = document.cookie.match(new RegExp(
-		"(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+		"(?:^|; )" + name.replace(/([.$?*|{}()[]\\\/+^])/g, '\\$1') + "=([^;]*)"
 	));
 	return matches ? decodeURIComponent(matches[1]) : undefined;
 }
@@ -69,13 +69,13 @@ export function date(format, date = new Date()) {
 	if (format === 'H:i:s') return date.toLocaleTimeString();
 
 	let formats = {
-		"H": 'Hours',
-		"i": 'Minutes',
-		"s": 'Seconds',
-		"Y": 'FullYear',
-		"y": 'FullYear',
-		"m": 'Month',
-		"d": 'Day'
+		H: 'Hours',
+		i: 'Minutes',
+		s: 'Seconds',
+		Y: 'FullYear',
+		y: 'FullYear',
+		m: 'Month',
+		d: 'Day'
 	};
 
 	return format.replace(/([YymdHis])/g, item => {
@@ -84,10 +84,14 @@ export function date(format, date = new Date()) {
 	});
 }
 
+function Exception() {
+   this.message = message;
+   this.name = "Application exception";
+}
 
 export function add(el, event, callback) {
 	if (!isFunction(callback)) {
-		throw 'Parameter callback must be callable';
+		throw new Exception('Parameter callback must be callable');
 	}
 
 	el.addEventListener(event, callback, false);
@@ -97,10 +101,15 @@ export function isFunction(guess, exception = false) {
 	const flag = typeof guess === 'function';
 
 	if (exception && !flag) {
-		throw `${guess} don't callable`;
+		throw new Exception(`${guess} don't callable`);
 	}
 
 	return flag;
+}
+
+const IS_ALLOW = 1;
+export function isAllow(response) {
+	return response == IS_ALLOW;
 }
 
 

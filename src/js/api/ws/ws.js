@@ -49,6 +49,7 @@ export class WS {
 			'getBackPack',
 			'removeItem',
 			'wearItem',
+			'takeoffItem',
 			'getLocMonsters',
 			'attackMonster',
 			'getEnemy',
@@ -126,9 +127,13 @@ export class WS {
 		this.server.connectViaToken();
 	}
 
-	doAction(action, params = '') {
+	doAction(action, params = '', subscriber = null) {
 		if (!this.validActions.includes(action)) {
 			throw new Error('Invalid action');
+		}
+
+		if (subscriber) {
+			this.subscribe(action, subscriber, null);
 		}
 
 		this.send({ [action]: params });

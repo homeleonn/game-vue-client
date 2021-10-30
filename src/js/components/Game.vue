@@ -2,6 +2,7 @@
 	<template v-if="apiReady">
 		<game-header @setCurComp="setCurComp"></game-header>
 		<div class="main">
+			<main-modal></main-modal>
 			<user-supplies></user-supplies>
 			<!-- <keep-alive> -->
 			<component :is="currentMainComponent" @chloc="changeLocation" @setCurComp="setCurComp"></component>
@@ -24,6 +25,7 @@ import TheDebug from "./debug/TheDebug";
 // import GameFight1 from "./fight/GameFight1";
 import GameFight2 from "./fight/GameFight2";
 import FightStats from "./fight/FightStats";
+import MainModal from "./modal/MainModal";
 import Api from "../api/api.js";
 
 // const UserBackpack = defineAsyncComponent(() =>
@@ -37,10 +39,10 @@ const TheHunting = defineAsyncComponent(() =>
 const api = new Api();
 
 export default {
-	components: { GameHeader, GameFooter, LocationWrapper, UserBackpack, TheHunting, TheDebug, GameFight2, UserSupplies, FightStats },
+	components: { GameHeader, GameFooter, LocationWrapper, MainModal, UserBackpack, TheHunting, TheDebug, GameFight2, UserSupplies, FightStats },
 	data() {
 		return {
-			currentMainComponent: 'LocationWrapper',
+			currentMainComponent: 'UserBackpack',
 			// currentMainComponent: "GameFight2",
 			// currentMainComponent: "TheHunting",
 			// currentMainComponent: "TheDebug",
@@ -199,7 +201,7 @@ export default {
 };
 </script>
 
-<style>
+<style lang="scss">
 .main {
 	position: relative;
 	padding-left: 70px;

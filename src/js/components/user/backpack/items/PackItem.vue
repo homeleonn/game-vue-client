@@ -36,9 +36,7 @@
 </template>
 
 <script>
-import { mapMutations } from 'vuex'
-
-const STAMINA_RATE = 6;
+import { mapMutations, mapGetters } from 'vuex'
 
 export default {
 	props: {
@@ -50,7 +48,7 @@ export default {
 		}
 	},
 
-	emits: ['removeItem', 'wearItem'],
+	emits: ['removeItem', 'wearItem', 'takeoffItem'],
 
 	data() {
 		return {
@@ -59,67 +57,19 @@ export default {
 	},
 
 	methods: {
-		...mapMutations(['SET_ACTIVE_ITEM', 'SET_NEED_REGENERATION']),
+		...mapMutations(['SET_ACTIVE_ITEM']),
 		setActive(item) {
 			this.SET_ACTIVE_ITEM(item);
 		},
 
 		remove (item) {
 			if (!confirm('Точно выбрость?')) return false;
-			this.$store.commit('REMOVE_ITEM', item.id);
+			this.$emit('removeItem', item);
 		},
 
 		use(item, usage) {
-			if (usage === 'Надеть') {
-				this.updateUser(item, 'on');
-				this.$store.commit('PUT_ON_ITEM', item.id);
-			} else {
-				this.updateUser(item, 'off');
-				this.$store.commit('TAKE_OFF_ITEM', item.id);
-			}
+			this.$emit(usage === 'Надеть' || usage === 'Исп-ть' ? 'wearItem' : 'takeoffItem', item);
 		},
-
-		updateUser(item, action) {
-			const user = this.$store.state.user;
-			const addProps = ['power', 'critical', 'evasion', 'stamina', 'hp', 'min_damage', 'max_damage'];
-			let userProp;
-			const isAdd = action === 'on';
-
-			addProps.forEach(prop => {
-				let needRegen = false;
-
-				userProp = prop;
-
-				if (prop === 'hp') {
-					userProp = 'maxhp';
-					needRegen = true;
-				} else if (prop === 'stamina') {
-					this.updateUserProps(user, 'maxhp', item[prop] * STAMINA_RATE, isAdd);
-					needRegen = true;
-				} else if (prop === 'min_damage' || prop === 'max_damage') {
-					userProp = `extra_${prop}`;
-				}
-
-				this.updateUserProps(user, userProp, item[prop], isAdd);
-
-				if (prop === 'power') {
-					this.recalculateDamage(user);
-				}
-
-				if (needRegen) {
-					this.SET_NEED_REGENERATION(true);
-				}
-			});
-		},
-
-		updateUserProps(user, prop, amount, isAdd) {
-			user[prop] = isAdd === true ? user[prop] + +amount : user[prop] - +amount;
-		},
-
-		recalculateDamage(user) {
-			user.min_damage = Math.floor(user.power / 2);
-			user.max_damage = user.power + Math.ceil(user.power / 2);
-		}
 	}
 }
 </script>

@@ -11,7 +11,11 @@
 				<div class="row">
 					<div class="user-form__left">
 						<div class="user-form__slot" v-for="(item, idx) in ['head', 'rhand', 'chest']" :key="idx">
-							<pack-item :item="getSlot(item)" usage="Снять"></pack-item>
+							<pack-item
+								:item="getSlot(item)"
+								usage="Снять"
+								@takeoffItem="(item) => $emit('takeoffItem', item)"
+							></pack-item>
 						</div>
 					</div>
 					<div class="user-form__image">
@@ -22,7 +26,11 @@
 					</div>
 					<div class="user-form__right">
 						<div class="user-form__slot" v-for="(item, idx) in ['gloves', 'lhand', 'legs', 'feet']" :key="idx">
-							<pack-item :item="getSlot(item)" usage="Снять"></pack-item>
+							<pack-item
+								:item="getSlot(item)"
+								usage="Снять"
+								@takeoffItem="(item) => $emit('takeoffItem', item)"
+							></pack-item>
 						</div>
 					</div>
 				</div>

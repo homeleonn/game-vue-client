@@ -14,7 +14,7 @@
 					</div>
 					<div class="price">Цена: {{ item.price }}</div>
 				</div>
-				<div class="col-md-3">
+				<div class="col-md-3" :class="{red : item.need_level > user.level}">
 					Ур.: {{ item.need_level }}
 				</div>
 			</div>
@@ -37,13 +37,13 @@ export default {
 		return {
 			item: null,
 			itemProps: {},
-			
+
 			autoList: ['power', 'critical', 'evasion', 'stamina', 'hp', 'weight', 'item_type', 'material']
 		}
 	},
 
 	computed: {
-		...mapGetters(['activeItem']),
+		...mapGetters(['activeItem', 'user']),
 	},
 
 	watch: {
@@ -58,13 +58,13 @@ export default {
 			if (!item) return;
 			if (this.itemProps[item.item_id]) return;
 			this.itemProps[item.item_id] = [];
-			
+
 			this.autoList.forEach(key => {
 				const checkKey = +item[key];
 				if (checkKey !== 0) {
 					const value = isNaN(checkKey) ? item[key] : '+' + item[key];
 					this.addItemProp(item.item_id, key, value);
-				}	
+				}
 			});
 
 			if (item.item_type === 'weapon') {
@@ -73,9 +73,9 @@ export default {
 		},
 
 		addItemProp(itemId, key, value, rawKey = false) {
-			this.itemProps[itemId].push({ 
-				name: (rawKey ? key : langKey[key]), 
-				value: (langValue[value] ? langValue[value] : value) 
+			this.itemProps[itemId].push({
+				name: (rawKey ? key : langKey[key]),
+				value: (langValue[value] ? langValue[value] : value)
 			});
 		},
 

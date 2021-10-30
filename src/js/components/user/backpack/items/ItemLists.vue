@@ -11,7 +11,7 @@
 			</button>
 		</div>
 		<div class="backpack-items">
-			
+
 			<div v-if="currentTab === 'main'">
 				<item-list
 				:items="itemsByType.armors"
@@ -19,18 +19,26 @@
 				@removeItem="itemId => $emit('removeItem', itemId)"
 				@wearItem="itemId => $emit('wearItem', itemId)"
 			>
-					<small class="center">Вещи</small>
-				</item-list>
+				<small class="center">Вещи</small>
+			</item-list>
 
-				<item-list :items="itemsByType.supplies" usage="Исп-ть">
+				<item-list
+					:items="itemsByType.supplies"
+					usage="Исп-ть"
+					@removeItem="itemId => $emit('removeItem', itemId)"
+					@wearItem="itemId => $emit('wearItem', itemId)"
+				>
 					<small class="center">Расходные материалы</small>
 				</item-list>
 			</div>
-			
+
 			<div v-else>
-				<item-list :items="itemsByType[currentTab]" @removeItem="itemId => $emit('removeItem', itemId)"></item-list>
-			</div>
-		
+				<item-list
+				:items="itemsByType[currentTab]"
+				@removeItem="itemId => $emit('removeItem', itemId)"
+			></item-list>
+		</div>
+
 		</div>
 	</div>
 </template>
