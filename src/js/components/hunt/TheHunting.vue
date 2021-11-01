@@ -11,6 +11,8 @@
 </template>
 
 <script>
+import { isAllow } from '@/js/common';
+
 export default {
 	inject: [
 		'api',
@@ -26,14 +28,6 @@ export default {
 	},
 
 	created() {
-		// this.apiSubscribe([
-		// 	'locMonsters',
-		// 	'fight',
-		// ], {
-		// 	locMonsters: (monsters) => { this.monsters = monsters },
-		// 	fight: (action) => { cl(this, action) },
-		// });
-
 		this.apiSubscribe({
 			locMonsters: (monsters) => { this.monsters = monsters },
 			fight: (action) => { cl(this, action) },
@@ -46,8 +40,11 @@ export default {
 
 	methods: {
 		attack(monsterId) {
-			// this.$emit('setCurComp', 'GameFight');
-			this.api.doAction('attackMonster', monsterId);
+			this.api.doAction('attackMonster', monsterId, res => {
+				if (!isAllow(res)) return;
+				this.$emit('setCurComp', 'GameFight2');
+				this.$store.state.user.fight = 1;
+			});
 		},
 	}
 }

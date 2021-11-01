@@ -21,8 +21,6 @@ import LocationWrapper from "./LocationWrapper";
 import UserBackpack from "./user/backpack/UserBackpack";
 import UserSupplies from "./user/UserSupplies";
 import TheDebug from "./debug/TheDebug";
-// import GameFight from "./fight/GameFight";
-// import GameFight1 from "./fight/GameFight1";
 import GameFight2 from "./fight/GameFight2";
 import FightStats from "./fight/FightStats";
 import MainModal from "./modal/MainModal";
@@ -42,13 +40,9 @@ export default {
 	components: { GameHeader, GameFooter, LocationWrapper, MainModal, UserBackpack, TheHunting, TheDebug, GameFight2, UserSupplies, FightStats },
 	data() {
 		return {
-			currentMainComponent: 'UserBackpack',
-			// currentMainComponent: "GameFight2",
-			// currentMainComponent: "TheHunting",
-			// currentMainComponent: "TheDebug",
-			// currentMainComponent: null,
-			// apiReady: true
-			apiReady: false
+			currentMainComponent: 'LocationWrapper',
+			apiReady: false,
+			timer: null,
 		};
 	},
 
@@ -79,6 +73,7 @@ export default {
 		},
 
 		setCurComp(compName) {
+			if (this.user.fight) return;
 			cl(compName);
 			this.currentMainComponent = compName;
 		},
@@ -105,6 +100,9 @@ export default {
 		me(user) {
 			this.apiReady = true;
 			this.SET_USER(user);
+			if (user.fight) {
+				this.currentMainComponent = 'GameFight2';
+			}
 		},
 
 		loc(loc) {
@@ -140,11 +138,23 @@ export default {
 			} else {
 				events.forEach(event => api.subscribe(event, ctx[event], ctx));
 			}
-		}
+		},
+
+		startTimeTimer() {
+			clearInterval(this.timer);
+			if (!this.user.trans_timeout || this.time > this.user.trans_timeout) return;
+			this.timer = setInterval(() => {
+				this.$store.commit('SET_TIME', this.time + 1);
+			}, 1000);
+		},
 	},
 
 	computed: {
 		...mapGetters(["test", 'user']),
+
+		time() {
+			return this.$store.state.time;
+		},
 
 		currentProps() {
 			switch (currentMainComponent) {
@@ -170,6 +180,15 @@ export default {
 			this
 		);
 
+		this.apiSubscribe({
+			time: (time) => {
+				this.$store.commit('SET_TIME', time);
+				if (time < this.user.trans_timeout) {
+					this.startTimeTimer();
+				}
+			}
+		});
+
 		api.subscribeToWS(
 			"open",
 			() => {
@@ -178,25 +197,10 @@ export default {
 			this
 		);
 
-		// this.$store.watch(
-		// 	(state, getters) => getters.test,
-		// 	() => {
-		// 		console.log("update");
-		// 	}
-		// );
-
-
-		// cl(this.$store);
-
-		// this.$store.watch(
-  //     () => this.$store.state.test,
-  //     (q) => {
-  //       cl(q);
-  //     }
-  //   )
-
-
-    // this.$store.watch(() => this.$store.getters.SEND_LOGIN, Login => { console.log('watched: ', Login) })
+		this.$store.watch(
+      () => this.$store.state.time,
+      () => this.startTimeTimer()
+    )
 	}
 };
 </script>

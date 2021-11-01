@@ -8,7 +8,7 @@
 			>
 
 			<div
-				v-if="usage"
+				v-if="usage && user.level >= item.need_level"
 				class="action tl"
 				@mouseenter="itemTitle=usage"
 				@click="use(item, usage)"
@@ -54,6 +54,10 @@ export default {
 		return {
 			itemTitle: null,
 		}
+	},
+
+	computed: {
+		...mapGetters(['user'])
 	},
 
 	methods: {

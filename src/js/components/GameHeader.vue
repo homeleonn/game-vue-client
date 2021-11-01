@@ -10,7 +10,7 @@
 			:hpLineStyle="hpLineStyle"
 		></user-short-info>
 		<!-- <button class="reset-hp" @click="reset">сбросить хп</button> -->
-		<div class="top-panel flex">
+		<div class="top-panel flex" :class="{ disabled: user.fight }">
 			<div>
 				<img
 					src="img/other/pack.jpg"
@@ -66,14 +66,14 @@ export default {
 				return (lastRestoreTime = null) => {
 					maxHp = this.user.maxhp;
 					const time = getTimeSeconds();
-					
+
 					if (!lastRestore) lastRestore = time;
-					
+
 					const limeLeft = time - lastRestore;
 					lastRestore = time;
 					curHp = curHp + limeLeft * restoreOneSecond;
 					// cl('hp are regenerating');
-					
+
 					if (curHp >= maxHp) {
 						// cl('hp are full')
 						curHp = maxHp;
@@ -145,4 +145,8 @@ export default {
 };
 </script>
 
-<style></style>
+<style>
+.top-panel.disabled {
+	opacity: .4;
+}
+</style>

@@ -16,10 +16,15 @@ export default createStore({
 		fightStats: null,
 		fightLog: [],
 		csrf: '',
-		modal: null
+		modal: null,
+		time: 0,
 	},
 
 	mutations: {
+		SET_TIME(state, time) {
+			state.time = time;
+		},
+
 		SET_MODAL(state, modal) {
 			state.modal = modal;
 		},

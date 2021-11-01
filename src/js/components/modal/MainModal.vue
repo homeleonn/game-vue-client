@@ -23,9 +23,9 @@ export default {
 	},
 
 	mounted() {
-		this.$store.commit('SET_MODAL', {
-			message : 'message'
-		});
+		// this.$store.commit('SET_MODAL', {
+		// 	message : 'message'
+		// });
 	},
 
 	methods: {

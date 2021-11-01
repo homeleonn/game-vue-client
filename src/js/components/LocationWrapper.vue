@@ -26,6 +26,7 @@
 						:closestLocations="closestLocations"
 						type="location"
 						@chloc="id => $emit('chloc', id)"
+						:disabled="progress"
 					></location-link>
 				</div>
 			</div>
@@ -37,6 +38,7 @@
 						:closestLocations="closestLocations"
 						type="object"
 						@chloc="id => $emit('chloc', id)"
+						:disabled="progress"
 					></location-link>
 				</div>
 			</div>
@@ -48,6 +50,7 @@
 						:closestLocations="closestLocations"
 						type="character"
 						@chloc="id => $emit('chloc', id)"
+						:disabled="progress"
 					></location-link>
 				</div>
 			</div>
@@ -58,10 +61,10 @@
 					<div class="progress" :style="{width: progress + '%'}"></div>
 				</div>
 				<div class="center" v-if="progress">{{ timerBoard }}</div>
-			</div>
-			<div class="center">
-				<div v-if="!progress">Переход возможен</div>
-				<div v-else>Шагаем...</div>
+				<div class="center">
+					<div v-if="!progress">Переход возможен</div>
+					<div v-else>До перехода осталось...</div>
+				</div>
 			</div>
 		</div>
 
@@ -81,22 +84,11 @@ export default {
 	inject: ['apiSubscribe'],
 
 	data: () => ({
-		// activeLocation: false
-		time: 0,
-		timer: null,
 		fullTransitionTime: 0
 	}),
 
 	methods: {
 		...mapMutations(["SET_ACTIVE_LOCATION"]),
-
-		startTimer() {
-			// cl('starttimer')
-			clearInterval(this.timer);
-			this.timer = setInterval(() => {
-				this.time++;
-			}, 1000);
-		},
 
 		getFullTimeTransition() {
 			return this.user.trans_timeout - this.user.trans_time;
@@ -113,37 +105,37 @@ export default {
 		},
 
 		progress() {
-			if (!this.user.trans_timeout || this.time > this.user.trans_timeout) {
-				clearInterval(this.timer);
-				return 0;
-			}
+			if (!this.user.trans_timeout || this.time > this.user.trans_timeout) return 0;
 
 			const fullTimeTransition = this.user.trans_timeout - this.user.trans_time;
 			const timeleft = this.time - this.user.trans_time;
 
-			return 100 - timeleft / fullTimeTransition * 100;
+			const progress = 100 - timeleft / fullTimeTransition * 100;
+
+			return progress > 100 ? 100 : progress;
 		},
 
 		timerBoard() {
 			return timer(this.user.trans_timeout - this.time);
+		},
+
+		time() {
+			return this.$store.state.time;
 		}
 	},
 
 	mounted() {
 		this.apiSubscribe({
 			chloc: ({ trans_time, trans_timeout }) => {
-				this.time = trans_time;
+				this.$store.commit('SET_TIME', trans_time);
 				this.user.trans_time = trans_time;
 				this.user.trans_timeout = trans_timeout;
-				this.startTimer();
 			},
-
-			time: (time) => {
-				this.time = time;
-				if (this.time > this.user.trans_timeout) return;
-				this.startTimer();
-			}
 		});
+	},
+
+	beforeUnmount() {
+		clearInterval(this.timer);
 	}
 };
 </script>
