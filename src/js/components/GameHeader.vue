@@ -4,6 +4,7 @@
 			class="avatar"
 			style="background-image: url('img/images/0.png')"
 			title="Персонаж"
+			@click="getUserInfo()"
 		></div>
 		<user-short-info
 			:user="user"
@@ -41,6 +42,7 @@
 <script>
 import { mapGetters, mapMutations, mapState } from "vuex";
 import UserShortInfo from './user/form/UserShortInfo'
+import { tokenUrl } from '@/../.env.js';
 
 export default {
 	name: "GameHeader",
@@ -121,12 +123,21 @@ export default {
 			}
 		},
 		...mapMutations(["SET_USER", 'SET_TEST', 'SET_IS_REGENERATING', 'SET_NEED_REGENERATION']),
-
+		getUserInfo() {
+			const url = new URL(tokenUrl);
+			window.open('http://' + url.hostname + `/user/${this.user.id}/info`, '_blank').focus();
+		}
 	},
 
 	computed: {
 		...mapGetters(["user", "dbLog", 'isRegenerating']),
-		...mapState(['needRegeneration'])
+		...mapState(['needRegeneration']),
+
+		userInfoUrl() {
+			const url = new URL(tokenUrl);
+
+			return url.hostname;
+		}
 	},
 
 	watch: {
