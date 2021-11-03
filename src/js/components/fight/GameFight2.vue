@@ -202,7 +202,7 @@ export default {
 		}
 
 		// watch(user.swap, (newV, oldV) => {
-		// 	cl(newV)
+		// 	console.log(newV)
 		// });
 		const getEnemy1 = computed(() => user.getEnemy());
 

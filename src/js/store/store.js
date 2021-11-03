@@ -18,6 +18,7 @@ export default createStore({
 		csrf: '',
 		modal: null,
 		time: 0,
+		host: 0,
 	},
 
 	mutations: {
@@ -42,7 +43,7 @@ export default createStore({
 		},
 
 		SET_USER(state, user) {
-			state.user = toNums(user);
+			Object.assign(state.user, toNums(user));
 		},
 
 		SET_NEED_REGENERATION(state, needRegeneration) {
@@ -78,7 +79,8 @@ export default createStore({
 		},
 
 		REMOVE_LOCATION_USER(state, userId) {
-			state.locationUsers = state.locationUsers.filter(user => user.id !== userId);
+			console.log(state.locationUsers.filter(user => { console.log(user.id); return user.id != userId }), userId);
+			state.locationUsers = state.locationUsers.filter(user => user.id != userId);
 		},
 
 		SET_CLOSEST_LOCATIONS(state, closestLocations) {
@@ -107,7 +109,7 @@ export default createStore({
 		},
 
 		PUT_ON_ITEM(state, itemId) {
-			// cl(state.userItems[itemId]);
+			// console.log(state.userItems[itemId]);
 			state.userItems[itemId].loc = 'WEARING';
 		},
 

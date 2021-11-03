@@ -45,7 +45,7 @@
 
 export default {
 	// setup() {
-	// 	// cl({});
+	// 	// console.log({});
 	// 	// const fighters = {};
 	// 	const fighters = reactive({});
 	// 	// const teams = reactive([{}, {}]);
@@ -59,7 +59,7 @@ export default {
 	// 	function changeFighter() {
 	// 		fighters[1].level = 2;
 	// 		// teams[0][1].level = 2;
-	// 		cl(fighters, teams);
+	// 		console.log(fighters, teams);
 	// 	}
 
 	// 	return {
@@ -90,7 +90,7 @@ export default {
 			'debug'
 		], this);
 
-		setTimeout(() => { cl(1); this.user = this.users[1] }, 2000)
+		setTimeout(() => { console.log(1); this.user = this.users[1] }, 2000)
 	},
 
 	computed: {

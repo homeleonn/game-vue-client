@@ -25,7 +25,7 @@ name: "UserSupplies",
 
 	methods: {
 		use(itemId) {
-			cl(itemId);
+			console.log(itemId);
 		},
 
 	}

@@ -23,6 +23,7 @@
 				i
 			</div>
 			<div
+				v-if="usage != 'Снять'"
 				class="action br"
 				@mouseenter="itemTitle='Выбросить'"
 				@click="remove(item)"

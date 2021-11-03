@@ -67,13 +67,13 @@
 <script>
 import { mapGetters } from "vuex";
 import UserList from "./location/UserList";
-let _footer;
+let _footer, _locUsers;
 
 export default {
 	name: "GameFooter",
 
 	emits: ['setCurComp'],
-	
+
 	inject: [
 		'api',
 	],
@@ -107,14 +107,17 @@ export default {
 			const stepSize = 50;
 			let footerHeight = _footer.css('height', false);
 
-			footerHeight += isUp ? stepSize : -stepSize; 
+			footerHeight += isUp ? stepSize : -stepSize;
 			_footer.css('height', footerHeight + 'px');
+			_locUsers.css('height', (footerHeight - 70) + 'px');
 		}
 	},
 
 	created() {},
 	mounted() {
 		_footer = _('footer');
+		_locUsers = _('#loc-users');
+		_locUsers.css('height', (+_footer.css('height').split('px')[0] - 70) + 'px');
 		let _fightLog = document.querySelector('.fight-log');
 
 		this.$store.watch((state) => state.fightLog, () => {

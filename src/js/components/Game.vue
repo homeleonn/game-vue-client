@@ -25,6 +25,7 @@ import GameFight2 from "./fight/GameFight2";
 import FightStats from "./fight/FightStats";
 import MainModal from "./modal/MainModal";
 import Api from "../api/api.js";
+import { tokenUrl } from '@/../.env.js';
 
 // const UserBackpack = defineAsyncComponent(() =>
 //	 import('./user/backpack/UserBackpack.vue')
@@ -50,6 +51,8 @@ export default {
 		if (!this.apiReady) {
 			api.init();
 		}
+
+		this.$store.state.host = new URL(tokenUrl).origin;
 	},
 
 	provide() {
@@ -65,16 +68,18 @@ export default {
 			"SET_USER",
 			"SET_LOCATION",
 			"SET_CLOSEST_LOCATIONS",
-			"SET_LOCATION_USERS"
+			"SET_LOCATION_USERS",
+			"ADD_LOCATION_USER",
+			"REMOVE_LOCATION_USER"
 		]),
 
 		event(event, data) {
-			cl(event, data);
+			console.log(event, data);
 		},
 
 		setCurComp(compName) {
 			if (this.user.fight) return;
-			cl(compName);
+			console.log(compName);
 			this.currentMainComponent = compName;
 		},
 
@@ -115,8 +120,9 @@ export default {
 			this.ADD_LOCATION_USER(user);
 		},
 
-		leaveLocUser(userId) {
-			this.REMOVE_LOCATION_USER(userId);
+		leaveLocUser({ id }) {
+			console.log(id);
+			this.REMOVE_LOCATION_USER(id);
 		},
 
 		message(message) {

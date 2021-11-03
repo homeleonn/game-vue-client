@@ -12,7 +12,7 @@ export default {
 	props: ['side', 'damage'],
 	watch: {
 		damage(newDamage) {
-			// cl(this.side, newDamage);
+			// console.log(this.side, newDamage);
 			blankHit(this.side)(...newDamage);
 		}
 	}
@@ -32,20 +32,20 @@ const HIT_STEPS = {
 // const _damage = [];
 
 function blankHit(side) {
-	// cl(side);
+	// console.log(side);
 	// let _fighter = [];
 	// let _damage = [];
 	const stepSize = 177;
 	const _fighter = _(`.fighter-wrapper.${side} .fighter`);
 	const _damage = _(`.fighter-wrapper.${side} .damage`);
-	// cl(_fighter);
+	// console.log(_fighter);
 	initStance(_fighter);
 
 	return function (type, damage = 0, crit = false) {
-		// cl(side);
+		// console.log(side);
 
 		// if (!type) return;
-		// cl(_fighter);
+		// console.log(_fighter);
 		let steps = HIT_STEPS[type];
 		if (!steps) steps = 0;
 		steps--;
@@ -73,7 +73,7 @@ function blankHit(side) {
 
 			if (type === HIT_TYPES.SUPER) {
 				color = 'gold';
-			} 
+			}
 
 			if (isNumeric(damage)) {
 				damage = `-${damage}`;
@@ -93,7 +93,7 @@ function blankHit(side) {
 			_damage.removeClass('active');
 		}, 1000);
 
-		
+
 		if (type === false) return;
 		setStance(_fighter, x, y);
 		const stepAction = (to) => {
@@ -114,7 +114,7 @@ function blankHit(side) {
 }
 
 function initStance(el) {
-	// cl(1)
+	// console.log(1)
 	setStance(el, 0, -200 * 2)
 }
 
@@ -139,7 +139,7 @@ function setStance(el, x, y) {
 	&.right {
 		left: -50px;
 	}
-	
+
 	&, .fighter {
 		width: 170px;
 		height: 197px;
@@ -154,7 +154,7 @@ function setStance(el, x, y) {
 	}
 
 	&.right .fighter {
-		transform: rotateY(180deg); 
+		transform: rotateY(180deg);
 	}
 
 	.damage {

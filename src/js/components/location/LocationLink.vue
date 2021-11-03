@@ -36,7 +36,7 @@ export default {
 	},
 
 	mounted() {
-		// cl(this.closestLocations['location'])
+		// console.log(this.closestLocations['location'])
 	}
 
 }

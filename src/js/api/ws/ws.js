@@ -26,7 +26,7 @@ export class Server {
 			throw new Error("Session error");
 		} else {
 			this.token = "/" + token;
-			// cl(token)
+			// console.log(token)
 			this.connect();
 		}
 	}
@@ -89,8 +89,12 @@ export class WS {
 
 		if (typeof this.eventHandlers[event] === "undefined") return;
 
-		this.eventHandlers[event].forEach(subscriber => {
-			subscriber.cb.call(subscriber.ctx, wsResponce[event]);
+		this.eventHandlers[event].forEach(function ({ cb, ctx, once }, idx) {
+			cb.call(ctx, wsResponce[event]);
+
+			if (once) {
+
+			}
 		});
 	}
 
@@ -113,7 +117,7 @@ export class WS {
 	exit(isExit = true) {
 		if (isExit) {
 			// _('body').html('<h1>обнаружено дублирование окна</h1>');
-			cl("<h1>обнаружено дублирование окна</h1>");
+			console.log("<h1>обнаружено дублирование окна</h1>");
 			return true;
 		}
 
@@ -133,18 +137,18 @@ export class WS {
 		}
 
 		if (subscriber) {
-			this.subscribe(action, subscriber, null);
+			this.subscribe(action, subscriber, null, true);
 		}
 
 		this.send({ [action]: params });
 	}
 
 	// subscribe to events
-	subscribe(event, cb, ctx) {
+	subscribe(event, cb, ctx, once = false) {
 		if (typeof this.eventHandlers[event] === "undefined") {
 			this.eventHandlers[event] = [];
 		}
-		this.eventHandlers[event].push({ cb, ctx });
+		this.eventHandlers[event].push({ cb, ctx, once });
 	}
 
 	// subscribe to browser ws events

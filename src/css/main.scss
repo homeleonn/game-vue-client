@@ -1,6 +1,20 @@
 @import "bootstrap-grid.min.css";
 @import "fontello.css";
 
+:root {
+	--color: #90ee90;
+	// --color: #ff0;
+	--color2: #bdecfb;
+	--chat-height: 150px;
+	--back: #fff;
+	--back2: #f3f3f3;
+	--border: #fcbebe;
+}
+
+.b {
+	font-weight: bold;
+}
+
 .center {
 	text-align: center;
 }
@@ -41,16 +55,6 @@
 
 .green {
 	color: green;
-}
-
-:root {
-	--color: #90ee90;
-	// --color: #ff0;
-	--color2: #bdecfb;
-	--chat-height: 100px;
-	--back: #fff;
-	--back2: #f3f3f3;
-	--border: #fcbebe;
 }
 
 html,
@@ -336,7 +340,7 @@ footer {
 	}
 
 	#loc-users {
-		height: 100%;
+		// height: var(--chat-height) - 70px;
 		overflow: auto;
 
 		.login {

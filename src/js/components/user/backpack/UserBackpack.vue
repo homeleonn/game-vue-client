@@ -45,6 +45,12 @@ export default {
 		this.api.doAction('getBackPack', '', items => {
 			this.$store.commit('SET_USER_ITEMS', items);
 		});
+
+		this.apiSubscribe({
+			wearItem: 	 itemId => { this.useReaction(itemId, 'ON') },
+			takeoffItem: itemId => { this.useReaction(itemId, 'OFF') },
+			removeItem:  itemId => { this.useReaction(itemId, 'REM') }
+		})
 	},
 
 	computed: {
@@ -82,20 +88,29 @@ export default {
 		},
 
 		use(item, type) {
+			const [action] = this.identifyActionType(type);
+			this.api.doAction(action, item.id);
+		},
+
+		useReaction(itemId, type) {
+			if (!isAllow(itemId)) return;
+			const [, actionType] = this.identifyActionType(type);
+			this.$store.commit(actionType, itemId);
+		},
+
+		identifyActionType(type) {
 			let action, actionType;
 			if (type == 'ON') {
 				action = 'wearItem';
 				actionType = 'PUT_ON_ITEM';
-			} else {
+			} else if (type == 'OFF') {
 				action = 'takeoffItem';
 				actionType = 'TAKE_OFF_ITEM';
+			} else if (type == 'REM') {
+				actionType = 'REMOVE_ITEM';
 			}
 
-			this.api.doAction(action, item.id, response => {
-				if (!isAllow(response)) return;
-				this.updateUser(item, type);
-				this.$store.commit(actionType, item.id);
-			});
+			return [action, actionType];
 		},
 
 		updateUser(item, action) {

@@ -1,11 +1,19 @@
 <template>
 	<div class="hunting">
 		<h1 class="center">Охота</h1>
-		<div class="monsters row">
+		<div class="monsters row" v-if="monsters.length">
 			<div class="monster row" v-for="monster in monsters" :key="monster">
-				<img :src="'img/npc/' + monster.image">
+				<div class="center b">{{ monster.name }}</div>
+				<div>
+					<div class="mark fight-mark" title="В бою" v-if="monster.fight"><img src="/img/tendencies/neutral.gif"></div>
+					<div class="mark level-mark">{{ monster.level }}</div>
+					<img :src="'img/npc/' + monster.image">
+				</div>
 				<button @click="attack(monster.id)">Напасть</button>
 			</div>
+		</div>
+		<div v-else>
+			<h2 class="center">Живых монстров в данной локации нет</h2>
 		</div>
 	</div>
 </template>
@@ -30,7 +38,13 @@ export default {
 	created() {
 		this.apiSubscribe({
 			locMonsters: (monsters) => { this.monsters = monsters },
-			fight: (action) => { cl(this, action) },
+			fight: (action) => { },
+			monsterAttacked: (monsterId) => {
+				this.monsters.forEach(m => {
+					if (m.id != monsterId) return;
+					m.fight = true;
+				});
+			}
 		});
 	},
 
@@ -57,7 +71,29 @@ export default {
 
 	.monster {
 		width: 100px;
-		margin: 10px;
+		margin: 10px 20px;
+		position: relative;
+
+		.mark {
+			position: absolute;
+			top: 8px;
+			border-radius: 50%;
+			padding: 5px 8px;
+			cursor: pointer;
+			border: 3px gold solid;
+		}
+
+		.fight-mark {
+			right: -10px;
+			background: #fb8662;
+		}
+
+		.level-mark {
+			padding: 2px 9px;
+			font-weight: bold;
+			left: -10px;
+			background: #eee;
+		}
 	}
 }
 </style>

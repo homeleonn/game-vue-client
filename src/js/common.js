@@ -109,7 +109,7 @@ export function isFunction(guess, exception = false) {
 
 const IS_ALLOW = 1;
 export function isAllow(response) {
-	return response == IS_ALLOW;
+	return response > 0;
 }
 
 

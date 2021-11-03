@@ -2,7 +2,7 @@
 	<header>
 		<div
 			class="avatar"
-			style="background-image: url('img/images/0.png')"
+			:style="{ backgroundImage: `url(img/images/${user.sex}.png)` }"
 			title="Персонаж"
 			@click="getUserInfo()"
 		></div>
@@ -74,10 +74,10 @@ export default {
 					const limeLeft = time - lastRestore;
 					lastRestore = time;
 					curHp = curHp + limeLeft * restoreOneSecond;
-					// cl('hp are regenerating');
+					// console.log('hp are regenerating');
 
 					if (curHp >= maxHp) {
-						// cl('hp are full')
+						// console.log('hp are full')
 						curHp = maxHp;
 						this.SET_IS_REGENERATING(false)
 					}

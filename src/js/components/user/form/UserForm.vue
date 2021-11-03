@@ -112,7 +112,7 @@ export default {
 
 
 		showDamage(id, counter = 50, speed = 25, side = 0) {
-			// cl(id)
+			// console.log(id)
 			let top = counter;
 			let left = 50;
 			const timer = setInterval(() => {
@@ -124,7 +124,7 @@ export default {
 					left += (side === 1 ? -2 : (side === 2 ? 2 : 0));
 				}
 
-				// cl(d1.style.top)
+				// console.log(d1.style.top)
 				try {
 					_('#d-' + id).css({ top: top + '%', left: left + '%' });
 				} catch (e) {}
@@ -136,7 +136,7 @@ export default {
 		const speed = 15;
 		const counter = 50;
 		// const repeatAfter = counter * (1000 / speed);
-		// cl(this.damage);
+		// console.log(this.damage);
 		if (this.damage.length) {
 			setTimeout(() => {
 				this.showDamage(this.damage[0].id, counter, speed, rand(0, 2))
@@ -146,12 +146,12 @@ export default {
 	},
 
 	updated() {
-		// cl(1)
+		// console.log(1)
 	},
 
 	watch: {
 		damage(damage) {
-			// cl(damage);
+			// console.log(damage);
 			// this.damageShowActive = true;
 			// setTimeout(() => { this.damageShowActive = false }, 3000);
 			// this.showDamage(this.damage[0].id, counter, speed, rand(0, 2))

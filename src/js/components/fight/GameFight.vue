@@ -204,13 +204,13 @@ export default {
 			this.createBots(botProto, 1, 1);
 			this.user.curhp = this.user.maxhp = 400;
 			this.setPairs();
-			for (const k in this.teams[0]) { 
-				this.teams[0][k].curhp = this.teams[0][k].maxhp = 100; 
+			for (const k in this.teams[0]) {
+				this.teams[0][k].curhp = this.teams[0][k].maxhp = 100;
 			}
 
 			this.processBots();
 		},
-		
+
 
 		setPairs() {
 			const freeTeamFightersIds = [[], []];
@@ -272,7 +272,7 @@ export default {
 		},
 
 		processBotsTick() {
-			cl('Next bot hit', Object.keys(this.botsHits).length);
+			console.log('Next bot hit', Object.keys(this.botsHits).length);
 			if (!Object.keys(this.botsHits).length) return;
 			let hitterTeam, defenderTeam, hitter, defender;
 			for (let botId in this.botsHits) {
@@ -471,7 +471,7 @@ export default {
 
 		setSwap(f1, f2) {
 			// if (f1.id === this.user.id || f2.id === this.user.id) {
-			// 	cl(11111);
+			// 	console.log(11111);
 			// }
 			const turn = selectTurn(f1, f2);
 			const swap = [
@@ -491,7 +491,7 @@ export default {
 			}
 
 			// Set user enemy
-			cl(hitter.id);
+			console.log(hitter.id);
 			if (this.isBot(hitter.id)) {
 				this.botsHits[hitter.id] = monsterDamageTime();
 			}
@@ -522,7 +522,7 @@ export default {
 				// 		this.isChangingEnemy = false;
 				// 	}, 1000)
 			}
-			
+
 			f1.lastEnemyId = f2.id;
 			f2.lastEnemyId = f1.id;
 
@@ -534,7 +534,7 @@ export default {
 			if (!this.isMe(hitter, defender)) return;
 			const d = crit ? `<span style="color: red;">${damage}</span>` : damage;
 			if (hitter.id === this.user.id) {
-				// cl(1);
+				// console.log(1);
 				this.damageEnemy = [false, damage, crit, this.hitId++];
 				this.damageMe = [3, false, crit, this.hitId++];
 			} else {
@@ -552,7 +552,7 @@ export default {
 			return hitter.id === this.user.id || defender.id === this.user.id;
 		}
 
-		
+
 	},
 
 	components: {
