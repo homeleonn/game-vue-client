@@ -18,7 +18,10 @@ export default {
 
 	computed: {
 		modal() {
-			return this.$store.state.modal;
+			const modal = this.$store.state.modal;
+			if (typeof modal == 'string') return { message: modal };
+
+			return modal;
 		}
 	},
 

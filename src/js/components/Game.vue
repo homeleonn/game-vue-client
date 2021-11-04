@@ -70,7 +70,7 @@ export default {
 			"SET_CLOSEST_LOCATIONS",
 			"SET_LOCATION_USERS",
 			"ADD_LOCATION_USER",
-			"REMOVE_LOCATION_USER"
+			"REMOVE_LOCATION_USER",
 		]),
 
 		event(event, data) {
@@ -140,10 +140,11 @@ export default {
 
 		apiSubscribe(events, ctx) {
 			if (!Array.isArray(events)) {
-				Object.keys(events).forEach(event => { api.subscribe(event, events[event], events) });
-			} else {
-				events.forEach(event => api.subscribe(event, ctx[event], ctx));
+				ctx = events;
+				events = Object.keys(events);
 			}
+
+			events.forEach(event => api.subscribe(event, ctx[event], ctx));
 		},
 
 		startTimeTimer() {
@@ -192,7 +193,9 @@ export default {
 				if (time < this.user.trans_timeout) {
 					this.startTimeTimer();
 				}
-			}
+			},
+
+			error: error => this.$store.commit('SET_MODAL', error)
 		});
 
 		api.subscribeToWS(

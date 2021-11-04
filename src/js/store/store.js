@@ -11,7 +11,6 @@ export default createStore({
 		userItems: null,
 		activeItem: null,
 		dbLog: [],
-		isRegenerating: false,
 		needRegeneration: false,
 		fightStats: null,
 		fightLog: [],
@@ -46,16 +45,8 @@ export default createStore({
 			Object.assign(state.user, toNums(user));
 		},
 
-		SET_NEED_REGENERATION(state, needRegeneration) {
-			state.needRegeneration = needRegeneration;
-		},
-
 		UPDATE_USER(state, user) {
 			Object.assign(state.user, toNums(user));
-		},
-
-		SET_IS_REGENERATING(state, isRegenerating) {
-			state.isRegenerating = isRegenerating;
 		},
 
 		SET_USER_ITEMS(state, items) {
@@ -119,9 +110,6 @@ export default createStore({
 	},
 
 	getters: {
-		isRegenerating(state) {
-			return state.isRegenerating;
-		},
 		user(state) {
 			return state.user;
 		},

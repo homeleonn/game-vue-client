@@ -40,12 +40,19 @@ export default {
 			locMonsters: (monsters) => { this.monsters = monsters },
 			fight: (action) => { },
 			monsterAttacked: (monsterId) => {
+				if (!this.monsters.length) return;
 				this.monsters.forEach(m => {
 					if (m.id != monsterId) return;
 					m.fight = true;
 				});
-			}
+			},
+			killMonster: (monsterId) => { this.monsters = this.monsters.filter(m => m.id != monsterId) },
+			spawnMonster: (monster) => { this.monsters.push(monster) },
 		});
+	},
+
+	beforeUnmount() {
+		['locMonsters', 'fight', 'monsterAttacked', 'killMonster', 'spawnMonster'].forEach(e => this.api.unsubscribe(e));
 	},
 
 	mounted() {

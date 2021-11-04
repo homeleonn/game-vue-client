@@ -151,6 +151,10 @@ export class WS {
 		this.eventHandlers[event].push({ cb, ctx, once });
 	}
 
+	unsubscribe(event) {
+		delete this.eventHandlers[event];
+	}
+
 	// subscribe to browser ws events
 	subscribeToWS(event, cb, ctx) {
 		if (typeof this.wsEventHandlers[event] === "undefined") {

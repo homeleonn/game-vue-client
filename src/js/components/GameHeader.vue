@@ -51,40 +51,37 @@ export default {
 	data() {
 		return {
 			hpLineStyle: {},
+			isRegenerating: false,
+			maxHpChanged: false,
+			HpRestore: null,
 		};
 	},
-	// options
-	maxHpChanged: false,
-	HpRestore: null,
 
 	methods: {
-		reset() {
-			fetch("/user/reset").then(() => location.reload());
+		stopRegen() {
+			this.isRegenerating = false;
 		},
 
 		regeneration(curHp = 180, maxHp = 200, lastRestore) {
-			return;
 			const hp = (curHp, maxHp, lastRestore) => {
 				return (lastRestoreTime = null) => {
+					if (this.user.fight) this.stopRegen();
+					this.isRegenerating = true;
 					maxHp = this.user.maxhp;
 					const time = getTimeSeconds();
 
 					if (!lastRestore) lastRestore = time;
 
-					const limeLeft = time - lastRestore;
+					curHp = curHp + (time - lastRestore) * restoreOneSecond;
 					lastRestore = time;
-					curHp = curHp + limeLeft * restoreOneSecond;
-					// console.log('hp are regenerating');
 
-					if (curHp >= maxHp) {
-						// console.log('hp are full')
-						curHp = maxHp;
-						this.SET_IS_REGENERATING(false)
-					}
+					if (curHp >= maxHp) curHp = maxHp;
 
 					this.user.curhp = Math.floor(+curHp);
 					this.user.last_restore = time;
 					this.hpLineStyle = setHpLineStyle(curHp, maxHp);
+
+					if (curHp >= maxHp) this.stopRegen();
 				};
 			};
 
@@ -93,65 +90,52 @@ export default {
 
 			curHp = this.user.curhp;
 			maxHp = this.user.maxhp;
+
 			if (curHp >= maxHp) {
 				this.user.curhp = maxHp;
 				this.hpLineStyle = setHpLineStyle(curHp, maxHp);
 				return;
 			}
+
 			if (this.isRegenerating) {
-				this.$options.HpRestore();
-				return;
+				return this.HpRestore();
 			}
-			this.SET_IS_REGENERATING(true);
 
-			// const restoreSpeed = 1;
-			const minutesToMaxHp = 5;
+			const restoreSpeed = 1;
+			const minutesToMaxHp = 1;
 			const renderSpeed = 1 / 2;
-			// const renderSpeed = 1;
-			const restoreOneSecond = maxHp / (minutesToMaxHp / 1) / 60;
+			const restoreOneSecond = maxHp / (minutesToMaxHp / restoreSpeed) / 60;
 
-			this.$options.HpRestore = hp(curHp, maxHp, lastRestore);
-			this.$options.HpRestore();
+			this.HpRestore = hp(curHp, maxHp, lastRestore);
+			this.HpRestore();
 
 			if (this.isRegenerating) {
 				const timer = setInterval(() => {
-					this.$options.HpRestore();
+					this.HpRestore();
 					if (!this.isRegenerating) {
 						clearInterval(timer);
 					}
 				}, 1000 / renderSpeed);
 			}
 		},
-		...mapMutations(["SET_USER", 'SET_TEST', 'SET_IS_REGENERATING', 'SET_NEED_REGENERATION']),
+
 		getUserInfo() {
-			const url = new URL(tokenUrl);
-			window.open('http://' + url.hostname + `/user/${this.user.id}/info`, '_blank').focus();
+			window.open(`${this.host}/user/${this.user.id}/info`, '_blank').focus();
 		}
 	},
 
 	computed: {
-		...mapGetters(["user", "dbLog", 'isRegenerating']),
-		...mapState(['needRegeneration']),
-
-		userInfoUrl() {
-			const url = new URL(tokenUrl);
-
-			return url.hostname;
-		}
-	},
-
-	watch: {
-		needRegeneration(newVal) {
-			if (newVal) {
-				// this.$options.HpRestore(getTimeSeconds());
-				this.regeneration();
-				this.SET_NEED_REGENERATION(false);
-			}
-		}
+		...mapGetters(["user", "dbLog"]),
+		...mapState(['host']),
 	},
 
 	mounted() {
 		this.regeneration();
+
+		this.$store.watch(
+			() => this.$store.state.user.curhp,
+			() => this.regeneration(),
+		);
 	}
 };
 </script>

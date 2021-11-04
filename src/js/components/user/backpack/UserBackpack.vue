@@ -69,7 +69,6 @@ export default {
 	},
 
 	methods: {
-		...mapMutations(['SET_NEED_REGENERATION']),
 		removeItem(item) {
 			this.api.doAction('removeItem', item.id, response => {
 				this.$store.commit('REMOVE_ITEM', item.id);
@@ -111,48 +110,6 @@ export default {
 			}
 
 			return [action, actionType];
-		},
-
-		updateUser(item, action) {
-			const user = this.$store.state.user;
-			const addProps = ['power', 'critical', 'evasion', 'stamina', 'hp', 'min_damage', 'max_damage'];
-			let userProp;
-			const isAdd = action === 'ON';
-
-			addProps.forEach(prop => {
-				let needRegen = false;
-
-				userProp = prop;
-
-				if (prop === 'hp') {
-					userProp = 'maxhp';
-					needRegen = true;
-				} else if (prop === 'stamina') {
-					this.updateUserProps(user, 'maxhp', item[prop] * STAMINA_RATE, isAdd);
-					needRegen = true;
-				} else if (prop === 'min_damage' || prop === 'max_damage') {
-					userProp = `extra_${prop}`;
-				}
-
-				this.updateUserProps(user, userProp, item[prop], isAdd);
-
-				if (prop === 'power') {
-					this.recalculateDamage(user);
-				}
-
-				if (needRegen) {
-					this.SET_NEED_REGENERATION(true);
-				}
-			});
-		},
-
-		updateUserProps(user, prop, amount, isAdd) {
-			user[prop] = isAdd === true ? user[prop] + +amount : user[prop] - +amount;
-		},
-
-		recalculateDamage(user) {
-			user.min_damage = Math.floor(user.power / 2);
-			user.max_damage = user.power + Math.ceil(user.power / 2);
 		},
 
 		filterByLoc(items, loc) {

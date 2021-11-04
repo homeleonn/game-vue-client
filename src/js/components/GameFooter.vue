@@ -86,7 +86,7 @@ export default {
 	},
 
 	computed: {
-		...mapGetters(["csrf", "location", "locationUsers"]),
+		...mapGetters(["csrf", "location", "locationUsers", 'user']),
 	},
 
 	methods: {
@@ -115,6 +115,12 @@ export default {
 
 	created() {},
 	mounted() {
+		if (this.user.fight) this.isFightLogVisible = true;
+		this.$store.watch(
+      () => this.$store.state.user.fight,
+      (fight) => { this.isFightLogVisible = fight }
+    );
+
 		_footer = _('footer');
 		_locUsers = _('#loc-users');
 		_locUsers.css('height', (+_footer.css('height').split('px')[0] - 70) + 'px');
