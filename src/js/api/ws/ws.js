@@ -55,6 +55,9 @@ export class WS {
 			'getEnemy',
 			'getFight',
 			'hit',
+			'talkToNpc',
+			'showQuest',
+			'questAnswer',
 		];
 
 		this.validActions.push('debug', 'admin_user');

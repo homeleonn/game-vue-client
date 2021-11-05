@@ -49,7 +49,6 @@
 					<location-link
 						:closestLocations="closestLocations"
 						type="character"
-						@chloc="id => $emit('chloc', id)"
 						:disabled="progress"
 					></location-link>
 				</div>

@@ -81,7 +81,9 @@ export default {
 					this.user.last_restore = time;
 					this.hpLineStyle = setHpLineStyle(curHp, maxHp);
 
-					if (curHp >= maxHp) this.stopRegen();
+					if (curHp >= maxHp) {
+						this.stopRegen();
+					}
 				};
 			};
 
@@ -121,7 +123,9 @@ export default {
 
 		getUserInfo() {
 			window.open(`${this.host}/user/${this.user.id}/info`, '_blank').focus();
-		}
+		},
+
+
 	},
 
 	computed: {
@@ -134,7 +138,16 @@ export default {
 
 		this.$store.watch(
 			() => this.$store.state.user.curhp,
-			() => this.regeneration(),
+			() => {
+				this.regeneration()
+			},
+		);
+
+		this.$store.watch(
+			() => this.$store.state.user.maxhp,
+			() => {
+				this.regeneration()
+			},
 		);
 	}
 };

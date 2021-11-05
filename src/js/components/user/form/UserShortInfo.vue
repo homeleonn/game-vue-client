@@ -1,8 +1,12 @@
 <template>
 	<div class="info-wrapper" :class="{shrink}">
 		<div class="info">
-			<!-- <div class="align"><img src="img/aligns/99.gif" /></div> -->
-			<div class="clan"><img src="img/clans/developers.png" /></div>
+			<div class="tendency" v-if="user.tendency_name">
+				<img :src="`/img/tendencies/${user.tendency_img}`" :title="user.tendency_name" />
+			</div>
+			<div class="clan" v-if="user.clan_name">
+				<img :src="`/img/clans/${user.clan_img}`" :title="user.clan_name" />
+			</div>
 			<div class="login">{{ user.login ?? user.name }}[{{ user.level }}]<span class="icon-ok"></span></div>
 		</div>
 		<div class="hp-wrapper">
@@ -36,7 +40,7 @@ export default {
 			return setHpLineStyle(this.user.curhp, this.user.maxhp);
 		}
 	}
-}	
+}
 </script>
 
 <style lang="scss">
@@ -62,7 +66,7 @@ export default {
 			}
 
 			.hp {
-				display: none;	
+				display: none;
 			}
 		}
 	}

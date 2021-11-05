@@ -4,8 +4,9 @@
 		<div class="main">
 			<main-modal></main-modal>
 			<user-supplies></user-supplies>
+			<npc-view v-if="npc" :npc="npc"></npc-view>
 			<!-- <keep-alive> -->
-			<component :is="currentMainComponent" @chloc="changeLocation" @setCurComp="setCurComp"></component>
+			<component v-else :is="currentMainComponent" @chloc="changeLocation" @setCurComp="setCurComp"></component>
 			<!-- </keep-alive> -->
 		</div>
 		<game-footer @sendMessage="sendMessage" @setCurComp="setCurComp"></game-footer>
@@ -24,6 +25,7 @@ import TheDebug from "./debug/TheDebug";
 import GameFight2 from "./fight/GameFight2";
 import FightStats from "./fight/FightStats";
 import MainModal from "./modal/MainModal";
+import NpcView from "./npc/NpcView";
 import Api from "../api/api.js";
 import { tokenUrl } from '@/../.env.js';
 
@@ -38,12 +40,13 @@ const TheHunting = defineAsyncComponent(() =>
 const api = new Api();
 
 export default {
-	components: { GameHeader, GameFooter, LocationWrapper, MainModal, UserBackpack, TheHunting, TheDebug, GameFight2, UserSupplies, FightStats },
+	components: { GameHeader, GameFooter, LocationWrapper, MainModal, UserBackpack, TheHunting, TheDebug, GameFight2, UserSupplies, FightStats, NpcView },
 	data() {
 		return {
 			currentMainComponent: 'LocationWrapper',
 			apiReady: false,
 			timer: null,
+			npc: null,
 		};
 	},
 
@@ -58,7 +61,8 @@ export default {
 	provide() {
 		return {
 			api,
-			apiSubscribe: this.apiSubscribe
+			apiSubscribe: this.apiSubscribe,
+			talkToNpc: this.talkToNpc,
 		};
 	},
 
@@ -80,10 +84,12 @@ export default {
 		setCurComp(compName) {
 			if (this.user.fight) return;
 			console.log(compName);
+			this.npc = null;
 			this.currentMainComponent = compName;
 		},
 
 		changeLocation(locId) {
+			this.npc = null;
 			api.doAction('chloc', locId);
 		},
 
@@ -154,10 +160,16 @@ export default {
 				this.$store.commit('SET_TIME', this.time + 1);
 			}, 1000);
 		},
+
+		talkToNpc(id) {
+			api.doAction('talkToNpc', id, npc => {
+				this.npc = npc;
+			});
+		}
 	},
 
 	computed: {
-		...mapGetters(["test", 'user']),
+		...mapGetters(['user']),
 
 		time() {
 			return this.$store.state.time;

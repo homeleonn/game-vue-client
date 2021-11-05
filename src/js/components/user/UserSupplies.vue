@@ -17,7 +17,7 @@ name: "UserSupplies",
 	data() {
 		return {
 			supplies: [
-				{ id: 1, image: 'life_potion.gif' }
+				{ id: 1, image: 'life_potion.jpg' }
 			],
 			supplySlotsCount: 4
 		}

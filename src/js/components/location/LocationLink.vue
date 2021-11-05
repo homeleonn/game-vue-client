@@ -2,7 +2,7 @@
 	<div
 		v-for="(location, id) in closestLocations[type]"
 		:key="'link-loc-' + id"
-		:class="['link', 'loc-' + id, {active: activeLocation == id, disabled}]"
+		:class="['link', 'loc-' + id, {active: activeLocation == id, disabled: disabled && type != 'character'}]"
 		@mouseenter="SET_ACTIVE_LOCATION(id)"
 		@mouseleave="SET_ACTIVE_LOCATION(false)"
 		@click="test(id)"
@@ -19,11 +19,13 @@ export default {
 
 	props: ['closestLocations', 'type', 'disabled'],
 	emits: ['chloc'],
+	inject: ['api', 'talkToNpc'],
 
 	methods: {
 		...mapMutations(['SET_ACTIVE_LOCATION']),
 
 		test(id) {
+			if (this.type == 'character') return this.talkToNpc(id);
 			if (this.disabled) return;
 			this.$emit('chloc', id);
 		}
@@ -36,7 +38,7 @@ export default {
 	},
 
 	mounted() {
-		// console.log(this.closestLocations['location'])
+		// api.subscribe('')
 	}
 
 }
