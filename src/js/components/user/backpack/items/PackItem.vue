@@ -30,6 +30,7 @@
 			>
 				x
 			</div>
+			<div class="action bl" v-if="count">{{ count }}</div>
 			<div class="pack-item__title">{{ itemTitle }}</div>
 		</template>
 		<template v-else><img :src="item.image"></template>
@@ -58,7 +59,11 @@ export default {
 	},
 
 	computed: {
-		...mapGetters(['user'])
+		...mapGetters(['user']),
+
+		count() {
+			return this.item.stackable && this.item.count > 1 ? this.item.count : '';
+		}
 	},
 
 	methods: {
@@ -128,6 +133,21 @@ export default {
 			right: 0;
 		}
 
+		&.bl {
+			background: gold;
+			border-radius: 3px;
+			bottom: 0;
+			left: 0;
+			display: block;
+			opacity: .9;
+			color: black;
+			width: 19px;
+			height: 16px;
+			font-size: 14px;
+			line-height: 11px;
+			font-weight: bold;
+		}
+
 		&.tr {
 			background: rgba(0, 0, 255, 1);
 			top: 0;
@@ -140,7 +160,7 @@ export default {
 		}
 
 
-		&:hover {
+		&:hover:not(.bl) {
 			opacity: 1;
 
 			~ .pack-item__title {

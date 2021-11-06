@@ -23,6 +23,9 @@
 							</li>
 						</ul>
 					</div>
+					<div class="quest-answers" v-else>
+						<ul><li><span @click="exit">Закрыть</span></li></ul>
+					</div>
 				</div>
 				<div v-else-if="quests">
 					<div v-for="quest in quests" :key="quest.id">
@@ -66,13 +69,13 @@ export default {
 		},
 
 		doAnswer(answerId) {
-			if (answerId == 'abort') {
-				this.activeQuest = null;
-				return;
-			}
 			this.api.doAction('questAnswer', { npcId: this.activeQuest.npc_id, questId: this.activeQuest.id, answerId }, activeQuest => {
-				// this.activeQuest = activeQuest;
+				this.activeQuest = activeQuest;
 			});
+		},
+
+		exit() {
+			this.activeQuest = null;
 		}
 	},
 
