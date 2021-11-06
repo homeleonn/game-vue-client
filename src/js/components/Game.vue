@@ -103,7 +103,7 @@ export default {
 
 		append(message) {
 			messages.innerHTML += `<div class="msg">${date(
-				"H:i:s"
+				"H:i"
 			)} ${message}</div>`;
 		},
 

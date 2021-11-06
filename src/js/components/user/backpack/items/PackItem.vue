@@ -1,39 +1,45 @@
 <template>
 	<div class="pack-item">
 		<template v-if="item.id">
+		<!-- <template> -->
 			<img
 				:src="item.image"
 				@mouseenter="setActive(item)"
 				@mouseleave="setActive(false)"
 			>
 
-			<div
-				v-if="usage && user.level >= item.need_level"
-				class="action tl"
-				@mouseenter="itemTitle=usage"
-				@click="use(item, usage)"
-			>
-				н
-			</div>
-			<div
-				class="action tr"
-				@mouseenter="itemTitle='Информация'"
-				@click="info"
-			>
-				i
-			</div>
-			<div
-				v-if="usage != 'Снять'"
-				class="action br"
-				@mouseenter="itemTitle='Выбросить'"
-				@click="remove(item)"
-			>
-				x
-			</div>
+			<!-- <div v-if="onlyShow"> -->
+				<div
+					v-if="usage && user.level >= item.need_level"
+					class="action tl"
+					@mouseenter="itemTitle=usage"
+					@click="use(item, usage)"
+				>
+					н
+				</div>
+				<div
+					class="action tr"
+					@mouseenter="itemTitle='Информация'"
+					@click="info"
+				>
+					i
+				</div>
+				<div
+					v-if="usage != 'Снять'"
+					class="action br"
+					@mouseenter="itemTitle='Выбросить'"
+					@click="remove(item)"
+				>
+					x
+				</div>
+			<!-- </div> -->
 			<div class="action bl" v-if="count">{{ count }}</div>
 			<div class="pack-item__title">{{ itemTitle }}</div>
 		</template>
-		<template v-else><img :src="item.image"></template>
+		<template v-else>
+			<img :src="item.image">
+			<div class="action bl" v-if="count">{{ count }}</div>
+		</template>
 	</div>
 </template>
 
@@ -43,6 +49,10 @@ import { mapMutations, mapGetters } from 'vuex'
 export default {
 	props: {
 		item: Object,
+		onlyShow: {
+			type: Boolean,
+			default: false
+		},
 		usage: {
 			type: String,
 			validator: (val) => [null, 'Надеть', 'Снять', 'Исп-ть'].includes(val),
@@ -62,7 +72,7 @@ export default {
 		...mapGetters(['user']),
 
 		count() {
-			return this.item.stackable && this.item.count > 1 ? this.item.count : '';
+			return this.item.count > 1 ? this.item.count : '';
 		}
 	},
 

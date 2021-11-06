@@ -43,7 +43,7 @@
 import PackItem from '../backpack/items/PackItem';
 import UserInfo from './UserInfo';
 import UserShortInfo from './UserShortInfo'
-// import { mapGetters } from 'vuex'
+import { mapGetters } from 'vuex'
 import { userInfo } from '@/js/lang/ru';
 
 export default {
@@ -71,12 +71,19 @@ export default {
 	},
 
 	computed: {
-		// ...mapGetters(['user']),
+		...mapGetters(['userItems']),
 		userInfo() {
 			const formattedInfo = this.setLangInfo(this.getLangInfoKeys, this.user);
 
 			if (formattedInfo.length > 1) {
-				formattedInfo.splice(1, 0, { k: 'Урон', v: `+${this.user.min_damage + this.user.extra_min_damage}...+${this.user.max_damage + this.user.extra_max_damage}` });
+				formattedInfo.splice(1, 0, {
+					k: 'Урон',
+					v: `+${this.user.min_damage + this.user.extra_min_damage}...+${this.user.max_damage + this.user.extra_max_damage}`
+				});
+			}
+
+			if (this.userItems) {
+				formattedInfo.splice(-1, 1, { k: 'Золото', v: this.userItems.find(item => item.item_id == 1).count });
 			}
 			return formattedInfo;
 		},

@@ -67,7 +67,7 @@
 <script>
 import { mapGetters } from "vuex";
 import UserList from "./location/UserList";
-let _footer, _locUsers;
+let _footer, _locUsers, _main;
 
 export default {
 	name: "GameFooter",
@@ -110,6 +110,7 @@ export default {
 			footerHeight += isUp ? stepSize : -stepSize;
 			_footer.css('height', footerHeight + 'px');
 			_locUsers.css('height', (footerHeight - 70) + 'px');
+			_main.css('margin-bottom', footerHeight + 'px');
 		}
 	},
 
@@ -122,8 +123,13 @@ export default {
     );
 
 		_footer = _('footer');
+    let fHeight = _footer.css('height', false);
+
+		_main = _('.main');
+		console.log(_main);
 		_locUsers = _('#loc-users');
-		_locUsers.css('height', (+_footer.css('height').split('px')[0] - 70) + 'px');
+		_locUsers.css('height', fHeight + 'px');
+		_main.css('margin-bottom', fHeight + 'px');
 		let _fightLog = document.querySelector('.fight-log');
 
 		this.$store.watch((state) => state.fightLog, () => {

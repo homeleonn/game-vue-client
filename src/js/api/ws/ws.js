@@ -58,6 +58,7 @@ export class WS {
 			'talkToNpc',
 			'showQuest',
 			'questAnswer',
+			'takeReward',
 		];
 
 		this.validActions.push('debug', 'admin_user');

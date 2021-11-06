@@ -16,6 +16,14 @@
 				<div class="active-quest" v-if="activeQuest">
 					<h3 class="center">{{ activeQuest.name }}</h3>
 					<div class="quest-text">{{ activeQuest.data.text }}</div>
+					<div class="quest-reward" v-if="activeQuest.data.reward">
+						<div v-for="reward in activeQuest.data.reward" :key="reward">
+							<pack-item :item="reward"></pack-item>
+						</div>
+						<div class="quest-answers">
+							<ul><li><span @click="takeReward">Забрать награду</span></li></ul>
+						</div>
+					</div>
 					<div class="quest-answers" v-if="activeQuest.data.answers">
 						<ul>
 							<li v-for="(answer, idx) in activeQuest.data.answers" :key="idx">
@@ -41,7 +49,10 @@
 </template>
 
 <script>
+import PackItem from '../user/backpack/items/PackItem'
+
 export default {
+	components: { PackItem },
 	props: {
 		npc: Object
 	},
@@ -76,6 +87,12 @@ export default {
 
 		exit() {
 			this.activeQuest = null;
+		},
+
+		takeReward() {
+			this.api.doAction('takeReward', { npcId: this.activeQuest.npc_id, questId: this.activeQuest.id }, activeQuest => {
+				this.activeQuest = null;
+			});
 		}
 	},
 
@@ -105,6 +122,8 @@ export default {
 			padding: 10px;
 		}
 
+
+
 		.npc-info {
 			.npc-info-img {
 				margin: 10px 0;
@@ -119,7 +138,6 @@ export default {
 			span {
 				display: block;
 				padding: 5px 10px;
-				margin: 10px 5px;
 				cursor: pointer;
 				border: 1px coral solid;
 				font-weight: bold;
@@ -129,6 +147,15 @@ export default {
 					background: #ddd;
 				}
 			}
+		}
+
+		.quest-answers,
+		.quests .quest {
+			margin: 10px 5px;
+		}
+
+		.quest-reward {
+			margin: 10px 0;
 		}
 
 		.quests {
