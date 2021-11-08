@@ -26,6 +26,7 @@ import GameFight2 from "./fight/GameFight2";
 import FightStats from "./fight/FightStats";
 import MainModal from "./modal/MainModal";
 import NpcView from "./npc/NpcView";
+import QuestList from "./user/quest/QuestList";
 import Api from "../api/api.js";
 import { tokenUrl } from '@/../.env.js';
 
@@ -40,7 +41,7 @@ const TheHunting = defineAsyncComponent(() =>
 const api = new Api();
 
 export default {
-	components: { GameHeader, GameFooter, LocationWrapper, MainModal, UserBackpack, TheHunting, TheDebug, GameFight2, UserSupplies, FightStats, NpcView },
+	components: { GameHeader, GameFooter, LocationWrapper, MainModal, UserBackpack, TheHunting, TheDebug, GameFight2, UserSupplies, FightStats, NpcView, QuestList },
 	data() {
 		return {
 			currentMainComponent: 'LocationWrapper',

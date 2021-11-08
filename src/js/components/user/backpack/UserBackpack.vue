@@ -9,7 +9,6 @@
 			<item-lists
 				:items="packedItems"
 				@removeItem="removeItem"
-				@takeoffItem="takeoffItem"
 				@wearItem="wearItem"
 			></item-lists>
 		</div>

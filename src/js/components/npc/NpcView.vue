@@ -93,6 +93,8 @@ export default {
 			this.api.doAction('takeReward', { npcId: this.activeQuest.npc_id, questId: this.activeQuest.id }, activeQuest => {
 				this.activeQuest = null;
 			});
+			delete this.quests[this.activeQuest.id];
+			this.activeQuest = null;
 		}
 	},
 

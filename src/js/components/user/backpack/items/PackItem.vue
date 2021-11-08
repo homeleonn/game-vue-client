@@ -151,10 +151,12 @@ export default {
 			display: block;
 			opacity: .9;
 			color: black;
-			width: 19px;
-			height: 16px;
-			font-size: 14px;
-			line-height: 11px;
+			// position: relative;
+			width: auto;
+			height: auto;
+			min-width: 19px;
+			font-size: 11px;
+			// line-height: 11px;
 			font-weight: bold;
 		}
 

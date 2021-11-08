@@ -126,7 +126,6 @@ export default {
     let fHeight = _footer.css('height', false);
 
 		_main = _('.main');
-		console.log(_main);
 		_locUsers = _('#loc-users');
 		_locUsers.css('height', fHeight + 'px');
 		_main.css('margin-bottom', fHeight + 'px');

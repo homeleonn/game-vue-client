@@ -59,6 +59,7 @@ export class WS {
 			'showQuest',
 			'questAnswer',
 			'takeReward',
+			'getQuests',
 		];
 
 		this.validActions.push('debug', 'admin_user');

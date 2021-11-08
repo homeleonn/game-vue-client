@@ -57,7 +57,6 @@ export default {
 
 	data() {
 		return {
-			test: 1,
 			itemIdCounter: 100,
 			activeItem: false,
 			currentTab: 'main',
