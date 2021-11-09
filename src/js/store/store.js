@@ -100,12 +100,13 @@ export default createStore({
 		},
 
 		PUT_ON_ITEM(state, itemId) {
-			// console.log(state.userItems[itemId]);
-			state.userItems[itemId].loc = 'WEARING';
+			const idx = state.userItems.findIndex(i => i.id == itemId);
+			state.userItems[idx].loc = 'WEARING';
 		},
 
 		TAKE_OFF_ITEM(state, itemId) {
-			state.userItems[itemId].loc = 'INVENTORY';
+			const idx = state.userItems.findIndex(i => i.id == itemId);
+			state.userItems[idx].loc = 'INVENTORY';
 		}
 	},
 

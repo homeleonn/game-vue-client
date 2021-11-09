@@ -52,7 +52,7 @@ export default {
 	},
 
 	beforeUnmount() {
-		['locMonsters', 'fight', 'monsterAttacked', 'killMonster', 'spawnMonster'].forEach(e => this.api.unsubscribe(e));
+		// ['locMonsters', 'fight', 'monsterAttacked', 'killMonster', 'spawnMonster'].forEach(e => this.api.unsubscribe(e));
 	},
 
 	mounted() {
@@ -65,6 +65,7 @@ export default {
 				if (!isAllow(res)) return;
 				this.$emit('setCurComp', 'GameFight2');
 				this.$store.state.user.fight = 1;
+				this.$store.commit('CLEAR_FIGHT_LOG');
 			});
 		},
 	}

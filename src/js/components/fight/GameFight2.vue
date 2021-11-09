@@ -10,7 +10,7 @@
 	<!-- {{getEnemy1}} -->
 	<!-- {{user.enemyfId}} -->
 	<div class="fight row center" v-if="loaded">
-		<div class="col-md-2">
+		<div class="fighter-slot-left">
 			<user-form
 				:items="[]"
 				:user="user"
@@ -18,7 +18,7 @@
 				:isFight="false"
 			></user-form>
 		</div>
-		<div class="col-md-4 flex fcol fight-panel">
+		<div class="flex fcol fight-panel" :style="`background-image: url('/img/locations/${image}')`">
 			<div class="fighters">
 				<div class="stats-wrapper">
 					<div class="stats">
@@ -46,15 +46,14 @@
 					</div>
 					<div class="super-hit" v-if="user.superHit">Супер-удар</div>
 				</div>
-				<img :src="'/img/locations/lake.jpeg'" class="location">
 				<fighter-model side="left" :damage="user.damageMe" :key="1"></fighter-model>
 				<fighter-model side="right" :damage="user.damageEnemy" :key="2" class="enemy-fighter" :class="{change: !user.getEnemy() || isChangingEnemy}"></fighter-model>
 			</div>
 			<!-- <div v-for="(s, idx) in fight.swap" :key="idx">{{idx}}: {{s}}</div> -->
-			<div><button @click="reset">Reset</button></div>
-			<div><button @click="fight.stopAllTimers()">Stop timers</button></div>
+			<!-- <div><button @click="reset">Reset</button></div> -->
+			<!-- <div><button @click="fight.stopAllTimers()">Stop timers</button></div> -->
 		</div>
-		<div class="col-md-2 center">
+		<div class="center fighter-slot-right">
 			<div v-if="user.getEnemy()" class="center">
 				<div v-if="isChangingEnemy" class="changing-enemy icon-spin3 active"></div>
 				<user-form v-else
@@ -68,7 +67,7 @@
 				<h3>Ожидание противника...</h3>
 			</div>
 		</div>
-		<div class="col-md-4">
+		<div class="teams-wrapper">
 			<div class="teams myblock row center">
 				<div class="col-md-6 team1">
 					<div class="team-title">Команда 1<hr></div>
@@ -224,6 +223,8 @@ export default {
 			runTimer();
 		});
 
+		const image = computed(() => store.state.location.image);
+
 		function toStatistics() {
 			emit('setCurComp', 'FightStats');
 		}
@@ -242,6 +243,7 @@ export default {
 			isChangingEnemy,
 			loaded,
 			getEnemy1,
+			image,
 
 			hit,
 
@@ -263,5 +265,55 @@ export default {
 		left: 0;
 		right: 0;
 	}
+
+
+
+	@media (max-width: 1366px) {
+		.fighter-slot-right,
+		.fighter-slot-left {
+			width: 80px;
+		}
+		.fighter-slot-left {
+			margin-left: 90px;
+		}
+		.fighter-slot-right {
+			margin-left: 30px;
+		}
+
+		.fight-panel {
+			width: 530px;
+		}
+
+		.teams-wrapper {
+			width: 300px;
+		}
+	}
+
+	.fight-panel {
+		background-size: 200%;
+		background-position: 40% 90%;
+	}
+		.teams-wrapper {
+			* {
+				max-width: 99.5%
+			}
+		}
 }
+
+
+	@media (min-width: 1367px) {
+		.fight {
+			.fighter-slot-right,
+			.fighter-slot-left {
+				width: 20%;
+			}
+
+			.fight-panel {
+				width: 40%;
+			}
+			.teams-wrapper {
+				width: 20%;
+			}
+		}
+	}
 </style>

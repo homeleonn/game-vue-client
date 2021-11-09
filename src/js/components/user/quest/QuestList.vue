@@ -1,12 +1,11 @@
 <template>
 	<div class="quest-list">
 		<h2 class="center">Квесты</h2>
-		<div class="__type">
-			<div class="active"></div>
-			<div class="completed"></div>
-			<div class="all"></div>
-		</div>
-		<simple-tabs :tabs="types" @change="setType"></simple-tabs>
+		<simple-tabs
+			:tabs="types"
+			@change="setType"
+			:counts="countEachQuestTypes"
+		></simple-tabs>
 		<div class="__list">
 			<div class="__item" v-for="(quest, idx) in quests[activeType]" :key="idx">
 				<quest-item :quest="quest"></quest-item>
@@ -31,6 +30,17 @@ export default {
 				all: 'Все',
 			},
 			activeType: 'active'
+		}
+	},
+
+	computed: {
+		countEachQuestTypes() {
+			const count = {};
+			for (let q in this.quests) {
+				count[q] = this.quests[q].length;
+			}
+
+			return count;
 		}
 	},
 

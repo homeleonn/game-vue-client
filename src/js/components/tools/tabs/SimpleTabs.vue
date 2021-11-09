@@ -6,19 +6,27 @@
 			:class="['tab-button', { active: activeTab === key }]"
 			@click="change(key)"
 		>
-			{{ tab }}
+			{{ tab }} {{ countTabItems(key) }}
 		</button>
 	</div>
 </template>
 
 <script>
 export default {
-	props: ['tabs'],
-	emits: ['activeTab'],
+	props: {
+		tabs: Object,
+		counts: {
+			type: Object,
+			default: null
+		}
+	},
+	emits: {
+		activeTab: String,
+	},
 
 	data() {
 		return {
-			activeTab:null,
+			activeTab: null,
 		}
 	},
 
@@ -26,6 +34,10 @@ export default {
 		change(key) {
 			this.activeTab = key;
 			this.$emit('change', key);
+		},
+
+		countTabItems(tab) {
+			return this.counts[tab] ? ` (${this.counts[tab]})` : ' (0)';
 		}
 	},
 

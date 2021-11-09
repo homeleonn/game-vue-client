@@ -94,11 +94,11 @@ export class WS {
 
 		if (typeof this.eventHandlers[event] === "undefined") return;
 
-		this.eventHandlers[event].forEach(function ({ cb, ctx, once }, idx) {
+		this.eventHandlers[event].forEach(({ cb, ctx, once }, idx) => {
 			cb.call(ctx, wsResponce[event]);
 
 			if (once) {
-
+				// this.unsubscribe(event);
 			}
 		});
 	}
@@ -153,7 +153,8 @@ export class WS {
 		if (typeof this.eventHandlers[event] === "undefined") {
 			this.eventHandlers[event] = [];
 		}
-		this.eventHandlers[event].push({ cb, ctx, once });
+		this.eventHandlers[event] = [{ cb, ctx, once }];
+		// this.eventHandlers[event].push({ cb, ctx, once });
 	}
 
 	unsubscribe(event) {

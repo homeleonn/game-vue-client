@@ -103,9 +103,10 @@ export default {
 		},
 
 		append(message) {
-			messages.innerHTML += `<div class="msg">${date(
-				"H:i"
-			)} ${message}</div>`;
+			messages.innerHTML += `<div class="msg">
+				<div class="msg-date">${date("H:i")}</div>
+				<div class="msg-text">${message}</div>
+			</div>`;
 		},
 
 		// api interaction
@@ -128,7 +129,6 @@ export default {
 		},
 
 		leaveLocUser({ id }) {
-			console.log(id);
 			this.REMOVE_LOCATION_USER(id);
 		},
 
@@ -145,13 +145,14 @@ export default {
 			this.scrollDown();
 		},
 
-		apiSubscribe(events, ctx) {
+		apiSubscribe(events, ctx, once = false) {
 			if (!Array.isArray(events)) {
 				ctx = events;
+				once = false;
 				events = Object.keys(events);
 			}
 
-			events.forEach(event => api.subscribe(event, ctx[event], ctx));
+			events.forEach(event => api.subscribe(event, ctx[event], ctx, once));
 		},
 
 		startTimeTimer() {

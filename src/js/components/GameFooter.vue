@@ -1,14 +1,16 @@
 <template>
 	<footer ref="footer">
-		<div class="resizer">
-			<div class="up" @click="resize(true)">▲</div>
-			<div class="down" @click="resize(false)">▼</div>
-		</div>
 		<div id="chat">
 			<div class="flex">
-				<div id="messages" ref="messages"></div>
+				<div class="messages-wrapper">
+					<div class="resizer" :class="{offset: isFightLogVisible}">
+						<div class="up" @click="resize(true)">▲</div>
+						<div class="down" @click="resize(false)">▼</div>
+					</div>
+					<div id="messages" ref="messages"></div>
+				</div>
 				<div class="fight-log" v-show="isFightLogVisible">
-					<div v-for="(log, idx) in $store.state.fightLog" :key="log" v-html="idx + '. ' + log"></div>
+					<div v-for="(log, idx) in $store.state.fightLog" :key="log" v-html="(idx + 1) + '. ' + log"></div>
 				</div>
 				<button class="fight-log-toggle btn" :class="{active: isFightLogVisible}" @click="isFightLogVisible = !isFightLogVisible">Лог боя</button>
 				<div id="chat-loc">
@@ -22,7 +24,7 @@
 				</div>
 			</div>
 			<div id="bottom-panel">
-				<div id="time"></div>
+				<div id="time">{{ clock }}</div>
 				<form id="sendmessage-form" class="flex" @submit.prevent>
 					<div id="message-wrap">
 						<input
@@ -67,7 +69,10 @@
 <script>
 import { mapGetters } from "vuex";
 import UserList from "./location/UserList";
-let _footer, _locUsers, _main;
+let
+	_footer,
+	_locUsers,
+	_main;
 
 export default {
 	name: "GameFooter",
@@ -82,6 +87,7 @@ export default {
 		return {
 			message: "",
 			isFightLogVisible: false,
+			clock: date('H:i'),
 		};
 	},
 
@@ -111,15 +117,25 @@ export default {
 			_footer.css('height', footerHeight + 'px');
 			_locUsers.css('height', (footerHeight - 70) + 'px');
 			_main.css('margin-bottom', footerHeight + 'px');
+		},
+
+		startClock() {
+			setInterval(() => {
+				this.clock = date('H:i');
+			}, 10000);
 		}
 	},
 
 	created() {},
 	mounted() {
+		this.startClock();
 		if (this.user.fight) this.isFightLogVisible = true;
 		this.$store.watch(
       () => this.$store.state.user.fight,
-      (fight) => { this.isFightLogVisible = fight }
+      (fight) => {
+				// setTimeout(() => { this.isFightLogVisible = fight; }, fight ? 0 : 5000);
+				this.isFightLogVisible = fight;
+      }
     );
 
 		_footer = _('footer');
@@ -146,6 +162,7 @@ export default {
 	// width: 500px;
 	flex-basis: 400px;
 	border-right: 1px lightgreen solid;
+	border-left: 1px lightgreen solid;
 	// overflow: hidden;
 	overflow-y: scroll;
 	font-size: 10px;

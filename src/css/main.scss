@@ -5,7 +5,7 @@
 	--color: #90ee90;
 	// --color: #ff0;
 	--color2: #bdecfb;
-	--chat-height: 0px;
+	--chat-height: 150px;
 	--back: #fff;
 	--back2: #f3f3f3;
 	--border: #fcbebe;
@@ -267,19 +267,28 @@ footer {
 .resizer {
 	position: absolute;
 	background: rgba(0, 0, 0, .5);
-	left: 45%;
-	height: 15px;
+	right: 20%;
+	height: 17px;
+	// width: 40px;
 	border-radius: 0 0 5px 5px;
+	z-index: 8;
+	text-align: center;
+	padding: 1px;
+	top: -2px;
+
+	&.offset {
+		// left: 22%;
+	}
 
 	> .up,
 	> .down {
 		top: -3px;
-		font-size: 20px;
+		font-size: 14px;
 		cursor: pointer;
 		color: #fff;
 		display: inline-block;
 		position: relative;
-		z-index: 8;
+		padding: 0 2px;
 
 		&:hover {
 			color: var(--color);
@@ -290,8 +299,6 @@ footer {
 		margin-left: -3px;
 	}
 }
-
-
 
 
 #chat {
@@ -307,21 +314,32 @@ footer {
 		height: calc(100% - 35px);
 	}
 
-	#messages {
+	.messages-wrapper {
 		flex-grow: 1;
+		position: relative;
+	}
+
+	#messages {
+		// flex-grow: 1;
 		padding: 3px 0;
 		border-right: 1px var(--color) solid;
 		overflow-y: auto;
+		max-height: 100%;
 		//.flex-column;
 
 		> .msg:nth-child(even) {
 			background-color: #fbfbfb;
+		}
+
+		.msg-date {
+			margin-right: 3px;
 		}
 	}
 
 	#chat-loc {
 		width: 300px;
 		//.flex-column;
+		border-left: 1px lightgreen solid;
 	}
 
 	#location-caption {
@@ -341,6 +359,7 @@ footer {
 
 	#loc-users {
 		// height: var(--chat-height) - 70px;
+
 		overflow: auto;
 
 		.login {
@@ -412,6 +431,7 @@ footer {
 		font-size: 12px;
 		border: 3px transparent solid;
 		border-radius: 5px;
+		height: 23px;
 	}
 
 	img {
@@ -708,7 +728,7 @@ area:hover {
 		text-align: center;
 		// margin-top: 20px;
 		button {
-			min-width: 100px;
+			// min-width: 100px;
 			display: block;
 			margin: 10px auto;
 		}
@@ -778,7 +798,7 @@ area:hover {
 			position: absolute;
 			top: -130%;
 			left: -100%;
-			width: 300%;
+			// width: 300%;
 		}
 	}
 
