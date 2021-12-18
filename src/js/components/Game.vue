@@ -91,7 +91,12 @@ export default {
 
 		changeLocation(locId) {
 			this.npc = null;
-			api.doAction('chloc', locId);
+			api.doAction('chloc', locId, ({ trans_time, trans_timeout }) => {
+				this.$store.commit('SET_TIME', trans_time);
+				this.user.trans_time = trans_time;
+				this.user.trans_timeout = trans_timeout;
+				this.startTimeTimer();
+			});
 		},
 
 		sendMessage(message) {
@@ -156,9 +161,9 @@ export default {
 		},
 
 		startTimeTimer() {
-			clearInterval(this.timer);
-			if (!this.user.trans_timeout || this.time > this.user.trans_timeout) return;
-			this.timer = setInterval(() => {
+			clearTimeout(this.timer);
+			if (this.isWalkingTimeout) return;
+			this.timer = setTimeout(() => {
 				this.$store.commit('SET_TIME', this.time + 1);
 			}, 1000);
 		},
@@ -175,6 +180,10 @@ export default {
 
 		time() {
 			return this.$store.state.time;
+		},
+
+		isWalkingTimeout() {
+			return !this.user.trans_timeout || this.time > this.user.trans_timeout;
 		},
 
 		currentProps() {

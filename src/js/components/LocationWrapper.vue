@@ -125,11 +125,11 @@ export default {
 
 	mounted() {
 		this.apiSubscribe({
-			chloc: ({ trans_time, trans_timeout }) => {
-				this.$store.commit('SET_TIME', trans_time);
-				this.user.trans_time = trans_time;
-				this.user.trans_timeout = trans_timeout;
-			},
+			// chloc: ({ trans_time, trans_timeout }) => {
+			// 	this.$store.commit('SET_TIME', trans_time);
+			// 	this.user.trans_time = trans_time;
+			// 	this.user.trans_timeout = trans_timeout;
+			// },
 		});
 	},
 

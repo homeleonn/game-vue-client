@@ -112,6 +112,24 @@ export function isAllow(response) {
 	return response > 0;
 }
 
+export function filterByLoc(items, loc) {
+	const filteredItems = [];
+
+	for (const itemId in items) {
+		if (items[itemId].loc === loc) {
+			filteredItems.push(items[itemId]);
+		}
+	}
+
+	return filteredItems;
+}
+
+export function loadUserItems(api, store) {
+	api.doAction('getBackPack', '', items => {
+		store.commit('SET_USER_ITEMS', items);
+	});
+}
+
 
 function sortClosestLocationsByType(closestLocations) {
 	const closestLocationByType = {};

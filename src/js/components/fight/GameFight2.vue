@@ -12,7 +12,7 @@
 	<div class="fight row center" v-if="loaded">
 		<div class="fighter-slot-left">
 			<user-form
-				:items="[]"
+				:items="wearedItems"
 				:user="user"
 				:info="[]"
 				:isFight="false"
@@ -107,6 +107,7 @@ import UserForm from '../user/form/UserForm'
 import UserShortInfo from '../user/form/UserShortInfo'
 import FighterModel from './FighterModel'
 import Fight from './use/Fight'
+import { filterByLoc, loadUserItems } from '@/js/common'
 
 export default {
 	components: { UserShortInfo, UserForm, FighterModel },
@@ -120,6 +121,7 @@ export default {
 
 		const fight = new Fight();
 		const user = fight.user;
+		const wearedItems = computed(() => filterByLoc(store.state.userItems, 'WEARING') || []);
 		const turn = computed(() => user.swap && user.swap[HIT_TURN] === user.team && user.hitsExist());
 		const isChangingEnemy = ref(false);
 		const timer1 = ref('');
@@ -219,6 +221,7 @@ export default {
 		}
 
 		onMounted(() => {
+			loadUserItems(api, store)
 			api.doAction('getFight');
 			runTimer();
 		});
@@ -246,6 +249,7 @@ export default {
 			image,
 
 			hit,
+			wearedItems,
 
 		// 	reset: () => { fight.init() },
 		}

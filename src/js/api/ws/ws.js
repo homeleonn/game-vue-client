@@ -1,4 +1,4 @@
-import { host, port, tokenUrl } from "@/../.env.js";
+import { host, port, tokenUrl, env } from "@/../.env.js";
 
 const DUPLICATE = "1";
 
@@ -20,6 +20,7 @@ export class Server {
 	}
 
 	async connectViaToken() {
+		// console.log(1);
 		const res = await fetch(tokenUrl + '?id=' + (new URL(document.URL).searchParams.get('id') ?? 1));
 		const token = await res.text();
 		if (res === "error") {
@@ -121,8 +122,12 @@ export class WS {
 
 	exit(isExit = true) {
 		if (isExit) {
-			// _('body').html('<h1>обнаружено дублирование окна</h1>');
-			console.log("<h1>обнаружено дублирование окна</h1>");
+			const msg = '<h1>обнаружено дублирование окна</h1>';
+			if (env == 'prod') {
+				_('body').html(msg);
+			} else {
+				console.log(msg);
+			}
 			return true;
 		}
 
@@ -134,6 +139,7 @@ export class WS {
 	init() {
 		this.server = new Server(`ws://${host}:${port}`);
 		this.server.connectViaToken();
+		// console.log(args);
 	}
 
 	doAction(action, params = '', subscriber = null) {

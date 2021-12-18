@@ -10,9 +10,17 @@ module.exports = {
     }
   },
 
-  configureWebpack: {
-    entry: __dirname + '/src/app.js'
+  // configureWebpack: {
+  //   entry: __dirname + '/src/app.js',
+  //   title: 'FightWorld',
+  // },
+
+  pages: {
+    index: {
+	    entry: __dirname + '/src/app.js',
+	    title: 'FightWorld',
+    }
   },
-  
+
   // outputDir: __dirname + '/public/js/'
 }
