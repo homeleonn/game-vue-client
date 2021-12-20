@@ -5,7 +5,8 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "deploy": "cd dist && mv index.html /home/homeleon/www/game-core/resources/views/game.php; rsync --archive --delete --exclude='login_'  --exclude='.htaccess' --exclude='favicon.ico' --exclude='index.php' . /home/homeleon/www/game-core/public/"
   },
   "dependencies": {
     "core-js": "^3.6.5",

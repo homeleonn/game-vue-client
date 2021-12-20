@@ -221,8 +221,8 @@ export default {
 		}
 
 		onMounted(() => {
-			loadUserItems(api, store)
-			api.doAction('getFight');
+			loadUserItems(api, store);
+			// api.doAction('getFight');
 			runTimer();
 		});
 

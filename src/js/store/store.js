@@ -70,7 +70,7 @@ export default createStore({
 		},
 
 		REMOVE_LOCATION_USER(state, userId) {
-			console.log(state.locationUsers.filter(user => { console.log(user.id); return user.id != userId }), userId);
+			// console.log(state.locationUsers.filter(user => { console.log(user.id); return user.id != userId }), userId);
 			state.locationUsers = state.locationUsers.filter(user => user.id != userId);
 		},
 

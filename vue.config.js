@@ -10,6 +10,8 @@ module.exports = {
     }
   },
 
+  // publicPath: '/prod/',
+
   // configureWebpack: {
   //   entry: __dirname + '/src/app.js',
   //   title: 'FightWorld',
