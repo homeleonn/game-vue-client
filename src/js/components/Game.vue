@@ -221,7 +221,7 @@ export default {
 			error: error => this.$store.commit('SET_MODAL', error),
 
 			drop: drop => drop.forEach(d => {
-				this.append(`<b>${d.npc_name} погиб и что-то выронил. Получено: ${d.name} ${d.count} шт.</b>`)
+				this.message(`<b>${d.npc_name} погиб и что-то выронил. Получено: ${d.name} ${d.count} шт.</b>`);
 			})
 		});
 

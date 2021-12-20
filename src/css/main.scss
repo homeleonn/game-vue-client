@@ -359,6 +359,8 @@ footer {
 
 	#loc-users {
 		// height: var(--chat-height) - 70px;
+		position: relative;
+		z-index: -1;
 
 		overflow: auto;
 
