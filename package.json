@@ -6,6 +6,7 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
+    "build-prod": "NODE_ENV=production npm run build && npm run deploy",
     "deploy": "cd dist && mv index.html /home/homeleon/www/game-core/resources/views/game.php; rsync --archive --delete --exclude='login_'  --exclude='.htaccess' --exclude='favicon.ico' --exclude='index.php' . /home/homeleon/www/game-core/public/"
   },
   "dependencies": {

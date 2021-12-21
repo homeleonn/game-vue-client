@@ -137,7 +137,8 @@ export class WS {
 	// api interface
 
 	init() {
-		this.server = new Server(`ws://${host}:${port}`);
+		const protocol = port == '443' ? 'wss' : 'ws';
+		this.server = new Server(`${protocol}://${host}:${port}`);
 		this.server.connectViaToken();
 		// console.log(args);
 	}
