@@ -17,9 +17,9 @@
 						<button @click="$emit('setCurComp', 'TheHunting')">На охоту</button>
 					</div>
 				</div>
-				
+
 				<hr>
-				
+
 				<div class="row times">
 					<div class="col-md-4">
 						<!-- Начало боя: 23.09.2021 18:01:47 -->
@@ -33,9 +33,9 @@
 						Длительность: {{ fightDuration }}
 					</div>
 				</div>
-				
+
 				<hr>
-				
+
 				<div class="row teams">
 					<div class="col-md-6 team1">
 						<h5>1я команда</h5>
@@ -122,7 +122,7 @@ export default {
 		this.$store.state.fightStats.teamsStatisticts.forEach(team => {
 			if (isUserFound) return;
 			for (const fighterId in team) {
-				if (+fighterId === this.$store.state.user.id) {
+				if (+team[fighterId].id === this.$store.state.user.id) {
 					this.user = team[fighterId];
 					isUserFound = true;
 					return;

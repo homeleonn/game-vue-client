@@ -82,7 +82,7 @@ export default {
 				});
 
 				if (this.userItems) {
-					formattedInfo.splice(-1, 1, { k: 'Золото', v: (this.userItems.find(item => item.item_id == 1)?.count || 0) });
+					formattedInfo.splice(-1, 1, { k: 'Золото', v: (this.userItems.find(item => item?.item_id == 1)?.count || 0) });
 				}
 			}
 			return formattedInfo;

@@ -65,7 +65,10 @@ export default {
 		regeneration(curHp = 180, maxHp = 200, lastRestore) {
 			const hp = (curHp, maxHp, lastRestore) => {
 				return (lastRestoreTime = null) => {
-					if (this.user.fight) this.stopRegen();
+					if (this.user.fight) {
+						this.stopRegen();
+						return;
+					}
 					this.isRegenerating = true;
 					maxHp = this.user.maxhp;
 					const time = getTimeSeconds();

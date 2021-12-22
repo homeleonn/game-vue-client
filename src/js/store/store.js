@@ -96,7 +96,7 @@ export default createStore({
 		},
 
 		REMOVE_ITEM(state, itemId) {
-			delete (state.userItems[itemId]);
+			delete (state.userItems[state.userItems.findIndex(i => i?.id == itemId)]);
 		},
 
 		PUT_ON_ITEM(state, itemId) {
