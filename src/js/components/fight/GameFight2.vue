@@ -178,6 +178,11 @@ export default {
 					store.commit('SET_FIGHTSTATS', d.statistics);
 				}
 			},
+
+			new_fighter(fighter) {
+				// console.log(fighter);
+				fight.setFighters(fighter);
+			}
 		});
 
 		function changeEnemy(swap) {
@@ -222,7 +227,7 @@ export default {
 
 		onMounted(() => {
 			loadUserItems(api, store);
-			// api.doAction('getFight');
+			setTimeout(() => { api.doAction('getFight'); }, 0);
 			runTimer();
 		});
 

@@ -126,9 +126,15 @@ export function filterByLoc(items, loc) {
 
 export function loadUserItems(api, store) {
 	api.doAction('getBackPack', '', items => {
-		api.doAction('getFight');
+		// api.doAction('getFight');
 		store.commit('SET_USER_ITEMS', items);
 	});
+}
+
+export function delay(callback, delay = 0) {
+	setTimeout(() => {
+		callback()
+	}, delay);
 }
 
 

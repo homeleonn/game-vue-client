@@ -55,8 +55,8 @@
 					/>
 				</div>
 				<div><img src="img/chat/chat.ico" title="Смайлы" /></div>
-			<!-- 	<div><button @click="doAction">doAction</button></div>
-				<div><button @click="$emit('setCurComp', 'TheDebug')">Debug</button></div> -->
+				<div v-if="user.access_level"><button @click="doAction">doAction</button></div>
+				<!-- <div><button @click="$emit('setCurComp', 'TheDebug')">Debug</button></div> -->
 				<form action="/logout" method="get" id="logout">
 					<input type="hidden" name="_token" :value="csrf" />
 					<button name="logout">Выход</button>
@@ -104,7 +104,8 @@ export default {
 			this.api.doAction('admin_user', {
 				userId: 1,
 				props: {
-					curhp: 18
+					curhp: 40,
+					last_restore: 'now()',
 				}
 			})
 		},

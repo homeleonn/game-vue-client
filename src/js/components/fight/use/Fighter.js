@@ -4,7 +4,7 @@ let fight;
 const HIT_TURN = 2;
 const HITS_COUNT = 3;
 const TURN_TIME = 4;
-const TURN_TIME_TIMEOUT = 10;
+const TURN_TIME_TIMEOUT = 20;
 
 
 export default class Fighter {

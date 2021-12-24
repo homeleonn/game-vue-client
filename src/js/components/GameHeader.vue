@@ -44,6 +44,8 @@ import { mapGetters, mapMutations, mapState } from "vuex";
 import UserShortInfo from './user/form/UserShortInfo'
 import { tokenUrl } from '@/../.env.js';
 
+let timer
+let fraction = 0;
 export default {
 	name: "GameHeader",
 	components: { UserShortInfo },
@@ -51,50 +53,20 @@ export default {
 	data() {
 		return {
 			hpLineStyle: {},
-			isRegenerating: false,
-			maxHpChanged: false,
-			HpRestore: null,
 		};
 	},
 
 	methods: {
-		stopRegen() {
-			this.isRegenerating = false;
-		},
 
-		regeneration(curHp = 180, maxHp = 200, lastRestore) {
-			const hp = (curHp, maxHp, lastRestore) => {
-				return (lastRestoreTime = null) => {
-					if (this.user.fight) {
-						this.stopRegen();
-						return;
-					}
-					this.isRegenerating = true;
-					maxHp = this.user.maxhp;
-					const time = getTimeSeconds();
+		regeneration() {
+			clearTimeout(timer);
+			if (this.user.fight) {
+				return;
+			}
 
-					if (!lastRestore) lastRestore = time;
-
-					curHp = curHp + (time - lastRestore) * restoreOneSecond;
-					lastRestore = time;
-
-					if (curHp >= maxHp) curHp = maxHp;
-
-					this.user.curhp = Math.floor(+curHp);
-					this.user.last_restore = time;
-					this.hpLineStyle = setHpLineStyle(curHp, maxHp);
-
-					if (curHp >= maxHp) {
-						this.stopRegen();
-					}
-				};
-			};
-
-
-			this.hpLineStyle = setHpLineStyle(curHp, maxHp);
-
-			curHp = this.user.curhp;
-			maxHp = this.user.maxhp;
+			let lastRestore = getTimeSeconds();
+			let curHp = this.user.curhp + fraction;
+			let maxHp = this.user.maxhp;
 
 			if (curHp >= maxHp) {
 				this.user.curhp = maxHp;
@@ -102,26 +74,33 @@ export default {
 				return;
 			}
 
-			if (this.isRegenerating) {
-				return this.HpRestore();
-			}
+			this.hpLineStyle = setHpLineStyle(curHp, maxHp);
 
 			const restoreSpeed = 1;
 			const minutesToMaxHp = 1;
 			const renderSpeed = 1 / 2;
 			const restoreOneSecond = maxHp / (minutesToMaxHp / restoreSpeed) / 60;
 
-			this.HpRestore = hp(curHp, maxHp, lastRestore);
-			this.HpRestore();
 
-			if (this.isRegenerating) {
-				const timer = setInterval(() => {
-					this.HpRestore();
-					if (!this.isRegenerating) {
-						clearInterval(timer);
-					}
-				}, 1000 / renderSpeed);
-			}
+			timer = setTimeout(() => {
+				if (this.user.fight) {
+					return;
+				}
+				maxHp = this.user.maxhp;
+				const time = getTimeSeconds();
+
+				if (!lastRestore) lastRestore = time;
+
+				curHp = curHp + (time - lastRestore) * restoreOneSecond;
+				lastRestore = time;
+
+				if (curHp >= maxHp) curHp = maxHp;
+
+				fraction = curHp - Math.floor(curHp)
+				this.user.curhp = Math.round(curHp);
+				this.user.last_restore = time;
+				this.hpLineStyle = setHpLineStyle(curHp, maxHp);
+			}, 1000 / renderSpeed);
 		},
 
 		getUserInfo() {
