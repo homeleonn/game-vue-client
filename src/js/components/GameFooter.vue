@@ -144,7 +144,7 @@ export default {
 
 		_main = _('.main');
 		_locUsers = _('#loc-users');
-		_locUsers.css('height', (fHeight - 30) + 'px');
+		_locUsers.css('height', (fHeight - 70) + 'px');
 		_main.css('margin-bottom', fHeight + 'px');
 		let _fightLog = document.querySelector('.fight-log');
 

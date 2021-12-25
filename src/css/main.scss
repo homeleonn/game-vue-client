@@ -359,7 +359,7 @@ footer {
 
 	#loc-users {
 		// height: var(--chat-height) - 70px;
-		position: relative;
+		// position: relative;
 		// z-index: -1;
 
 		overflow: auto;
@@ -413,6 +413,8 @@ footer {
 }
 
 #bottom-panel {
+	position: relative;
+	z-index: 2;
 	display: flex;
 	align-items: center;
 	background: linear-gradient(to bottom, var(--color2), var(--color));
