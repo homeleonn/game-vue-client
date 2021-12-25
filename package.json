@@ -7,7 +7,7 @@
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
     "build-prod": "NODE_ENV=production npm run build && npm run deploy",
-    "deploy": "cd dist && mv index.html /home/homeleon/www/game-core/resources/views/game.php; rsync --archive --delete css /home/homeleon/www/game-core/public/css/ && rsync --archive --delete js /home/homeleon/www/game-core/public/js/ && rsync --archive --delete img /home/homeleon/www/game-core/public/img/ && rsync --archive --delete fonts /home/homeleon/www/game-core/public/fonts/"
+    "deploy": "cd dist && mv index.html /home/homeleon/www/game-core/resources/views/game.php; rsync --archive --delete css /home/homeleon/www/game-core/public/ && rsync --archive --delete js /home/homeleon/www/game-core/public/ && rsync --archive --delete img /home/homeleon/www/game-core/public/ && rsync --archive --delete fonts /home/homeleon/www/game-core/public/"
   },
   "dependencies": {
     "core-js": "^3.6.5",
