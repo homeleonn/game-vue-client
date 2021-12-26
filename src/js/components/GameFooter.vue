@@ -47,14 +47,14 @@
 						/>
 					</div>
 				</form>
-				<div>
+				<!-- <div>
 					<img
 						src="img/chat/chat_clear.gif"
 						title="очистить чат"
 						id="chat-clear"
 					/>
-				</div>
-				<div><img src="img/chat/chat.ico" title="Смайлы" /></div>
+				</div> -->
+				<!-- <div><img src="img/chat/chat.ico" title="Смайлы" /></div> -->
 				<div v-if="user.access_level"><button @click="doAction">doAction</button></div>
 				<!-- <div><button @click="$emit('setCurComp', 'TheDebug')">Debug</button></div> -->
 				<form action="/logout" method="get" id="logout">
