@@ -105,8 +105,10 @@ export default {
 			this.api.doAction('admin_user', {
 				userId: 1,
 				props: {
-					curhp: 40,
-					last_restore: 'now()',
+					// level: 1,
+					// exp: 0,
+					// curhp: 40,
+					// last_restore: 'now()',
 				}
 			})
 		},
