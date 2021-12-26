@@ -1,6 +1,6 @@
 <template>
 	<div
-		class="user-form-wrapper col-md-5"
+		class="user-form-wrapper col-xl-5"
 		:class="{'fight': isFight}"
 	>
 		<div class="flex">
@@ -259,4 +259,8 @@ export default {
 		}
 	}
 }
+
+
+
+
 </style>

@@ -33,8 +33,8 @@
 							id="message"
 							type="text"
 							name="message"
-							size="80"
 							autocomplete="off"
+							placeholder="Type your message here ..."
 						/>
 					</div>
 					<div>

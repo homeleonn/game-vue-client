@@ -436,6 +436,7 @@ footer {
 		border: 3px transparent solid;
 		border-radius: 5px;
 		height: 23px;
+		width: 500px;
 	}
 
 	img {
@@ -541,8 +542,15 @@ footer {
 
 #location-wrapper,
 #location-wrapper > * {
-	border: 1px var(--color) solid;
+	// border: 1px var(--color) solid;
+	border: 0;
+	.location-select {
+		border: 1px var(--color) solid;
+
+	}
 }
+
+
 
 area:hover {
 	cursor: pointer;
@@ -898,3 +906,100 @@ area:hover {
 		}
 	}
 }
+
+
+@media (max-width: 1000px) {
+	body {
+		font-size: 13px;
+	}
+	.location {
+		transform: scale(.6);
+		top: -70px;
+		position: relative;
+
+		.name {
+			// position: relative;
+			top: 0;
+		}
+	}
+
+	.top-panel > div > img, .avatar {
+		width: 50px;
+		height: 50px;
+	}
+
+	.top-panel > div, .avatar {
+		border-width: 2px;
+	}
+
+	.top-panel {
+		width: auto;
+	}
+
+
+	#location-wrapper {
+		justify-content: right;
+		max-width: 95%;
+	}
+
+	.location-select {
+    margin-left: -130px;
+    // max-width: 100px;
+    min-width: 180px;
+  }
+
+  #bottom-panel #message {
+		width: 300px;
+  }
+
+  #chat #chat-loc {
+		width: 190px;
+  }
+
+  .fight-log-toggle {
+    right: 205px;
+  }
+
+  footer {
+    height: 100px;
+  }
+
+  .fight {
+  	transform: scale(.9);
+  	margin-left: 3%;
+
+
+  	.teams-wrapper {
+	  	order: -1;
+	  	width: 230px;
+	  	top: -60px;
+	  	position: relative;
+
+  	}
+
+	  .fight-panel {
+	  	order: -2;
+	  	// margin-left: 100px;
+	  	margin-left: -60px;
+	  	margin-top: -40px;
+	  }
+
+	  .fighters {
+	    padding: 40px;
+	  }
+
+  }
+
+
+  .fight-stats > .row {
+		> div:first-child, > div:last-child {
+			display: none;
+		}
+
+		.stats {
+			width: 90%;
+			margin: 10px auto;
+		}
+  }
+}
+

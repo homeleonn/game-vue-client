@@ -1,5 +1,5 @@
 <template>
-	<div class="backpack-wrapper col-md-7">
+	<div class="backpack-wrapper col-xl-7">
 		<div class="tabs">
 			<button
 				v-for="(tab, key) in $options.tabs"
