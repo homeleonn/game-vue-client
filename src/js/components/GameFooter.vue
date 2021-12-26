@@ -97,6 +97,7 @@ export default {
 
 	methods: {
 		send() {
+			if (!this.message.trim()) return;
 			this.$emit("sendMessage", this.message);
 			this.message = "";
 		},
