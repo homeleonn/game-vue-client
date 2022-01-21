@@ -130,6 +130,7 @@ export default {
 		let timerId;
 		let enemyTeam;
 		let clearEnemyTimer;
+		let fightDataReceived = false;
 
 		let hitter, defender;
 		apiSubscribe({
@@ -203,10 +204,6 @@ export default {
 			}, 1000);
 		}
 
-		function changeEnemyAnimation() {
-
-		}
-
 		// watch(user.swap, (newV, oldV) => {
 		// 	console.log(newV)
 		// });
@@ -227,9 +224,22 @@ export default {
 
 		onMounted(() => {
 			loadUserItems(api, store);
-			setTimeout(() => { api.doAction('getFight'); }, 0);
+			setTimeout(() => {
+				api.doAction('getFight', null, () => {
+					fightDataReceived = true;
+				});
+				setTimeout(() => {
+					checkReceivingFightData();
+				}, 1000);
+			}, 0);
 			runTimer();
 		});
+
+		function checkReceivingFightData() {
+			if (!fightDataReceived) {
+				api.doAction('getFight');
+			}
+		}
 
 		const image = computed(() => store.state.location.image);
 
