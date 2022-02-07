@@ -10,7 +10,7 @@
 							:points="coords"
 							@mouseenter="SET_ACTIVE_LOCATION(index)"
 							@mouseleave="SET_ACTIVE_LOCATION(false)"
-							@click="$emit('chloc', index)"
+							@click="if ([5].includes(+index)) this.talkToNpc(index); else $emit('chloc', index);"
 						/>
 					</template>
 				</svg>
@@ -80,7 +80,7 @@ export default {
 	components: { LocationLink },
 
 	emits: ["chloc"],
-	inject: ['apiSubscribe'],
+	inject: ['apiSubscribe', 'talkToNpc'],
 
 	data: () => ({
 		fullTransitionTime: 0
