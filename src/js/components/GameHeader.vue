@@ -14,21 +14,21 @@
 		<div class="top-panel flex" :class="{ disabled: user.fight }">
 			<div>
 				<img
-					src="img/other/pack.jpg"
+					src="/img/other/pack.jpg"
 					title="Рюкзак"
 					@click="$emit('setCurComp', 'UserBackpack')"
 				/>
 			</div>
 			<div>
 				<img
-					src="img/other/location.jpg"
+					src="/img/other/location.jpg"
 					title="Локация"
 					@click="$emit('setCurComp', 'LocationWrapper')"
 				/>
 			</div>
-			<div><img src="img/other/fight.jpg" title="Бои" @click="$emit('setCurComp', 'TheHunting')" /></div>
-			<div><img src="img/other/quest.jpg" title="Квесты" @click="$emit('setCurComp', 'QuestList')" /></div>
-			<!-- <div><img src="img/other/info.jpg" title="Анкета" /></div> -->
+			<div><img src="/img/other/fight.jpg" title="Бои" @click="$emit('setCurComp', 'TheHunting')" /></div>
+			<div><img src="/img/other/quest.jpg" title="Квесты" @click="$emit('setCurComp', 'QuestList')" /></div>
+			<!-- <div><img src="/img/other/info.jpg" title="Анкета" /></div> -->
 		</div>
 		<div id="dblog">
 			<div v-for="query in dbLog" :key="query">

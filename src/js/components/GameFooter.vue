@@ -40,7 +40,7 @@
 					<div>
 						<input
 							type="image"
-							src="img/chat/message_send.png"
+							src="/img/chat/message_send.png"
 							title="Отправить"
 							id="sendmessage"
 							@click="send"
@@ -49,12 +49,12 @@
 				</form>
 				<!-- <div>
 					<img
-						src="img/chat/chat_clear.gif"
+						src="/img/chat/chat_clear.gif"
 						title="очистить чат"
 						id="chat-clear"
 					/>
 				</div> -->
-				<!-- <div><img src="img/chat/chat.ico" title="Смайлы" /></div> -->
+				<!-- <div><img src="/img/chat/chat.ico" title="Смайлы" /></div> -->
 				<div v-if="user.access_level"><button @click="doAction">doAction</button></div>
 				<!-- <div><button @click="$emit('setCurComp', 'TheDebug')">Debug</button></div> -->
 				<form action="/logout" method="get" id="logout">

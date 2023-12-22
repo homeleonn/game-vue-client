@@ -16,7 +16,7 @@
 			</div>
 			<div>
 				<a :href="`${$store.state.host}/user/${user.id}/info`" target="_blank">
-					<img src="img/user/get_info.gif" class="get-info" title="Информация о персонаже">
+					<img src="/img/user/get_info.gif" class="get-info" title="Информация о персонаже">
 				</a>
 			</div>
 		</div>

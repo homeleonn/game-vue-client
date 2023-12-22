@@ -101,7 +101,7 @@
 	</div>
 </template>
 <script>
-import { setup, computed, watch, ref, toRef, onMounted, onCreated, inject, reactive } from 'vue'
+import { computed, watch, ref, toRef, onMounted, inject, reactive } from 'vue'
 import { useStore } from 'vuex'
 import UserForm from '../user/form/UserForm.vue'
 import UserShortInfo from '../user/form/UserShortInfo.vue'
