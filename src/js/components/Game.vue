@@ -16,17 +16,17 @@
 <script>
 import { defineAsyncComponent } from 'vue'
 import { mapMutations, mapGetters } from "vuex";
-import GameHeader from "./GameHeader";
-import GameFooter from "./GameFooter";
-import LocationWrapper from "./LocationWrapper";
-import UserBackpack from "./user/backpack/UserBackpack";
-import UserSupplies from "./user/UserSupplies";
-import TheDebug from "./debug/TheDebug";
-import GameFight2 from "./fight/GameFight2";
-import FightStats from "./fight/FightStats";
-import MainModal from "./modal/MainModal";
-import NpcView from "./npc/NpcView";
-import QuestList from "./user/quest/QuestList";
+import GameHeader from "./GameHeader.vue";
+import GameFooter from "./GameFooter.vue";
+import LocationWrapper from "./LocationWrapper.vue";
+import UserBackpack from "./user/backpack/UserBackpack.vue";
+import UserSupplies from "./user/UserSupplies.vue";
+import TheDebug from "./debug/TheDebug.vue";
+import GameFight2 from "./fight/GameFight2.vue";
+import FightStats from "./fight/FightStats.vue";
+import MainModal from "./modal/MainModal.vue";
+import NpcView from "./npc/NpcView.vue";
+import QuestList from "./user/quest/QuestList.vue";
 import Api from "../api/api.js";
 import { tokenUrl } from '@/../.env.js';
 

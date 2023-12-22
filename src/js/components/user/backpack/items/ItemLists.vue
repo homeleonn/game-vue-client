@@ -44,7 +44,7 @@
 </template>
 
 <script>
-import ItemList from './ItemList'
+import ItemList from './ItemList.vue'
 
 export default {
 	props: {

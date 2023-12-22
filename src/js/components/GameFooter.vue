@@ -68,7 +68,7 @@
 
 <script>
 import { mapGetters } from "vuex";
-import UserList from "./location/UserList";
+import UserList from "./location/UserList.vue";
 let
 	_footer,
 	_locUsers,

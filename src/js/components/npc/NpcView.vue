@@ -49,7 +49,7 @@
 </template>
 
 <script>
-import PackItem from '../user/backpack/items/PackItem'
+import PackItem from '../user/backpack/items/PackItem.vue'
 
 export default {
 	components: { PackItem },

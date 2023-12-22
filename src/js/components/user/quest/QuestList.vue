@@ -15,8 +15,8 @@
 </template>
 
 <script>
-import SimpleTabs from "@/js/components/tools/tabs/SimpleTabs";
-import QuestItem from './QuestItem';
+import SimpleTabs from "@/js/components/tools/tabs/SimpleTabs.vue";
+import QuestItem from './QuestItem.vue';
 
 export default {
 	components: { SimpleTabs, QuestItem },

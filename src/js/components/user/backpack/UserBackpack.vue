@@ -17,9 +17,9 @@
 </template>
 
 <script>
-import ItemLists from './items/ItemLists'
-import UserForm from '../form/UserForm'
-import ItemInfo from '../../modal/ItemInfo'
+import ItemLists from './items/ItemLists.vue'
+import UserForm from '../form/UserForm.vue'
+import ItemInfo from '../../modal/ItemInfo.vue'
 import { isAllow } from '@/js/common'
 import { mapGetters, mapMutations } from 'vuex'
 

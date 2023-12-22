@@ -98,9 +98,9 @@
 </template>
 <script>
 import { mapGetters } from 'vuex'
-import UserForm from '../user/form/UserForm'
-import UserShortInfo from '../user/form/UserShortInfo'
-import FighterModel from './FighterModel'
+import UserForm from '../user/form/UserForm.vue'
+import UserShortInfo from '../user/form/UserShortInfo.vue'
+import FighterModel from './FighterModel.vue'
 // import FighterModel1 from './FighterModel'
 // import { fight } from '../../use/fight/fight'
 

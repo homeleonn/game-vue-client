@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import PackItem from './PackItem'
+import PackItem from './PackItem.vue'
 
 export default {
 	components: { PackItem },

@@ -103,9 +103,9 @@
 <script>
 import { setup, computed, watch, ref, toRef, onMounted, onCreated, inject, reactive } from 'vue'
 import { useStore } from 'vuex'
-import UserForm from '../user/form/UserForm'
-import UserShortInfo from '../user/form/UserShortInfo'
-import FighterModel from './FighterModel'
+import UserForm from '../user/form/UserForm.vue'
+import UserShortInfo from '../user/form/UserShortInfo.vue'
+import FighterModel from './FighterModel.vue'
 import Fight from './use/Fight'
 import { filterByLoc, loadUserItems } from '@/js/common'
 

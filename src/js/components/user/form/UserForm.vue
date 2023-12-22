@@ -40,9 +40,9 @@
 	</div>
 </template>
 <script>
-import PackItem from '../backpack/items/PackItem';
-import UserInfo from './UserInfo';
-import UserShortInfo from './UserShortInfo'
+import PackItem from '../backpack/items/PackItem.vue';
+import UserInfo from './UserInfo.vue';
+import UserShortInfo from './UserShortInfo.vue'
 import { mapGetters } from 'vuex'
 import { userInfo } from '@/js/lang/ru';
 

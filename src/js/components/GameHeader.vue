@@ -41,7 +41,7 @@
 
 <script>
 import { mapGetters, mapMutations, mapState } from "vuex";
-import UserShortInfo from './user/form/UserShortInfo'
+import UserShortInfo from './user/form/UserShortInfo.vue'
 import { tokenUrl } from '@/../.env.js';
 
 let timer

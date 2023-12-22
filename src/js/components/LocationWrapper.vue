@@ -73,7 +73,7 @@
 
 <script>
 import { mapGetters, mapMutations } from "vuex";
-import LocationLink from "./location/LocationLink";
+import LocationLink from "./location/LocationLink.vue";
 
 export default {
 	name: "location-wrapper",
