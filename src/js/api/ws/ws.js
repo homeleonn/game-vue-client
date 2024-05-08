@@ -41,6 +41,7 @@ export class WS {
 	constructor() {
 		this.eventHandlers = {};
 		this.wsEventHandlers = {};
+    this.connected = false;
 		this.wsBind();
 
 
@@ -53,6 +54,7 @@ export class WS {
 			'takeoffItem',
 			'getLocMonsters',
 			'attackMonster',
+			'attackUser',
 			'getEnemy',
 			'getFight',
 			'hit',
@@ -76,6 +78,7 @@ export class WS {
 				callback.cb.call(callback.ctx)
 			);
 		}
+    this.connected = true;
 	}
 
 	message(response) {
@@ -104,13 +107,24 @@ export class WS {
 		});
 	}
 
+  close() {
+    if (this.connected) {
+      this.eventHandlers = {};
+      this.wsEventHandlers = {};
+      this.connected = false;
+      setTimeout(() => {
+        document.location.reload();
+      }, 1000);
+    }
+  }
+
 	wsBind() {
 		const WS = window.WebSocket;
 		const app = this;
 
 		window.WebSocket = function(a, b) {
 			const that = b ? new WS(a, b) : new WS(a);
-			["message", "open"].forEach(event =>
+			["message", "open", "close"].forEach(event =>
 				that.addEventListener(event, app[event].bind(app))
 			);
 			// ['open', 'message', 'error', 'close'].forEach(event => that.addEventListener(event, app[event].bind(app)));

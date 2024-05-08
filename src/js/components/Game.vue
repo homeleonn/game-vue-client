@@ -129,6 +129,10 @@ export default {
 			this.SET_CLOSEST_LOCATIONS(loc.closestLocs);
 		},
 
+    fight() {
+      this.currentMainComponent = 'GameFight2';
+    },
+
 		addLocUser(user) {
 			this.ADD_LOCATION_USER(user);
 		},
@@ -206,7 +210,7 @@ export default {
 
 	created() {
 		this.apiSubscribe(
-			["me", "loc", "addLocUser", "leaveLocUser", "message"],
+			["me", "loc", "addLocUser", "leaveLocUser", "message", 'fight'],
 			this
 		);
 

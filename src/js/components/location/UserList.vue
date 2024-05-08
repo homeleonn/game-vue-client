@@ -18,6 +18,7 @@
 				<a :href="`${$store.state.host}/user/${user.id}/info`" target="_blank">
 					<img src="/img/user/get_info.gif" class="get-info" title="Информация о персонаже">
 				</a>
+        <button v-if="+$store.state.user.id !== +user.id" @click="attack(user.id)">-></button>
 			</div>
 		</div>
 	</div>
@@ -29,8 +30,12 @@ export default {
 		users: Array
 	},
 
-	mounted() {
-		// console.log(this.users);
-	}
+  inject: ['api'],
+
+  methods: {
+    attack(userId) {
+      this.api.doAction('attackUser', userId);
+    }
+  }
 }
 </script>
