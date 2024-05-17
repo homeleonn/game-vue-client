@@ -21,7 +21,8 @@ export class Server {
 
 	async connectViaToken() {
 		// console.log(1);
-		const res = await fetch(tokenUrl + '?id=' + (new URL(document.URL).searchParams.get('id') ?? 1));
+		// const res = await fetch(tokenUrl + '?jwt='+sessionStorage.getItem('jwt')+'&id=' + (new URL(document.URL).searchParams.get('id') ?? 1));
+		const res = await fetch(tokenUrl + '?jwt='+sessionStorage.getItem('jwt'));
 		const token = await res.text();
 		if (res === "error") {
 			throw new Error("Session error");

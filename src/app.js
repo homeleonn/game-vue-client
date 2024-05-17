@@ -1,7 +1,6 @@
 import { createApp } from 'vue'
 import store from './js/store/store'
-import Game from './js/components/Game.vue'
-import "./css/main.scss";
+import Game from './js/components/TheIndex.vue'
 
 const game = createApp(Game);
 
