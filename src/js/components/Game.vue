@@ -14,6 +14,7 @@
 </template>
 
 <script>
+// import '@/js/common.js'
 import { defineAsyncComponent } from 'vue'
 import { mapMutations, mapGetters } from "vuex";
 import GameHeader from "./GameHeader.vue";
@@ -246,6 +247,7 @@ export default {
 </script>
 
 <style lang="scss">
+@import "@/css/main.scss";
 .main {
 	position: relative;
 	padding-left: 70px;

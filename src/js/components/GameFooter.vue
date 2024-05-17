@@ -57,9 +57,9 @@
 				<!-- <div><img src="/img/chat/chat.ico" title="Смайлы" /></div> -->
 				<div v-if="user.access_level"><button @click="doAction">doAction</button></div>
 				<!-- <div><button @click="$emit('setCurComp', 'TheDebug')">Debug</button></div> -->
-				<form action="/logout" method="get" id="logout">
+				<form action="#" method="get" id="logout" @submit.prevent>
 					<input type="hidden" name="_token" :value="csrf" />
-					<button name="logout">Выход</button>
+					<button name="logout" @click="logout">Выход</button>
 				</form>
 			</div>
 		</div>
@@ -69,6 +69,7 @@
 <script>
 import { mapGetters } from "vuex";
 import UserList from "./location/UserList.vue";
+import {logout} from "@/js/api/http/http.js";
 let
 	_footer,
 	_locUsers,
@@ -112,6 +113,10 @@ export default {
 				}
 			})
 		},
+
+    logout() {
+      logout();
+    },
 
 		resize(isUp) {
 			const stepSize = 50;
