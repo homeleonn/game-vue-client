@@ -3,9 +3,9 @@
     <form id="login" @submit.prevent>
       <h2>Вход</h2>
       <div id="g-recaptcha1" style="display:inline-block; margin: 0 auto;"></div>
-      <br><br>id: <input type="text" name="id" id="id" v-model="id" v-if="!env"><br><br>
+      <br><br>id: <input type="text" name="id" id="id" v-model="id" v-if="!isProd"><br><br>
       <a class="btn center entry-button" href="#" @click="login">Войти</a>
-      <div class="inactive" v-if="!env">
+      <div class="inactive" v-if="!isProd">
         <div>Email</div>
         <div><input type="text" name="email"></div>
         <div>Пароль</div>
@@ -91,7 +91,7 @@ import '//ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js';
 import "@/js/login/js/index.js";
 import "@/js/login/js/shower.js";
 import { login } from "@/js/api/http/http.js";
-import { recaptchaSiteKey, env } from "@/../.env.js";
+import { recaptchaSiteKey, isProd } from "@/../.env.js";
 
 export default {
   name: 'TheLogin',
