@@ -3,24 +3,27 @@
     <form id="login" @submit.prevent>
       <h2>Вход</h2>
       <div id="g-recaptcha1" style="display:inline-block; margin: 0 auto;"></div>
-      <br><br>id: <input type="text" name="id" id="id" v-model="id" v-if="!isProd"><br><br>
-      <a class="btn center entry-button" href="#" @click="login">Войти</a>
-      <div class="inactive" v-if="!isProd">
-        <div>Email</div>
-        <div><input type="text" name="email"></div>
-        <div>Пароль</div>
-        <div><input type="password" name="password"></div>
-        <div><button>Войти</button></div>
-        <div class="row">
-          <div class="col-md-6">
-            <label for="remember_me">Запомнить меня</label>
-            <input type="checkbox" id="remember_me" name="remember_me">
+        
+      <div v-if="!isProd">
+        <br><br>id: <input type="text" name="id" id="id" v-model="id"><br><br>
+        <a class="btn center entry-button" href="#" @click="login">Войти</a>
+        <div class="inactive" v-if="!isProd">
+          <div>Email</div>
+          <div><input type="text" name="email"></div>
+          <div>Пароль</div>
+          <div><input type="password" name="password"></div>
+          <div><button>Войти</button></div>
+          <div class="row">
+            <div class="col-md-6">
+              <label for="remember_me">Запомнить меня</label>
+              <input type="checkbox" id="remember_me" name="remember_me">
+            </div>
+            <div class="col-md-6">
+              <a href="#">Забыли пароль?</a>
+            </div>
           </div>
-          <div class="col-md-6">
-            <a href="#">Забыли пароль?</a>
-          </div>
+          <div><a href="#" class="btn">Регистрация</a></div>
         </div>
-        <div><a href="#" class="btn">Регистрация</a></div>
       </div>
     </form>
     <div class="progressbar-circle2-wrapper">
@@ -101,7 +104,8 @@ export default {
 
   data: () => ({
     captcha: null,
-    id: 1
+    id: 1,
+    isProd
   }),
 
   mounted() {
