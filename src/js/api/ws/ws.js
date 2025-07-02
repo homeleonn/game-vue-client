@@ -42,7 +42,7 @@ export class WS {
 	constructor() {
 		this.eventHandlers = {};
 		this.wsEventHandlers = {};
-    this.connected = false;
+    	this.connected = false;
 		this.wsBind();
 
 
@@ -93,7 +93,7 @@ export class WS {
 
 				return;
 		}
-
+		if (response.data === 'ping') return;
 		const wsResponce = JSON.parse(response.data);
 		const event = Object.keys(wsResponce)[0];
 
@@ -115,7 +115,9 @@ export class WS {
       this.connected = false;
       setTimeout(() => {
         document.location.reload();
-      }, 1000);
+        // console.log('connecting ...')
+        // this.init();
+      }, 1500);
     }
   }
 

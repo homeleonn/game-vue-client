@@ -91,6 +91,7 @@ import '//ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js';
 import "@/js/login/js/index.js";
 import "@/js/login/js/shower.js";
 import { login } from "@/js/api/http/http.js";
+import { recaptchaSiteKey } from "@/../.env.js";
 
 export default {
   name: 'TheLogin',
@@ -114,7 +115,7 @@ export default {
     })
     setTimeout(() => {
       grecaptcha.render(document.getElementById('g-recaptcha1'), {
-        'sitekey' : '6LfbKEUpAAAAAGaAdYGmhmBxpWcq735wj-aKy7fq',
+        'sitekey' : recaptchaSiteKey,
         'callback' : (response) => {
           this.captcha = response;
         },

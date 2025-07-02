@@ -111,6 +111,7 @@ import { filterByLoc, loadUserItems } from '@/js/common'
 
 export default {
 	components: { UserShortInfo, UserForm, FighterModel },
+	emits: ['setCurComp'],
 
 	setup(props, { emit }) {
 		const store = useStore();

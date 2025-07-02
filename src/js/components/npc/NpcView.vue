@@ -130,6 +130,10 @@ export default {
 			.npc-info-img {
 				margin: 10px 0;
 			}
+
+      img {
+        max-width: 100%;
+      }
 		}
 
 		.quest-text {
