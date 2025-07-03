@@ -3,7 +3,7 @@
     <form id="login" @submit.prevent>
       <h2>Вход</h2>
       <div id="g-recaptcha1" style="display:inline-block; margin: 0 auto;"></div>
-      <br><br><a class="btn center entry-button" href="#" @click="login" v-show="recaptchaLoaded">Войти</a>
+      <br><br><a class="btn center entry-button" href="#" @click.prevent="login" v-show="recaptchaLoaded">Войти</a>
         
       <div v-if="!isProd">
         <br><br>id: <input type="text" name="id" id="id" v-model="id"><br><br>
