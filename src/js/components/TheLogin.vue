@@ -50,37 +50,37 @@
     <small class="center block white">(На случай, если вдруг сервер "лежит" =)</small>
     <div class="row flex">
       <div class="col-md-4">
-        <a class="shower" href="/src/img/fightworld-screens/1.png">
+        <a class="shower" href="@/img/fightworld-screens/1.png">
           <img src="@/img/fightworld-screens/resize/1.png">
         </a>
       </div>
       <div class="col-md-4">
-        <a class="shower" href="/src/img/fightworld-screens/2.png">
+        <a class="shower" href="@/img/fightworld-screens/2.png">
           <img src="@/img/fightworld-screens/resize/2.png">
         </a>
       </div>
       <div class="col-md-4">
-        <a class="shower" href="/src/img/fightworld-screens/3.png">
+        <a class="shower" href="@/img/fightworld-screens/3.png">
           <img src="@/img/fightworld-screens/resize/3.png">
         </a>
       </div>
       <div class="col-md-4">
-        <a class="shower" href="/src/img/fightworld-screens/4.png">
+        <a class="shower" href="@/img/fightworld-screens/4.png">
           <img src="@/img/fightworld-screens/resize/4.png">
         </a>
       </div>
       <div class="col-md-4">
-        <a class="shower" href="/src/img/fightworld-screens/5.png">
+        <a class="shower" href="@/img/fightworld-screens/5.png">
           <img src="@/img/fightworld-screens/resize/5.png">
         </a>
       </div>
       <div class="col-md-4">
-        <a class="shower" href="/src/img/fightworld-screens/6.png">
+        <a class="shower" href="@/img/fightworld-screens/6.png">
           <img src="@/img/fightworld-screens/resize/6.png">
         </a>
       </div>
       <div class="col-md-4">
-        <a class="shower" href="/src/img/fightworld-screens/7.png">
+        <a class="shower" href="@/img/fightworld-screens/7.png">
           <img src="@/img/fightworld-screens/resize/7.png">
         </a>
       </div>
