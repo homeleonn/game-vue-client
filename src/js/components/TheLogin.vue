@@ -80,7 +80,7 @@
         </a>
       </div>
       <div class="col-md-4">
-        <a class="shower" href="@/img/fightworld-screens/7.png">
+        <a class="shower" href="/img/fightworld-screens/7.png">
           <img src="@/img/fightworld-screens/resize/7.png">
         </a>
       </div>

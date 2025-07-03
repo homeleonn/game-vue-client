@@ -131,7 +131,5 @@ function Shower(cl)
 
 
 $(() => {
-	setTimeout(() => {
-		Shower('.shower');
-	}, 1000)
+	Shower('.shower');
 })
