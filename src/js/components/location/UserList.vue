@@ -18,7 +18,7 @@
 				<a :href="`${$store.state.host}/user/${user.id}/info`" target="_blank">
 					<img src="/img/user/get_info.gif" class="get-info" title="Информация о персонаже">
 				</a>
-        <button v-if="+$store.state.user.id !== +user.id" @click="attack(user.id)">-></button>
+                <span v-if="+$store.state.user.id !== +user.id" @click="attack(user.id, user.login)" class="user__attack" :title="`Напасть на ${user.login}`">⚔️</span>
 			</div>
 		</div>
 	</div>
@@ -33,7 +33,10 @@ export default {
   inject: ['api'],
 
   methods: {
-    attack(userId) {
+    attack(userId, login) {
+        if (!confirm(`Подтвердите нападение на ${login}`)) {
+            return;
+        }
       this.api.doAction('attackUser', userId);
     }
   }
