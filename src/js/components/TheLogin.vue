@@ -1,10 +1,11 @@
 <template>
   <main class="content">
-    <form id="login" @submit.prevent>
+    <form id="login" class="center" @submit.prevent>
       <h2>Вход</h2>
+      <div class="loader1" v-show="recaptchaLoadedSpinner"></div>
       <div id="g-recaptcha1" style="display:inline-block; margin: 0 auto;"></div>
-      <br><br><a class="btn center entry-button" href="#" @click.prevent="login" v-show="recaptchaLoaded">Войти</a>
-        
+      <br><br><a class="btn center entry-button characterEntry" href="#" @click.prevent="login" v-show="recaptchaLoaded">Войти</a>
+
       <div v-if="!isProd">
         <br><br>id: <input type="text" name="id" id="id" v-model="id"><br><br>
         <div class="inactive" v-if="!isProd">
@@ -96,6 +97,9 @@ import "@/js/login/js/shower.js";
 import { login } from "@/js/api/http/http.js";
 import { recaptchaSiteKey, isProd } from "@/../.env.js";
 
+
+
+
 export default {
   name: 'TheLogin',
   emits: [
@@ -106,19 +110,25 @@ export default {
     captcha: null,
     id: 1,
     isProd,
-    recaptchaLoaded: false
+    recaptchaLoaded: false,
+    recaptchaLoadedSpinner: false,
   }),
 
   mounted() {
-    const urls = [
-      'https://www.google.com/recaptcha/api.js',
-    ];
-    urls.forEach(url => {
-      let script = document.createElement('script')
-      script.setAttribute('src', url);
-      document.getElementsByTagName("body")[0].appendChild(script);
-    })
-    setTimeout(() => {
+      setTimeout(() => {
+        this.recaptchaLoadedSpinner = true;
+      }, 100);
+
+      window.onRecaptchaLoadCallback = this.onRecaptchaLoaded;
+      const script = document.createElement('script');
+      script.src = 'https://www.google.com/recaptcha/api.js?onload=onRecaptchaLoadCallback&render=explicit';
+      script.async = true;
+      script.defer = true;
+      document.body.appendChild(script);
+  },
+
+  methods: {
+    onRecaptchaLoaded() {
       grecaptcha.render(document.getElementById('g-recaptcha1'), {
         'sitekey' : recaptchaSiteKey,
         'callback' : (response) => {
@@ -127,10 +137,9 @@ export default {
         'theme' : 'dark'
       });
       this.recaptchaLoaded = true;
-    }, 2000)
-  },
+      this.recaptchaLoadedSpinner = false;
+    },
 
-  methods: {
     async login() {
       let response = await login(this.captcha, this.id);
 
@@ -158,5 +167,29 @@ export default {
 <style>
 #game {
   height: 80%;
+}
+
+.loader1 {
+  width: 50px;
+  height: 50px;
+  display: inline-block;
+  transform-origin: center center;
+  animation: spin 3s linear infinite;
+  border: 5px #ddd dashed;
+  margin: 0 auto;
+  border-radius: 30px;
+}
+
+.loader1.active {
+  animation: spin 3s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.none {
+  display: none !important;
 }
 </style>
